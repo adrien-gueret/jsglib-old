@@ -1,0 +1,2 @@
+# jsglib
+JavaScript Gaming Library
