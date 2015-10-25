@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Super Mario Bros : Level 1-1</title>
+</head>
+<body>
+<p style="
+				border: 2px solid;
+				margin: auto;
+				cursor: none;
+				transition: transform 500ms;
+				-moz-transition: -moz-transform 500ms;
+				-webkit-transition: -webkit-transform 500ms;
+				-o-transition: -o-transform 500ms;
+				-ms-transition: -ms-transform 500ms;" id="game"></p>
+<p class="center" id="controls" style="
+				display: none;
+				transition: margin-top 500ms;
+				-moz-transition: margin-top 500ms;
+				-webkit-transition: margin-top 500ms;
+				-o-transition: margin-top 500ms;
+				-ms-transition: margin-top 500ms;"></p>
+<script src="./JSGlib-3.0.js"></script>
+<script src="./JSGlib.GravityElement.class.js"></script>
+<script src="./JSGlib.Platformer.class.js"></script>
+<script src="./createGame.js"></script>
+<script src="./Mario.class.js"></script>
+<script src="./Ennemy.class.js"></script>
+<script src="./Goomba.class.js"></script>
+<script src="./Koopa.class.js"></script>
+<script src="./Brick.class.js"></script>
+<script src="./Flag.class.js"></script>
+<script src="./Objects.class.js"></script>
+<script>
+   //Launch game
+	myGame.load({
+		images: {
+			background: './images/backgroundLastPlan.png',
+			middleground: './images/background.png',
+			tiles: './images/tiles.png',
+			small_mario: './images/mini_mario.png',
+			small_mario_mask: './images/mini_mario_mask.png',
+			mario: './images/mario.png',
+			mario_fire: './images/mariofire.png',
+			mario_mask: './images/mario_mask.png',
+			objects: './images/objects.png',
+			small_objects: './images/small_objects.png',
+			goomba: './images/goomba.png',
+			koopa: './images/koopa.png',
+			koopa_mask: './images/koopa_mask.png'
+		},
+		rooms: [
+			'./level.json'
+		],
+		tiles: [
+			'./tiles_definitions.json'
+		],
+		sounds: {
+			main: [
+				'./sounds/main.ogg',
+				'./sounds/main.mp3'
+			],
+			jump: [
+				'./sounds/jump.ogg',
+				'./sounds/jump.mp3'
+			],
+			bump: [
+				'./sounds/bump.ogg',
+				'./sounds/bump.mp3'
+			],
+			brick: [
+				'./sounds/brick.ogg',
+				'./sounds/brick.mp3'
+			],
+			item: [
+				'./sounds/item.ogg',
+				'./sounds/item.mp3'
+			],
+			powerup: [
+				'./sounds/powerup.ogg',
+				'./sounds/powerup.mp3'
+			],
+			powerdown: [
+				'./sounds/powerdown.ogg',
+				'./sounds/powerdown.mp3'
+			],
+			coin: [
+				'./sounds/coin.ogg',
+				'./sounds/coin.mp3'
+			],
+			die: [
+				'./sounds/die.ogg',
+				'./sounds/die.mp3'
+			],
+			sprotch: [
+				'./sounds/sprotch.ogg',
+				'./sounds/sprotch.mp3'
+			],
+			stomp: [
+				'./sounds/stomp.ogg',
+				'./sounds/stomp.mp3'
+			],
+			fireball: [
+				'./sounds/fireball.ogg',
+				'./sounds/fireball.mp3'
+			],
+			fireball_end: [
+				'./sounds/fireball_end.ogg',
+				'./sounds/fireball_end.mp3'
+			],
+			flag: [
+				'./sounds/flag.ogg',
+				'./sounds/flag.mp3'
+			],
+			levelEnd: [
+				'./sounds/level_end.ogg',
+				'./sounds/level_end.mp3'
+			]
+		}
+	}, true, function () {
+		var game = this;
+						
+		this.getRoom('Level 1-1').eventStart = function () {
+			var mario = game.getInstancesByType('Mario')[0];
+			
+			game
+				.playSound('main', true)
+				.putElementToFirstPlan(mario)
+				.getCurrentRoom()
+					.viewLinkedElement(mario);
+		};
+		
+		JSGlib.addStateConstant('attack');
+		
+		this.run();
+		
+		document.getElementById('controls').style.display = 'block';
+	});
+	
+	//Remove reference to the game by security.
+	myGame = null;
+</script>
+<h2>Controls</h2>
+<p>Press the <strong>arrows keys</strong> in order to make Mario move or jump. Keep the <strong>space bar</strong> pressed if you want to run. <strong>Bar space</strong> also permits you to throw fireballs if you got a Fire Flower.</p>
+<p>You can also use the <strong>Q</strong> key to jump and the <strong>W</strong> key to run/throw fireballs.</p>
+</body>
+</html>

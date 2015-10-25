@@ -1,0 +1,20 @@
+{
+    "Plain": {
+        "image": "tiles",
+        "separation": 1,
+        "types": {
+            "WALL": [1, 2, 6, 7, 11, 12, 16, 17],
+			"DOOR": [48]
+        },
+		"animations": [{
+			"tiles": [3, 8, 13],
+			"speed": 0.05
+		}, {
+			"tiles": [4, 9, 14],
+			"speed": 0.05
+		}, {
+			"tiles": [5, 10, 15],
+			"speed": 0.05
+		}]
+    }
+}
