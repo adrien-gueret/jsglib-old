@@ -1,10 +1,10 @@
 /*!
- * JSGlib v3.0, JavaScript Library
+ * JSGlib v3.0.1, JavaScript Library
  *
- * Copyright 2011-2013, Adrien Guéret
+ * 2011-2015, Adrien Guéret
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * 
- * Date: 07/07/2013
+ * Date: 25/10/2015
  */
 
 (function (window, document, undefined) {
@@ -307,7 +307,7 @@
             /// {<br />
             ///  'url': URL to call. (required),<br />
             ///  'async': Boolean indicating if request must be asynchronous (true) or synchronous (false). Default: true,<br />
-            ///  'type': 'GET' or 'POST'. Default: 'POST',<br />
+            ///  'type': 'GET' or 'POST'. Default: 'GET',<br />
             ///  'dataType': Type of data to receive from server: 'TEXT', 'XML' or 'JSON'. Default: 'TEXT',<br />
             ///  'data': Object containing values to send to the server. Default: {},<br />
             ///  'onAjaxAborted': function () { Function called if request is aborted },<br />
@@ -320,7 +320,7 @@
                 defaults = {
                     url: './',
                     async: true,
-                    type: 'POST',
+                    type: 'GET',
                     dataType: 'TEXT',
                     data: {},
                     onAjaxAborted: function () {},
