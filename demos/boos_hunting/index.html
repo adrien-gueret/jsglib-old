@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<title>Boos Hunting</title>
+		<meta charset="utf-8" />
+		<style>
+			html, body {
+				position: relative;
+				height: 100%;
+				overflow: hidden;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			
+			body {
+				background-color: #000;
+				background-image: url('./images/background.png');
+				background-repeat: repeat-x;
+				background-position: -50px bottom;
+			}
+			
+			body.flash {
+				background-color: #fff;
+			}
+			
+			#sounds {
+				width: 29px;
+				height: 28px;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				background-color: transparent;
+				cursor: pointer;
+				background-image: url('./images/sound_button.png');
+				background-position: left;
+				float: right;
+			}
+			
+			#sounds.mute {
+				background-position: right;
+			}
+			
+			p {
+				margin: auto;
+				color: #f3f3f3;
+			}
+			
+			.flash p {
+				color: #333;
+			}
+			
+			#controls {
+				margin-top: 5px;
+				padding: 0;
+				height: 60px;
+				line-height: 60px;
+				text-align: center;
+				font-weight: bold;
+			}
+			
+			#target {
+				display: block;
+				display: inline-block;
+				width: 52px;
+				height: 52px;
+				vertical-align: middle;
+				margin-left: 10px;
+				background-image: url('./images/boos.png');
+			}
+			
+			#results {
+				display: block;
+				position: relative;
+				z-index: 999;
+				width: 50%;
+				margin: auto;
+				color: #333;
+				background-color: #fff;
+				background-color: rgba(255, 255, 255, 0.7);
+				margin-top: 100px;
+				font-size: 30px;
+				text-align: center;
+				padding: 20px;
+				font-weight: bold;
+				border-radius: 30px;
+				opacity: 0;
+				transition: opacity 500ms;
+				-moz-transition: opacity 500ms;
+				-webkit-transition: opacity 500ms;
+				-o-transition: opacity 500ms;
+				-ms-transition: opacity 500ms;
+			}
+			
+			#results a, #results a:visited {
+				color: #22789a;
+				text-decoration: none;
+				cursor: pointer;
+			}
+			
+			#results a:hover {
+				text-decoration: underline;
+			}
+		</style>
+	</head>
+	<body>
+        
+		<p id="game"></p>
+		<p id="controls">
+			<span id="label_target">Prochaine cible :</span> <span id="target"></span>
+			<button class="mute" id="sounds"></button>
+			<span id="timer">00::000</span>
+		</p>
+        
+		<script src="./JSGlib-min.js"></script>
+        <script src="./createGame.js"></script>
+        <script src="./Controlor.class.js"></script>
+        <script src="./DeathBoos.class.js"></script>
+        <script src="./Boos.class.js"></script>
+        <script src="./Ectofeux.class.js"></script>
+        <script src="./Luigi.class.js"></script>
+        <script>          
+		   //Launch game
+            myGame.load({
+                images: {
+                    boos			:	'./images/boos.png',
+                    walls			:	'./images/walls.png',
+                    luigi			:	'./images/luigi.png',
+                    ectofeux	:	'./images/ectofeux.png',
+                    death_boo	:	'./images/death_boo.png'
+                },
+				sounds: {
+					thunder: ['./sounds/lightning.ogg', './sounds/lightning.mp3'],
+					background: ['./sounds/ambiance.ogg', './sounds/ambiance.mp3'],
+					background_dark: ['./sounds/ambiance_dark.ogg', './sounds/ambiance_dark.mp3'],
+					boo_ok: ['./sounds/boo_ok.ogg', './sounds/boo_ok.mp3'],
+					boo_wrong: ['./sounds/boo_wrong.ogg', './sounds/boo_wrong.mp3'],
+					go_dark: ['./sounds/go_dark.ogg', './sounds/go_dark.mp3'],
+					start_end: ['./sounds/start_end.ogg', './sounds/start_end.mp3'],
+					end: ['./sounds/end.ogg', './sounds/end.mp3']
+				}
+            }, true, function () {
+				var	game	=	this;
+				
+				this.muteSounds(true);
+				
+				document.getElementById('sounds').onclick	=	function () {
+					game.toggleMuteSounds();
+					
+					if (game.muteSounds()) {
+						this.className	=	'mute';
+					} else {
+						this.className	=	'';
+					}
+				};
+				
+				this.playSound('background', true).run();
+            });
+			
+			//Remove global reference to the game by security
+			myGame	=	null;
+        </script>
+	</body>
+</html>
