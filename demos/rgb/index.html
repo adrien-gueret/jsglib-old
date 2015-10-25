@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>RGB : Really Great Ball</title>
+		<link rel="stylesheet" media="all" href="style.css" />
+	</head>
+	<body>
+		<h1 id="level" class="change">Chargement du jeu...</h1>
+		<p id="borders" style="width: 600px; height: 75px;" class="change">
+			<canvas id="jeu">
+				<b>Oh, votre navigateur n'est pas capable d'afficher le jeu...<br />
+				Avez-vous déjà essayé <a href="http://www.mozilla.com/fr/firefox/">Mozilla
+				Firefox</a>, <a href="http://www.opera.com/">Opera</a> ou encore
+				<a href="http://www.google.com/chrome/">Google Chrome</a> ?</b>
+			</canvas>
+		</p>
+
+		<ul id="credits" class="change">
+			<li>== Crédits ==</li>
+			<li><a href="http://www.danosongs.com/" title="(Three Drops) http://www.danosongs.com/">Musique de fond : <em>DanoSongs.com</em></a></li>
+			<li><a href="http://www.allmusiclibrary.com" title="http://www.allmusiclibrary.com">Bruitages : <em>AllMusicLibrary.com</em></a></li>
+			<li><a href="http://adriengueret.no-ip.org" title="http://adriengueret.no-ip.org">Graphismes et développement : <em>Adrien Guéret</em></a></li>
+		</ul>
+
+		<div class="footerObject ball"></div>
+		<div class="footerObject paint"></div>
+		<div class="footerObject pan"></div>
+        <script src="./scripts/JSGlib.js"></script>
+		<script src="./scripts/RGB.game.js"></script>
+	</body>
+</html>

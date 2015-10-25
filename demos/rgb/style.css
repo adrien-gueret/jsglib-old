@@ -1,0 +1,174 @@
+html, body
+{
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	background-attachment: fixed;
+	background-image: url('./images/background.png'), url('./images/backgroundLastPlan.png');
+	overflow: hidden;
+}
+
+body
+{
+	text-align: center;
+	background-image: url('./images/footer.png');
+	background-repeat: repeat-x;
+	background-position: left bottom;
+}
+
+.footerObject
+{
+	width: 32px;
+	height: 32px;
+	background-image: url('./images/footerObjects.png');
+	background-repeat: no-repeat;
+	position: absolute;
+	z-index: 50;
+}
+
+.footerObject.ball{bottom: 32px; left: 337px; background-position: left;}
+.footerObject.paint{bottom: 128px; left: 704px; background-position: center;}
+.footerObject.pan{bottom: 224px; left: 960px; background-position: right;}
+
+.change
+{
+	color: #e3e3e3;
+	background-color: #000;
+	background-image: url('./images/webBackground.png');
+	-moz-transition: background-color 1s;
+	-webkit-transition: background-color 1s;
+	-o-transition: background-color 1s;
+	transition: background-color 1s;
+}
+
+#borders
+{
+	background-color: tranparent;
+	background-image: none;
+	display: block;
+	height: 350px;
+	margin: auto;
+	padding-top: 30px;
+	position: relative;
+	z-index: 100;
+	border-radius: 10px;
+}
+
+#infoGameBuilder, #infoGameBuilder a, #infoGameBuilder a:visited
+{
+	color: #e3e3e3;
+	font-family: 'Fixedsys', Arial, 'Sans Serif';
+}
+
+h1
+{
+	display: inline-block;
+	min-width: 330px;
+	padding: 10px;
+	margin-top: 0px;
+	font-family: 'Fixedsys', Arial, 'Sans Serif';
+	font-size: 40px;
+	border: 3px solid #000;
+	border-top: 0px;
+	background-color: #000;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+#jeu
+{
+	border: 3px solid #000;
+	background-image: url('./images/backgroundLastPlan.png');
+	margin-bottom:-5px;
+}
+
+#credits
+{
+	text-align: left;
+	position: absolute;
+	z-index: 80;
+	left: 0px;
+	top: 100px;
+	list-style: none;
+	padding: 0;
+	border: 3px solid #000;
+	border-left: 0px;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+#credits li
+{
+	height: 40px;
+	line-height: 40px;
+	color: #e3e3e3;
+	background-color: transparent;
+	padding-right: 5px;
+	-moz-transition: background-color 1s;
+	-webkit-transition: background-color 1s;
+	-o-transition: background-color 1s;
+	transition: background-color 1s;
+}
+
+#credits li  a, #credits li a:visited
+{
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+#credits li:first-child
+{
+	border-top-right-radius: 5px;
+	text-decoration: underline;
+	text-align: center;
+	font-weight: bold;
+}
+
+#credits li:last-child
+{
+	border-bottom-right-radius: 5px;
+}
+
+.tache
+{
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	font-weight: bold;
+	text-align: center;
+	font-size: 30px;
+	float: left;
+	background-image: url('./images/taches.png');
+	background-position: right bottom;
+	background-repeat: no-repeat;
+	text-shadow: 0 -1px 0 #fff;
+}
+
+.none{background-image: none;}
+#red,#green,#blue{opacity: 0.2;}
+#red,#color.red{background-position: left top;}
+#green,#color.green{background-position: -40px top;}
+#blue,#color.blue{background-position: -80px top;}
+#color.red.green{background-position: right top;}
+#color.red.blue{background-position: left bottom;}
+#color.blue.green{background-position: -40px bottom;}
+#color.red.green.blue{background-position: -80px bottom;}
+
+.change.red{background-color: #c04040;}
+.change.blue{background-color: #4040c0;}
+.change.green{background-color: #40c040;}
+.change.red.green{background-color: #c0c040;}
+.change.red.blue{background-color: #c040c0;}
+.change.green.blue{background-color: #40c0c0;}
+.change.red.green.blue{background-color: #c0c0c0;}
+
+#credits li:hover{background-color: #515151;}
+#credits.red li:hover{color: #000; background-color: #f05050;}
+#credits.blue li:hover{color: #000; background-color: #5050f0;}
+#credits.green li:hover{color: #000; background-color: #50f050;}
+#credits.red.green li:hover{color: #000; background-color: #f0f050;}
+#credits.red.blue li:hover{color: #000; background-color: #f050f0;}
+#credits.green.blue li:hover{color: #000; background-color: #50f0f0;}
+#credits.red.green.blue li:hover{color: #000; background-color: #f0f0f0;}
