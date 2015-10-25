@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Bomb Danger!</title>
+	</head>
+	<body>
+		<p style="border: 2px solid; margin: auto; cursor: none;" id="game"></p>
+		<script src="./JSGlib-3.0-min.js"></script>
+		<script src="./createGame.js"></script>
+		<script src="./Controlor.class.js"></script>
+		<script src="./Bomb.class.js"></script>
+		<script src="./Fire.class.js"></script>
+		<script src="./Bowser.class.js"></script>
+		<script>
+			//Launch game
+			myGame.load({
+				images: {
+					backgroundImage: './images/background.png',
+					bomb: './images/bombe.png',
+					big_fire: './images/boule.png',
+					small_fire: './images/feu.png',
+					explode: './images/boum.png',
+					bowser: './images/statue.png'
+				}
+			}, true, function () {
+				myGame.run();
+			});
+		</script>
+	</body>
+</html>
