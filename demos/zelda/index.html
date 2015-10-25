@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<title>The Legend of Zelda : Ocarina of Time 2D</title>
+		<script src="JSGlib-2.2.js"></script>
+		<script src="InitTexts.js"></script>
+		<script src="JSGlib.Form.class.js"></script>
+		<script src="FormMainChoice.class.js"></script>
+		<script src="FormNewGame.class.js"></script>
+		<script src="FormUser.class.js"></script>
+		<script src="FormLoad.class.js"></script>
+		<script src="FormControls.class.js"></script>
+		<script src="Title.class.js"></script>
+		<script src="Holdable.class.js"></script>
+		<script src="Pushable.class.js"></script>
+		<script src="FreezeGame.class.js"></script>
+		<script src="Message.class.js"></script>
+		<script src="PauseMenu.class.js"></script>
+		<script src="Overlay.class.js"></script>
+		<script src="Items.class.js"></script>
+		<script src="Torch.class.js"></script>
+		<script src="Instant.class.js"></script>
+		<script src="ArrowsItem.class.js"></script>
+		<script src="ShieldItem.class.js"></script>
+		<script src="FollowLinkObjects.class.js"></script>
+		<script src="DekuSeeds.class.js"></script>
+		<script src="DekuNut.class.js"></script>
+		<script src="DekuStick.class.js"></script>
+		<script src="Bullets.class.js"></script>
+		<script src="Link.class.js"></script>
+		<script src="Fairie.class.js"></script>
+		<script src="Chest.class.js"></script>
+		<script src="Sword.class.js"></script>
+		<script src="Grass.class.js"></script>
+		<script src="Sign.class.js"></script>
+		<script src="Barrier.class.js"></script>
+		<script src="GossipStone.class.js"></script>
+		<script src="Tree.class.js"></script>
+		<script src="TreeHouse.class.js"></script>
+		<script src="Solid.class.js"></script>
+		<script src="SolidJump.class.js"></script>
+		<script src="Rock.class.js"></script>
+		<script src="SmallRock.class.js"></script>
+		<script src="Pot.class.js"></script>
+		<script src="ArbreMojo.class.js"></script>
+		<script src="InfosBar.class.js"></script>
+		<script src="BackgroundAmbiance.class.js"></script>
+		<script src="Rupees.class.js"></script>
+		<script src="Heart.class.js"></script>
+		<script src="Ennemy.class.js"></script>
+		<script src="DekuBaba.class.js"></script>
+		<script src="DekuScrub.class.js"></script>
+		<script src="Skulltula.class.js"></script>
+		<script src="Characters.class.js"></script>
+		<script src="InitVars.js"></script>
+		<script src="InitFunctions.js"></script>
+		<script src="InitRooms.js"></script>
+		<script>
+			window.onload=function()
+			{
+				window.initRooms();
+				
+				Game.gameStart=Game.initSprites;
+				
+				Game.loadAndRun('jeu',
+				{
+					'link': './images/link.png',
+					'tree': './images/tree.png',
+					'tree_house': './images/tree_house.png',
+					'tiles_plaine': './images/tiles_plaine.png',
+					'tiles_walls': './images/tiles_walls.png',
+					'tiles_houses': './images/tiles_houses.png',
+					'fairie': './images/fairie.png',
+					'items': './images/items.png',
+					'grass_cut': './images/grass_cut.png',
+					'big_chest': './images/big_chest.png',
+					'sword': './images/sword.png',
+					'hearts': './images/hearts.png',
+					'rock': './images/rock.png',
+					'broken_rock': './images/broken_rock.png',
+					'broken_pot': './images/broken_pot.png',
+					'arbre_mojo': './images/arbre_mojo.png',
+					'bourse': './images/bourse.png',
+					'chiffres': './images/chiffres.png',
+					'rupees': './images/rupees.png',
+					'message': './images/message.png',
+					'saria': './images/saria.png',
+					'deku_baba': './images/dekubaba.png',
+					'deku_scrub': './images/dekuscrub.png',
+					'monster_death': './images/monster_death.png',
+					'dialog_arrow': './images/dialog_arrow.png',
+					'menu': './images/pause_menu.png',
+					'cursor': './images/cursor.png',
+					'cursor_heart': './images/cursor_heart.png',
+					'cursor_save': './images/cursor_save.png',
+					'pause_arrows': './images/arrows.png',
+					'pause_heart': './images/big_part_heart.png',
+					'pause_selected': './images/pause_selected.png',
+					'puddle': './images/puddle.png',
+					'spin_attack': './images/spin_attack.png',
+					'letters_buttons': './images/letters_buttons.png',
+					'press_enter': './images/press_enter.png',
+					'back_title': './images/backgrounds/title.png',
+					'back_kokiri': './images/backgrounds/kokiri_forest.png',
+					'back_kokiri_houses': './images/backgrounds/kokiri_houses.png',
+					'exclamation_mark': './images/exclamation_mark.png',
+					'fire': './images/fire.png',
+					'gossip_stone': './images/gossip_stone.png',
+					'skulltula': './images/skulltula.png'
+				},
+				{
+					'main_menu': ['./sounds/main_menu.mp3','./sounds/main_menu.ogg'],
+					'intro_deku': ['./sounds/intro_deku.mp3','./sounds/intro_deku.ogg'],
+					'intro_navi': ['./sounds/intro_navi.mp3','./sounds/intro_navi.ogg'],
+					'kokiri': ['./sounds/kokiri.mp3','./sounds/kokiri.ogg'],
+					'house': ['./sounds/house.mp3','./sounds/house.ogg'],
+					'chest': ['./sounds/chest_open.mp3','./sounds/chest_open.ogg'],
+					'small_chest': ['./sounds/small_chest_open.mp3','./sounds/small_chest_open.ogg'],
+					'attack1': ['./sounds/attack1.mp3','./sounds/attack1.ogg'],
+					'attack2': ['./sounds/attack2.mp3','./sounds/attack2.ogg'],
+					'attack3': ['./sounds/attack3.mp3','./sounds/attack3.ogg'],
+					'spin_attack1': ['./sounds/spin_attack1.mp3','./sounds/spin_attack1.ogg'],
+					'spin_attack2': ['./sounds/spin_attack2.mp3','./sounds/spin_attack2.ogg'],
+					'grass': ['./sounds/grass.mp3','./sounds/grass.ogg'],
+					'rupee': ['./sounds/rupee.mp3','./sounds/rupee.ogg'],
+					'small_heart': ['./sounds/small_heart.mp3','./sounds/small_heart.ogg'],
+					'hurt': ['./sounds/hurt.mp3','./sounds/hurt.ogg'],
+					'text_open': ['./sounds/text_open.mp3','./sounds/text_open.ogg'],
+					'text_close': ['./sounds/text_close.mp3','./sounds/text_close.ogg'],
+					'text_next': ['./sounds/text_next.mp3','./sounds/text_next.ogg'],
+					'pause_open': ['./sounds/pause_open.mp3','./sounds/pause_open.ogg'],
+					'pause_close': ['./sounds/pause_close.mp3','./sounds/pause_close.ogg'],
+					'pause_cursor': ['./sounds/pause_cursor.mp3','./sounds/pause_cursor.ogg'],
+					'pause_change': ['./sounds/pause_change.mp3','./sounds/pause_change.ogg'],
+					'pause_select': ['./sounds/pause_select.mp3','./sounds/pause_select.ogg'],
+					'splash': ['./sounds/splash.mp3','./sounds/splash.ogg'],
+					'jump': ['./sounds/jump.mp3','./sounds/jump.ogg'],
+					'pickup_rock': ['./sounds/pickup_rock.mp3','./sounds/pickup_rock.ogg'],
+					'broken_rock': ['./sounds/broken_rock.mp3','./sounds/broken_rock.ogg'],
+					'pickup_pot': ['./sounds/pickup_pot.mp3','./sounds/pickup_pot.ogg'],
+					'broken_pot': ['./sounds/broken_pot.mp3','./sounds/broken_pot.ogg'],
+					'throw_item': ['./sounds/throw_item.mp3','./sounds/throw_item.ogg'],
+					'shop': ['./sounds/shop.mp3','./sounds/shop.ogg'],
+					'press_start': ['./sounds/press_start.mp3','./sounds/press_start.ogg'],
+					'deku_nut': ['./sounds/deku_nut.mp3','./sounds/deku_nut.ogg'],
+					'enemy_hit': ['./sounds/enemy_hit.mp3','./sounds/enemy_hit.ogg'],
+					'enemy_kill': ['./sounds/enemy_kill.mp3','./sounds/enemy_kill.ogg'],
+					'navi_hey': ['./sounds/navi_hey.mp3','./sounds/navi_hey.ogg'],
+					'navi_listen': ['./sounds/navi_listen.mp3','./sounds/navi_listen.ogg'],
+					'link_yawn': ['./sounds/link_yawn.mp3','./sounds/link_yawn.ogg'],
+					'dekuscrub': ['./sounds/dekuscrub.mp3','./sounds/dekuscrub.ogg'],
+					'shield_block': ['./sounds/shield_block.mp3','./sounds/shield_block.ogg'],
+					'init_fire': ['./sounds/init_fire.mp3','./sounds/init_fire.ogg']
+				});
+                
+                document.body.onkeydown = function (e) {
+                    if (e.keyCode == 16) { //Maj
+                        Game.toggleFullscreen();
+                    }
+                };
+			};
+		</script>
+        <style>#infoGameBuilder{color: #e3e3e3;}</style>
+	</head>
+	<body style="background-color: #000;">
+		<div style="text-align: center;">
+			<canvas id="jeu" style="background-color: #fff;">
+				<b>Oh, votre navigateur n'est pas capable d'afficher le jeu...<br />
+				Avez-vous déjà essayé <a href="http://www.mozilla.com/fr/firefox/">Mozilla
+				Firefox</a>, <a href="http://www.opera.com/">Opera</a> ou encore
+				<a href="http://www.google.com/chrome/">Google Chrome</a> ?</b>
+			</canvas>
+		</div>
+	</body>
+</html>
