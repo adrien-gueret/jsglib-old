@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<title>The Legend of Zelda : Ocarina of Time 2D</title>
+		<meta charset="utf-8" />
+		<style>
+			@font-face {
+				font-family: Zelda;
+				src: url("./Zelda_DX_TT_BRK.ttf");
+			}
+			
+			html, body {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				position: relative;
+				margin: 0;
+				padding: 0;
+				background-color: #000;
+				color: #e3e3e3;
+				font-family: "Zelda";
+			}
+			
+			#game_container {
+				transition: transform 500ms;
+				-moz-transition: -moz-transform 500ms;
+				-webkit-transition: -webkit-transform 500ms;
+				-o-transition: -o-transform 500ms;
+				-ms-transition: -ms-transform 500ms;
+			}
+			
+			#zelda_container {
+				margin: auto;
+			}
+			
+			#game_container, #zelda_container canvas, #message, #infos_bar {
+				image-rendering: optimizeSpeed;             /*                     */
+				image-rendering: -moz-crisp-edges;          /* Firefox             */
+				image-rendering: -o-crisp-edges;            /* Opera               */
+				image-rendering: -webkit-optimize-contrast; /* Chrome (and Safari) */
+				image-rendering: optimize-contrast;         /* CSS3 Proposed       */
+				-ms-interpolation-mode: nearest-neighbor;   /* IE8+                */
+			}
+			
+			#message {
+				z-index: 9999999;
+				position: absolute;
+				left: 8px;
+				top: 8px;
+				display: none;
+				overflow: hidden;
+				color: #fff;
+				background-color: #000;
+				padding: 0 8px 4px 8px;
+				width: 130px;
+				height: 28px;
+				font-size: 13px;
+				line-height: 16px;
+				font-family: Zelda;
+				background-repeat: no-repeat;
+				background-position: right bottom;
+				letter-spacing: -2px;
+			}
+			
+			#message .red {color: #de0000;}
+			#message .blue {color: #1882ff;}
+			
+			#message.next {
+				background-image: url('./images/arrow_message.png');
+			}
+			
+			#message.end {
+				background-image: url('./images/block_message.png');
+			}
+			
+			#zoom {
+				display: none;
+				text-align: center;
+				transition: margin-top 500ms;
+				-moz-transition: margin-top 500ms;
+				-webkit-transition: margin-top 500ms;
+				-o-transition: margin-top 500ms;
+				-ms-transition: margin-top 500ms;
+			}
+			
+			#infos_bar {
+				display: none;
+				height: 16px;
+				background-color: #fce6c6;
+				width: 160px;
+				margin: auto;
+				background-image: url('./images/bar_infos.png');
+				background-repeat: no-repeat;
+				background-position: left;
+				color: #000;
+				position: relative;
+			}
+			
+			#infos_bar > div {
+				width: 40px;
+				float: left;
+				position: relative;
+				margin-left: 1px;
+			}
+			
+			#infos_bar .letter {
+				display: block;
+				width: 5px;
+				height: 7px;
+				margin-left: 1px;
+				margin-top: 2px;
+				background-image: url('./images/bar_infos_letters.png');
+				background-repeat: no-repeat;
+			}
+			
+			#infos_bar .letter.letter_65 {background-position: 0;}
+			#infos_bar .letter.letter_66 {background-position: -5px;}
+			#infos_bar .letter.letter_67 {background-position: -10px;}
+			#infos_bar .letter.letter_68 {background-position: -15px;}
+			#infos_bar .letter.letter_69 {background-position: -20px;}
+			#infos_bar .letter.letter_70 {background-position: -25px;}
+			#infos_bar .letter.letter_71 {background-position: -30px;}
+			#infos_bar .letter.letter_72 {background-position: -35px;}
+			#infos_bar .letter.letter_73 {background-position: -40px;}
+			#infos_bar .letter.letter_74 {background-position: -45px;}
+			#infos_bar .letter.letter_75 {background-position: -50px;}
+			#infos_bar .letter.letter_76 {background-position: -55px;}
+			#infos_bar .letter.letter_77 {background-position: -60px; margin-left: 0;}
+			#infos_bar .letter.letter_78 {background-position: -65px; margin-left: 0;}
+			#infos_bar .letter.letter_79 {background-position: -70px;}
+			#infos_bar .letter.letter_80 {background-position: -75px;}
+			#infos_bar .letter.letter_81 {background-position: -80px;  margin-left: 0;}
+			#infos_bar .letter.letter_82 {background-position: -85px;}
+			#infos_bar .letter.letter_83 {background-position: -90px;}
+			#infos_bar .letter.letter_84 {background-position: -95px; margin-left: 0;}
+			#infos_bar .letter.letter_85 {background-position: -100px;}
+			#infos_bar .letter.letter_86 {background-position: -105px; margin-left: 0;}
+			#infos_bar .letter.letter_87 {background-position: -110px; margin-left: 0;}
+			#infos_bar .letter.letter_88 {background-position: -115px; margin-left: 0;}
+			#infos_bar .letter.letter_89 {background-position: -120px;}
+			#infos_bar .letter.letter_90 {background-position: -125px; margin-left: 0;}
+			
+			#infos_bar #hearts_container {
+				float: right;
+				height: 100%;
+				width: 64px;
+			}
+			
+			#hearts_container > div {
+				width: 7px;
+				height: 7px;
+				background-repeat: no-repeat;
+				background-image: url('./images/bar_infos_hearts.png');
+				background-position: left;
+				margin-right: 1px;
+				margin-bottom: 1px;
+				float: left;
+			}
+			
+			#hearts_container > div.third {background-position: -7px}
+			#hearts_container > div.half {background-position: -14px}
+			#hearts_container > div.quarter {background-position: -21px}
+			#hearts_container > div.empty {background-position: -28px}
+		</style>
+	</head>
+	<body>
+        
+		<div id="game_container">
+			<div id="infos_bar">
+				<div id="first_object">
+					<div class="letter letter_81"></div>
+				</div>
+				<div id="second_object">
+					<div class="letter letter_87"></div>
+				</div>
+				<div id="hearts_container"></div>
+			</div>
+			<p id="zelda_container">
+				<span id="message"></span>
+			</p>		
+		</div>
+		<p id="zoom"></p>
+        
+		<script src="./JSGlib-min.js"></script>
+        <script src="./createGame.js"></script>
+        <script src="./Data.class.js"></script>
+        <script src="./InitTexts.js"></script>
+        <script src="./Utils.class.js"></script>
+        <script src="./Interactive.class.js"></script>
+        <script src="./Message.class.js"></script>
+        <script src="./Fairy.class.js"></script>
+        <script src="./Link.class.js"></script>
+        <script src="./ViewControlor.class.js"></script>
+        <script src="./NaviInterest.class.js"></script>
+        <script src="./Chest.class.js"></script>
+        <script src="./Sign.class.js"></script>
+        <script src="./Grass.class.js"></script>
+        <script src="./Rock.class.js"></script>
+        <script src="./Kokiri.class.js"></script>
+        <script>
+            //Launch game
+            myGame.load({
+                images: {
+                    link					:	'./images/link.png',
+                    link_mask			:	'./images/link_mask.png',
+                    splash				:	'./images/splash.png',
+                    fairy					:	'./images/fairy.png',
+                    objects				:	'./images/objects.png',
+                    kokiri				:	'./images/kokiri.png',
+					tiles_forest		:	'./images/tiles/forest.png',
+					tiles_mountain	:	'./images/tiles/mountain.png',
+					tiles_water			:	'./images/tiles/water.png'
+                },
+				sounds: {
+					link_fall: ['./sounds/link_fall.ogg', './sounds/link_fall.mp3'],
+				},
+				rooms: [
+					'./levels/kokiri_forest.json',
+				],
+				tiles: [
+					'./tiles_definitions.json',
+				]
+            }, true, function () {
+				this.callStatic('Data', 'load');
+				this.callStatic('ViewControlor', 'showInfosBar');
+				this.run();
+            });
+			
+			//Remove global reference to the game by security
+			//myGame	=	null;
+        </script>
+	</body>
+</html>
