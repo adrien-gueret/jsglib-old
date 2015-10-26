@@ -1,0 +1,94 @@
+.main-content {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+#doc-content {
+	display: flex;
+	flex-direction: row;
+}
+
+#doc-content .description:not(#documentation_jsglib) {
+	display: none;
+}
+
+#doc-menu {
+	padding-right: 10px;
+}
+
+#doc-menu .item-highlight {
+	font-style: italic;
+	background-color: #96CFEF;
+	border-radius: 5px;
+}
+
+#doc-menu li:hover:not(.item-highlight) {
+	background-color: #8CE8BB;
+	border-radius: 5px;
+}
+
+#doc-menu li {
+	padding: 0 5px 5px 5px;
+}
+
+#doc-menu label {
+	font-weight: bold;
+}
+
+#doc-menu li, #doc-menu label {
+	cursor: pointer;
+}
+
+#doc-menu label + ul {
+	display: none;
+	font-style: normal;
+	background-color: #fff;
+}
+
+.signature {
+	background-color: #96CFEF;
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+
+.signature > * {
+	background-color: #fff;
+	padding: 5px;
+}
+
+.signature blockquote {
+	width: 100%;
+	margin: 0;
+	border: .3rem solid #dce6f0;
+	border-left-width: .6rem;
+	padding: 10px;
+}
+
+.signature .signature_function {
+	background-color: inherit;
+	font-size: 1.4rem;
+}
+
+.signature_function {
+	font-family: Calibri, Arial, "Sans Serif";
+}
+
+.list_params, .desc_returns, .list_values {
+	font-weight: bold;
+	color: #159957;
+	background-color: #dce6f0;
+}
+
+.list_params, .desc_returns, .param, .value {
+	border-bottom: 1px solid #dce6f0;
+}
+
+.param[data-optional="true"] {
+	font-style: italic;
+}
+
+.param::before {
+	content: attr(data-name) ": ";
+	font-weight: bold;
+}
