@@ -19,15 +19,14 @@
 	<body>
 		<div id="myGame"></div>
 		<p>Click on the canvas to change tileset.</p>
-		<script src="../../dist/jsglib/events_handler.js"></script>
-		<script src="../../dist/jsglib/timer.js"></script>
-		<script src="../../dist/jsglib/http.js"></script>
-		<script src="../../dist/jsglib/game.js"></script>
-		<script src="../../dist/jsglib/layer.js"></script>
-		<script src="../../dist/jsglib/sprite.js"></script>
-		<script src="../../dist/jsglib/tile.js"></script>
-		<script src="../../dist/jsglib/room.js"></script>
-		<script src="../../dist/jsglib/point.js"></script>
-		<script src="../../dist/samples/tilesets/sample.js"></script>
+		<script data-main="../../dist/samples/tilesets/sample.js"
+				src="//requirejs.org/docs/release/2.1.22/minified/require.js"></script>
+		<script>
+			require.config({
+				paths: {
+					jsglib: '../../jsglib'
+				}
+			});
+	</script>
 	</body>
 </html>

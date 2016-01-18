@@ -1,25 +1,55 @@
-'use strict';
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-(function (window, undefined) {
+define(['exports', 'jsglib/layer', 'jsglib/timer'], function (exports, _layer, _timer) {
 	"use strict";
 
-	var JSGlib = window.JSGlib || {};
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _layer2 = _interopRequireDefault(_layer);
+
+	var _timer2 = _interopRequireDefault(_timer);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _createClass = (function () {
+		function defineProperties(target, props) {
+			for (var i = 0; i < props.length; i++) {
+				var descriptor = props[i];
+				descriptor.enumerable = descriptor.enumerable || false;
+				descriptor.configurable = true;
+				if ("value" in descriptor) descriptor.writable = true;
+				Object.defineProperty(target, descriptor.key, descriptor);
+			}
+		}
+
+		return function (Constructor, protoProps, staticProps) {
+			if (protoProps) defineProperties(Constructor.prototype, protoProps);
+			if (staticProps) defineProperties(Constructor, staticProps);
+			return Constructor;
+		};
+	})();
 
 	var Game = (function () {
 		function Game(game_container) {
-			var layers = arguments.length <= 1 || arguments[1] === undefined ? [JSGlib.Layer.MAIN_LAYER, JSGlib.Layer.TILES_LAYER, JSGlib.Layer.BACKGROUND_LAYER] : arguments[1];
+			var layers = arguments.length <= 1 || arguments[1] === undefined ? [_layer2.default.MAIN_LAYER, _layer2.default.TILES_LAYER, _layer2.default.BACKGROUND_LAYER] : arguments[1];
+			var fps = arguments.length <= 2 || arguments[2] === undefined ? 30 : arguments[2];
 
 			_classCallCheck(this, Game);
 
 			this.container = game_container;
 			this.current_room = null;
 			this.classes = {};
-			this.timer = new JSGlib.Timer();
-
+			this.timer = new _timer2.default(fps);
 			this.defineLayers(layers);
 		}
 
@@ -29,13 +59,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				var _this = this;
 
 				this.layers = {};
-
 				layers.forEach(function (layer, key) {
 					layer.setZindex(key);
 					_this.layers[layer.name] = layer;
+
 					_this.container.appendChild(layer.canvas);
 				});
-
 				return this;
 			}
 		}, {
@@ -73,21 +102,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: 'loop',
 			value: function loop() {
 				window.requestAnimationFrame(this.loop.bind(this));
-
 				var now = Date.now();
 				var delta = now - this.last_loop_time;
 				var interval = 1000 / this.timer.fps;
 
 				if (delta <= interval) {
 					this.timer.trigger('step');
-
 					return this;
 				}
 
 				this.render();
-
 				this.last_loop_time = now - delta % interval;
-
 				return this;
 			}
 		}, {
@@ -108,7 +133,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function goToRoom(level) {
 				this.current_room = level;
 				level.initRoom(this);
-
 				this.container.style.width = level.width + 'px';
 				this.container.style.height = level.height + 'px';
 
@@ -124,8 +148,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		return Game;
 	})();
 
-	JSGlib.Game = Game;
-
-	window.JSGlib = JSGlib;
-})(window);
+	exports.default = Game;
+});
 //# sourceMappingURL=game.js.map

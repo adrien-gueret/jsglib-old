@@ -1,13 +1,41 @@
-"use strict";
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-(function (window) {
+define(["exports", "jsglib/tile"], function (exports, _tile) {
 	"use strict";
 
-	var JSGlib = window.JSGlib || {};
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _tile2 = _interopRequireDefault(_tile);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _createClass = (function () {
+		function defineProperties(target, props) {
+			for (var i = 0; i < props.length; i++) {
+				var descriptor = props[i];
+				descriptor.enumerable = descriptor.enumerable || false;
+				descriptor.configurable = true;
+				if ("value" in descriptor) descriptor.writable = true;
+				Object.defineProperty(target, descriptor.key, descriptor);
+			}
+		}
+
+		return function (Constructor, protoProps, staticProps) {
+			if (protoProps) defineProperties(Constructor.prototype, protoProps);
+			if (staticProps) defineProperties(Constructor, staticProps);
+			return Constructor;
+		};
+	})();
 
 	var Sprite = (function () {
 		function Sprite() {
@@ -33,23 +61,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "getTile",
 			value: function getTile(tile_number) {
 				var clone = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-
 				tile_number--;
 
 				if (tile_number < 0) {
-					return new JSGlib.Tile(null);
+					return new _tile2.default(null);
 				}
 
 				var tiles = this.tiles;
 				var total_columns = tiles[0].length;
-
 				var row_index = Math.floor(tile_number / total_columns);
 				var column_index = tile_number % total_columns;
-
 				var tile = tiles[row_index][column_index];
 
 				if (!tile) {
-					return new JSGlib.Tile(null);
+					return new _tile2.default(null);
 				}
 
 				return clone ? tiles[row_index][column_index].clone() : tiles[row_index][column_index];
@@ -87,7 +112,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.tiles_width = tiles_width;
 				this.tiles_height = tiles_height;
 				this.tiles_separation = tiles_separation;
-
 				var image_width = this.image.naturalWidth;
 				var image_height = this.image.naturalHeight;
 
@@ -96,9 +120,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.tiles[x] = [];
 
 					for (var i = 0; i < image_width; i += tiles_width) {
-						this.tiles[x][i / tiles_width] = new JSGlib.Tile(this, i + tiles_separation * (i / tiles_width), j + tiles_separation * (j / tiles_height));
+						this.tiles[x][i / tiles_width] = new _tile2.default(this, i + tiles_separation * (i / tiles_width), j + tiles_separation * (j / tiles_height));
 						image_width -= tiles_separation;
 					}
+
 					image_width = this.image.naturalWidth;
 					image_height -= tiles_separation;
 				}
@@ -121,11 +146,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				try {
 					var _loop = function _loop() {
 						var animation = _step.value;
-
 						animation.tiles.forEach(function (tile_number, index) {
 							var current_animated_tile = _this2.getTile(tile_number, false);
-							var next_tile_number = animation.tiles[index + 1] || animation.tiles[0];
 
+							var next_tile_number = animation.tiles[index + 1] || animation.tiles[0];
 							current_animated_tile.setAnimation(next_tile_number, animation.time);
 						});
 					};
@@ -163,8 +187,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				try {
 					for (var _iterator2 = types[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						// TODO
-
 						var type = _step2.value;
 					}
 				} catch (err) {
@@ -192,9 +214,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	Sprite.TILES_TYPES = {
 		WALL: Symbol()
 	};
-
-	JSGlib.Sprite = Sprite;
-
-	window.JSGlib = JSGlib;
-})(window);
+	exports.default = Sprite;
+});
 //# sourceMappingURL=sprite.js.map

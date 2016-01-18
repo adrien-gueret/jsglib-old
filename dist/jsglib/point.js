@@ -1,22 +1,26 @@
-"use strict";
+define(["exports"], function (exports) {
+	"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
-(function (window) {
-    "use strict";
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
 
-    var JSGlib = window.JSGlib || {};
+	var Point = function Point() {
+		var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+		var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 
-    JSGlib.Point = function Point() {
-        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+		_classCallCheck(this, Point);
 
-        _classCallCheck(this, Point);
+		this.x = x;
+		this.y = y;
+	};
 
-        this.x = x;
-        this.y = y;
-    };
-
-    window.JSGlib = JSGlib;
-})(window);
+	exports.default = Point;
+});
 //# sourceMappingURL=point.js.map

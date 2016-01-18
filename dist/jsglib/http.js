@@ -1,10 +1,9 @@
-'use strict';
-
-(function (window, undefined) {
+define(['exports'], function (exports) {
     "use strict";
 
-    var JSGlib = window.JSGlib || {};
-
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
     var METHOD_GET = 'GET';
     var METHOD_POST = 'POST';
     var METHOD_PUT = 'PUT';
@@ -29,7 +28,7 @@
         return function () {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200 || xhr.status === 304) {
-                    var response = void 0;
+                    var response = undefined;
 
                     switch (data_type) {
                         case DATA_TYPE_JSON:
@@ -89,12 +88,11 @@
             var async = _ref$async === undefined ? true : _ref$async;
             var _ref$data_type = _ref.data_type;
             var data_type = _ref$data_type === undefined ? DATA_TYPE_TEXT : _ref$data_type;
-
             return performRequest(request_method, url, data, async, data_type);
         };
     }
 
-    JSGlib.http = {
+    var $http = {
         DATA_TYPES: {
             TEXT: DATA_TYPE_TEXT,
             XML: DATA_TYPE_XML,
@@ -105,7 +103,6 @@
         delete: getExposedMethod(METHOD_DELETE),
         put: getExposedMethod(METHOD_PUT)
     };
-
-    window.JSGlib = JSGlib;
-})(window);
+    exports.default = $http;
+});
 //# sourceMappingURL=http.js.map
