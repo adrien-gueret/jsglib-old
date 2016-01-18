@@ -26,18 +26,18 @@ function getReadyStateChangeHandler(xhr, data_type, resolve, reject) {
             if (xhr.status === 200 || xhr.status === 304) {
                 let response;
 
-                switch(data_type) {
+                switch (data_type) {
                     case DATA_TYPE_JSON:
                         response = JSON.parse(xhr.responseText);
-                    break;
+                        break;
 
                     case DATA_TYPE_XML:
                         response = xhr.responseXML;
-                    break;
+                        break;
 
                     default:
                         response = xhr.responseText;
-                    break;
+                        break;
                 }
 
                 resolve(response);
@@ -72,16 +72,16 @@ function performRequest(method, url, data = undefined, async = true, data_type =
 }
 
 function getExposedMethod(request_method) {
-    return (url,  {data = undefined, async = true, data_type = DATA_TYPE_TEXT} = {}) => {
+    return (url, {data = undefined, async = true, data_type = DATA_TYPE_TEXT} = {}) => {
         return performRequest(request_method, url, data, async, data_type);
     };
 }
 
 let $http = {
     DATA_TYPES: {
-      TEXT: DATA_TYPE_TEXT,
-      XML: DATA_TYPE_XML,
-      JSON: DATA_TYPE_JSON
+        TEXT: DATA_TYPE_TEXT,
+        XML: DATA_TYPE_XML,
+        JSON: DATA_TYPE_JSON
     },
     get: getExposedMethod(METHOD_GET),
     post: getExposedMethod(METHOD_POST),
