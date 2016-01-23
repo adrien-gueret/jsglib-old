@@ -80,9 +80,6 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
                 this.makeTiles(32, 32).defineTilesAnimations({
                     tiles: [6, 14],
                     time: 500
-                }).defineTilesTypes({
-                    type: _sprite2.default.TILES_TYPES.WALL,
-                    tiles: [1, 2, 3, 7, 8, 9, 11, 15, 16, 17, 18, 19, 23]
                 });
                 return this;
             }
@@ -122,7 +119,7 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
     Promise.all([TilesPlainSprite.loadImage('./tiles_plain.png'), TilesSnowSprite.loadImage('./tiles_snow.png')]).then(function () {
         TilesPlainSprite.initTiles();
         TilesSnowSprite.initTiles();
-        return level1.useDefinition('./level1.json');
+        return level1.useDefinition('./level.json');
     }).then(function () {
         my_game.goToRoom(level1).start();
 

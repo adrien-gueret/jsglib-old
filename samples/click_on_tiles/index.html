@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<title>Tilesets example</title>
+		<title>Click on tiles</title>
 		<style>
 			body {
 				text-align: center;
@@ -12,14 +12,18 @@
 				border: 10px solid #000;
 				margin: auto;
 				position: relative;
-				background-color: lightblue;
+				background-color: #b0a898;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="myGame"></div>
-		<p>Click on the canvas to change tileset.</p>
-		<script data-main="../../dist/samples/tilesets/sample.js"
+        <p>Click to dig.</p>
+        <p>
+            Sprites from <em>Pokémon Diamond/Pearl</em>, ripped by <b>redblueyellow</b> for
+            <a href="http://www.spriters-resource.com/ds/pokemondiamondpearl/sheet/37301/">The Spriters Resource</a>
+        </p>
+		<script data-main="../../dist/samples/click_on_tiles/sample.js"
 				src="//requirejs.org/docs/release/2.1.22/minified/require.js"></script>
 		<script>
 			require.config({

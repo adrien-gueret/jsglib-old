@@ -59,6 +59,22 @@ define(['exports'], function (exports) {
                 return this;
             }
         }, {
+            key: 'getTileFromPoint',
+            value: function getTileFromPoint(point) {
+                if (!this.tiles_sprite) {
+                    return null;
+                }
+
+                var tiles_size = this.tiles_sprite.getTilesSize();
+                var row = this.tiles[Math.floor(point.y / tiles_size.height)];
+
+                if (!row) {
+                    return null;
+                }
+
+                return row[Math.floor(point.x / tiles_size.width)] || null;
+            }
+        }, {
             key: 'draw',
             value: function draw(timer) {
                 var _this = this;
@@ -66,18 +82,18 @@ define(['exports'], function (exports) {
                 var force_redraw = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
                 this.tiles.forEach(function (row, row_index) {
                     row.forEach(function (tile, column_index) {
-                        if (!tile || !tile.sprite_class) {
-                            return;
-                        }
-
                         if (!force_redraw && !tile.needs_redraw) {
                             return;
                         }
 
-                        tile.draw(_this.ctx, column_index, row_index, timer).on('animation', function () {
-                            _this.tiles[row_index][column_index] = tile.sprite_class.getTile(tile.animation.next_tile_number);
-                            tile.off('animaiton');
-                        });
+                        tile.needs_redraw = false;
+                        tile.clear(_this.ctx, column_index, row_index);
+
+                        if (tile.is_empty) {
+                            return;
+                        }
+
+                        tile.draw(_this.ctx, column_index, row_index, timer);
                     });
                 });
                 return this;

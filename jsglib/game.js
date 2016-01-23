@@ -2,19 +2,45 @@
 
 import Layer from 'jsglib/layer';
 import Timer from 'jsglib/timer';
+import EventsHandler from 'jsglib/events_handler';
+import Point from 'jsglib/point';
 
-export default class Game {
+export default class Game extends EventsHandler {
     constructor(game_container, layers = [
         Layer.MAIN_LAYER,
         Layer.TILES_LAYER,
         Layer.BACKGROUND_LAYER
     ], fps = 30) {
+        super();
         this.container = game_container;
         this.current_room = null;
         this.classes = {};
         this.timer = new Timer(fps);
+        this.mouse = new Point();
 
         this.defineLayers(layers);
+
+        this.container.addEventListener('mousemove', (e) => {
+            var x = e.pageX;
+            var y = e.pageY;
+            var container = this.container;
+
+            x -= (container.getBoundingClientRect().left  + (window.pageXOffset || container.scrollLeft)  + (container.clientLeft  || 0));
+            y -= (container.getBoundingClientRect().top  + (window.pageYOffset || container.scrollTop)  + (container.clientTop || 0));
+
+            this.mouse.x = Math.floor(x);
+            this.mouse.y = Math.floor(y);
+
+            this.trigger('mousemove', {
+                mouse: this.mouse
+            })
+        });
+
+        this.container.addEventListener('click', () => {
+            this.trigger('click', {
+                mouse: this.mouse
+            });
+        });
     }
 
     defineLayers(layers) {

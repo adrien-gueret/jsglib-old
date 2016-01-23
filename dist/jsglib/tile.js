@@ -71,6 +71,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
         function Tile(sprite_class) {
             var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
             var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+            var tile_number = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
 
             _classCallCheck(this, Tile);
 
@@ -78,15 +79,17 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
 
             _this.sprite_class = sprite_class;
             _this.position = new _point2.default(x, y);
+            _this.tile_number = tile_number;
             _this.needs_redraw = true;
             _this.clock_animation = null;
+            _this.is_empty = false;
             return _this;
         }
 
         _createClass(Tile, [{
             key: "clone",
             value: function clone() {
-                var new_tile = new Tile(this.sprite_class, this.position.x, this.position.y);
+                var new_tile = new Tile(this.sprite_class, this.position.x, this.position.y, this.tile_number);
 
                 if (this.animation) {
                     var _animation = this.animation;
@@ -99,6 +102,18 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                 }
 
                 return new_tile;
+            }
+        }, {
+            key: "setTileNumber",
+            value: function setTileNumber(tile_number) {
+                this.trigger('clear_animation');
+                var tile = this.sprite_class.getTile(tile_number);
+                this.is_empty = tile.is_empty;
+                this.tile_number = tile_number;
+                this.position = tile.position;
+                this.animation = tile.animation;
+                this.needs_redraw = true;
+                return this;
             }
         }, {
             key: "draw",
@@ -115,20 +130,33 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                 };
                 var dest_x = x * tiles_size.height;
                 var dest_y = y * tiles_size.width;
-                ctx.clearRect(dest_x, dest_y, tiles_size.width, tiles_size.height);
                 ctx.drawImage(this.sprite_class.image, this.position.x, this.position.y, tiles_size.width, tiles_size.height, dest_x, dest_y, tiles_size.width, tiles_size.height);
-                this.needs_redraw = false;
 
                 if (this.animation) {
-                    if (this.clock_animation) {
-                        timer.clearTimeout(this.clock_animation);
-                    }
-
+                    this.trigger('clear_animation');
                     this.clock_animation = timer.setTimeout(function () {
-                        _this2.trigger('animation');
+                        _this2.setTileNumber(_this2.animation.next_tile_number);
                     }, this.animation.time);
+                    this.off('clear_animation').on('clear_animation', function () {
+                        if (_this2.clock_animation) {
+                            timer.clearTimeout(_this2.clock_animation);
+                            _this2.clock_animation = null;
+                        }
+                    });
                 }
 
+                return this;
+            }
+        }, {
+            key: "clear",
+            value: function clear(ctx, x, y) {
+                var tiles_size = {
+                    width: this.sprite_class.tiles_width,
+                    height: this.sprite_class.tiles_height
+                };
+                var dest_x = x * tiles_size.height;
+                var dest_y = y * tiles_size.width;
+                ctx.clearRect(dest_x, dest_y, tiles_size.width, tiles_size.height);
                 return this;
             }
         }, {
@@ -139,6 +167,13 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                     time: time
                 };
                 return this;
+            }
+        }], [{
+            key: "getNewEmptyTile",
+            value: function getNewEmptyTile(sprite_class) {
+                var tile = new Tile(sprite_class);
+                tile.is_empty = true;
+                return tile;
             }
         }]);
 

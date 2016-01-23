@@ -22,7 +22,7 @@ class Sprite {
         tile_number--;
 
         if (tile_number < 0) {
-            return new Tile(null);
+            return Tile.getNewEmptyTile(this);
         }
 
         let tiles = this.tiles;
@@ -31,10 +31,10 @@ class Sprite {
         let row_index = Math.floor(tile_number / total_columns);
         let column_index = tile_number % total_columns;
 
-        let tile = tiles[row_index][column_index];
+        let tile = tiles[row_index] ? tiles[row_index][column_index] : null;
 
         if (!tile) {
-            return new Tile(null);
+            return Tile.getNewEmptyTile(this);
         }
 
         return clone ? tiles[row_index][column_index].clone() : tiles[row_index][column_index];
@@ -67,6 +67,7 @@ class Sprite {
 
         let image_width = this.image.naturalWidth;
         let image_height = this.image.naturalHeight;
+        let tile_number = 1;
 
         for (let j = 0; j < image_height; j += tiles_height) {
             let x = j / tiles_height;
@@ -76,7 +77,8 @@ class Sprite {
                 this.tiles[x][i / tiles_width] = new Tile(
                     this,
                     i + tiles_separation * (i / tiles_width),
-                    j + tiles_separation * (j / tiles_height)
+                    j + tiles_separation * (j / tiles_height),
+                    tile_number++
                 );
                 image_width -= tiles_separation;
             }

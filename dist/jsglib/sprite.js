@@ -64,17 +64,17 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
                 tile_number--;
 
                 if (tile_number < 0) {
-                    return new _tile2.default(null);
+                    return _tile2.default.getNewEmptyTile(this);
                 }
 
                 var tiles = this.tiles;
                 var total_columns = tiles[0].length;
                 var row_index = Math.floor(tile_number / total_columns);
                 var column_index = tile_number % total_columns;
-                var tile = tiles[row_index][column_index];
+                var tile = tiles[row_index] ? tiles[row_index][column_index] : null;
 
                 if (!tile) {
-                    return new _tile2.default(null);
+                    return _tile2.default.getNewEmptyTile(this);
                 }
 
                 return clone ? tiles[row_index][column_index].clone() : tiles[row_index][column_index];
@@ -114,13 +114,14 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
                 this.tiles_separation = tiles_separation;
                 var image_width = this.image.naturalWidth;
                 var image_height = this.image.naturalHeight;
+                var tile_number = 1;
 
                 for (var j = 0; j < image_height; j += tiles_height) {
                     var x = j / tiles_height;
                     this.tiles[x] = [];
 
                     for (var i = 0; i < image_width; i += tiles_width) {
-                        this.tiles[x][i / tiles_width] = new _tile2.default(this, i + tiles_separation * (i / tiles_width), j + tiles_separation * (j / tiles_height));
+                        this.tiles[x][i / tiles_width] = new _tile2.default(this, i + tiles_separation * (i / tiles_width), j + tiles_separation * (j / tiles_height), tile_number++);
                         image_width -= tiles_separation;
                     }
 

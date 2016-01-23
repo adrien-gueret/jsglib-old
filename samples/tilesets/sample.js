@@ -11,10 +11,6 @@ class MainTilesSprite extends Sprite {
             .defineTilesAnimations({
                 tiles: [6, 14],
                 time: 500
-            })
-            .defineTilesTypes({
-                type: Sprite.TILES_TYPES.WALL,
-                tiles: [1, 2, 3, 7, 8, 9, 11, 15, 16, 17, 18, 19, 23]
             });
         return this;
     }
@@ -38,7 +34,7 @@ Promise.all([
     .then(() => {
         TilesPlainSprite.initTiles();
         TilesSnowSprite.initTiles();
-        return level1.useDefinition('./level1.json');
+        return level1.useDefinition('./level.json');
     })
     .then(() => {
         my_game

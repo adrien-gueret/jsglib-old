@@ -27,25 +27,38 @@ class Layer {
         return this;
     }
 
+    getTileFromPoint(point) {
+        if (!this.tiles_sprite) {
+            return null;
+        }
+
+        let tiles_size = this.tiles_sprite.getTilesSize();
+        let row = this.tiles[Math.floor(point.y / tiles_size.height)];
+
+        if (!row) {
+            return null;
+        }
+
+        return row[Math.floor(point.x / tiles_size.width)] || null;
+    }
+
     draw(timer, force_redraw = false) {
         this.tiles.forEach((row, row_index) => {
             row.forEach((tile, column_index) => {
-                // If empty tile, we skip it
-                if (!tile || !tile.sprite_class) {
-                    return;
-                }
-
                 // Draw tile only if we need it
                 if (!force_redraw && !tile.needs_redraw) {
                     return;
                 }
 
-                tile
-                    .draw(this.ctx, column_index, row_index, timer)
-                    .on('animation', () => {
-                        this.tiles[row_index][column_index] = tile.sprite_class.getTile(tile.animation.next_tile_number);
-                        tile.off('animaiton');
-                    });
+                tile.needs_redraw = false;
+                tile.clear(this.ctx, column_index, row_index);
+
+                // If empty tile, we skip it
+                if (tile.is_empty) {
+                    return;
+                }
+
+                tile.draw(this.ctx, column_index, row_index, timer);
             });
         });
 
