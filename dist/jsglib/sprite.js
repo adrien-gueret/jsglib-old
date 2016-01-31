@@ -1,4 +1,4 @@
-define(["exports", "jsglib/tile"], function (exports, _tile) {
+define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile, _animation) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -6,6 +6,8 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
     });
 
     var _tile2 = _interopRequireDefault(_tile);
+
+    var _animation2 = _interopRequireDefault(_animation);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -40,16 +42,9 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
     var Sprite = (function () {
         function Sprite() {
             _classCallCheck(this, Sprite);
-
-            this.image = this.constructor.image;
         }
 
-        _createClass(Sprite, [{
-            key: "getTilesSize",
-            value: function getTilesSize() {
-                return this.constructor.getTilesSize();
-            }
-        }], [{
+        _createClass(Sprite, null, [{
             key: "getTilesSize",
             value: function getTilesSize() {
                 return {
@@ -133,78 +128,24 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
             }
         }, {
             key: "defineTilesAnimations",
-            value: function defineTilesAnimations() {
+            value: function defineTilesAnimations(animations, timer) {
                 var _this2 = this;
 
-                for (var _len = arguments.length, animations = Array(_len), _key = 0; _key < _len; _key++) {
-                    animations[_key] = arguments[_key];
-                }
-
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
-
-                try {
-                    var _loop = function _loop() {
-                        var animation = _step.value;
-                        animation.tiles.forEach(function (tile_number, index) {
-                            var current_animated_tile = _this2.getTile(tile_number, false);
-
-                            var next_tile_number = animation.tiles[index + 1] || animation.tiles[0];
-                            current_animated_tile.setAnimation(next_tile_number, animation.time);
-                        });
-                    };
-
-                    for (var _iterator = animations[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        _loop();
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
-                    }
-                }
-
+                this.animations = {};
+                animations.forEach(function (animation) {
+                    _this2.animations[animation.name || Symbol()] = _animation2.default.define(timer, animation.tiles, animation.time);
+                });
                 return this;
             }
         }, {
+            key: "getAnimationClass",
+            value: function getAnimationClass(animation_name) {
+                return this.animations[animation_name] || null;
+            }
+        }, {
             key: "defineTilesTypes",
-            value: function defineTilesTypes() {
-                for (var _len2 = arguments.length, types = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                    types[_key2] = arguments[_key2];
-                }
-
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                    for (var _iterator2 = types[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var type = _step2.value;
-                    }
-                } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
-                        }
-                    } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
-                        }
-                    }
-                }
-
+            value: function defineTilesTypes(types) {
+                types.forEach(function (type) {});
                 return this;
             }
         }]);
@@ -212,8 +153,13 @@ define(["exports", "jsglib/tile"], function (exports, _tile) {
         return Sprite;
     })();
 
+    Sprite.image = null;
+    Sprite.tiles = [];
+    Sprite.tiles_width = 0;
+    Sprite.tiles_height = 0;
+    Sprite.animations = {};
     Sprite.TILES_TYPES = {
-        WALL: Symbol()
+        SOLID: Symbol()
     };
     exports.default = Sprite;
 });

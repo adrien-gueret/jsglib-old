@@ -76,11 +76,11 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
 
         _createClass(MainTilesSprite, null, [{
             key: "initTiles",
-            value: function initTiles() {
-                this.makeTiles(32, 32).defineTilesAnimations({
+            value: function initTiles(timer) {
+                this.makeTiles(32, 32).defineTilesAnimations([{
                     tiles: [6, 14],
                     time: 500
-                });
+                }], timer);
                 return this;
             }
         }]);
@@ -117,16 +117,16 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
     my_game.registerClass(TilesSnowSprite);
     var level1 = new _room2.default();
     Promise.all([TilesPlainSprite.loadImage('./tiles_plain.png'), TilesSnowSprite.loadImage('./tiles_snow.png')]).then(function () {
-        TilesPlainSprite.initTiles();
-        TilesSnowSprite.initTiles();
+        TilesPlainSprite.initTiles(my_game.timer);
+        TilesSnowSprite.initTiles(my_game.timer);
         return level1.useDefinition('./level.json');
     }).then(function () {
         my_game.goToRoom(level1).start();
 
         my_game.container.onclick = function () {
-            var used_sprite = _layer2.default.TILES_LAYER.tiles_sprite;
-            var new_sprite_class = used_sprite instanceof TilesPlainSprite ? TilesSnowSprite : TilesPlainSprite;
-            _layer2.default.TILES_LAYER.tiles_sprite = new new_sprite_class();
+            var used_sprite_class = _layer2.default.TILES_LAYER.tiles_sprite_class;
+            var new_sprite_class = used_sprite_class === TilesPlainSprite ? TilesSnowSprite : TilesPlainSprite;
+            _layer2.default.TILES_LAYER.tiles_sprite_class = new_sprite_class;
 
             _layer2.default.TILES_LAYER.tiles.forEach(function (row) {
                 row.forEach(function (tile) {

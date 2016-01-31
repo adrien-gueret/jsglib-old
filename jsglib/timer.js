@@ -9,7 +9,7 @@ export default class Timer extends EventsHandler {
         this.fps = fps;
         this.clocks = {};
 
-        this.on('step', () => {
+        this.on('frame', () => {
             this.checkCounters();
         });
     }

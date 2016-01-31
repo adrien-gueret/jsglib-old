@@ -1,19 +1,19 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsglib/point'], function (exports, _layer, _timer, _events_handler, _point) {
+define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsglib/inputs'], function (exports, _layer3, _timer, _events_handler, _inputs) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
 
-    var _layer2 = _interopRequireDefault(_layer);
+    var _layer4 = _interopRequireDefault(_layer3);
 
     var _timer2 = _interopRequireDefault(_timer);
 
     var _events_handler2 = _interopRequireDefault(_events_handler);
 
-    var _point2 = _interopRequireDefault(_point);
+    var _inputs2 = _interopRequireDefault(_inputs);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -73,7 +73,7 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
         _inherits(Game, _EventsHandler);
 
         function Game(game_container) {
-            var layers = arguments.length <= 1 || arguments[1] === undefined ? [_layer2.default.MAIN_LAYER, _layer2.default.TILES_LAYER, _layer2.default.BACKGROUND_LAYER] : arguments[1];
+            var layers = arguments.length <= 1 || arguments[1] === undefined ? [_layer4.default.MAIN_LAYER, _layer4.default.TILES_LAYER, _layer4.default.BACKGROUND_LAYER] : arguments[1];
             var fps = arguments.length <= 2 || arguments[2] === undefined ? 30 : arguments[2];
 
             _classCallCheck(this, Game);
@@ -84,30 +84,10 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
             _this.current_room = null;
             _this.classes = {};
             _this.timer = new _timer2.default(fps);
-            _this.mouse = new _point2.default();
 
             _this.defineLayers(layers);
 
-            _this.container.addEventListener('mousemove', function (e) {
-                var x = e.pageX;
-                var y = e.pageY;
-                var container = _this.container;
-                x -= container.getBoundingClientRect().left + (window.pageXOffset || container.scrollLeft) + (container.clientLeft || 0);
-                y -= container.getBoundingClientRect().top + (window.pageYOffset || container.scrollTop) + (container.clientTop || 0);
-                _this.mouse.x = Math.floor(x);
-                _this.mouse.y = Math.floor(y);
-
-                _this.trigger('mousemove', {
-                    mouse: _this.mouse
-                });
-            });
-
-            _this.container.addEventListener('click', function () {
-                _this.trigger('click', {
-                    mouse: _this.mouse
-                });
-            });
-
+            _this.inputs = new _inputs2.default(_this.container);
             return _this;
         }
 
@@ -165,23 +145,53 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
                 var interval = 1000 / this.timer.fps;
 
                 if (delta <= interval) {
-                    this.timer.trigger('step');
+                    this.timer.trigger('frame');
                     return this;
                 }
 
+                this.manageElements();
                 this.render();
                 this.last_loop_time = now - delta % interval;
                 return this;
             }
         }, {
-            key: 'render',
-            value: function render() {
-                if (!this.layers) {
-                    return this;
-                }
+            key: 'manageElements',
+            value: function manageElements() {
+                var _this3 = this;
+
+                var _loop = function _loop(layer_name) {
+                    var layer = _this3.layers[layer_name];
+                    layer.elements.forEach(function (element) {
+                        element.trigger('frame');
+
+                        if (!element.position.equals(element.prev_position)) {
+                            layer.needs_clear = true;
+                            Object.assign(element.prev_position, element.position);
+                        }
+                    });
+                };
 
                 for (var layer_name in this.layers) {
-                    this.layers[layer_name].draw(this.timer);
+                    _loop(layer_name);
+                }
+
+                return this;
+            }
+        }, {
+            key: 'render',
+            value: function render() {
+                for (var layer_name in this.layers) {
+                    var _layer = this.layers[layer_name];
+                    var force_redraw = false;
+
+                    if (_layer.needs_clear) {
+                        _layer.clear();
+
+                        _layer.needs_clear = false;
+                        force_redraw = true;
+                    }
+
+                    _layer.draw(force_redraw);
                 }
 
                 return this;
@@ -195,10 +205,12 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
                 this.container.style.height = level.height + 'px';
 
                 for (var layer_name in this.layers) {
-                    var layer = this.layers[layer_name];
-                    layer.setSize(level.width, level.height);
+                    var _layer2 = this.layers[layer_name];
+
+                    _layer2.setSize(level.width, level.height);
                 }
 
+                level.trigger('start');
                 return this;
             }
         }]);

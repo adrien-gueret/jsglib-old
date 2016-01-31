@@ -9,7 +9,8 @@ var my_game = new Game(document.getElementById('myGame'));
 
 var level = new Room();
 
-class TilesSprite extends Sprite {}
+class TilesSprite extends Sprite {
+}
 
 TilesSprite.loadImage('./tiles.png')
     .then(() => {
@@ -47,16 +48,17 @@ TilesSprite.loadImage('./tiles.png')
     .then(() => {
         my_game
             .goToRoom(level)
-            .start()
-            .on('click', (e) => {
-                var tile = Layer.TILES_LAYER.getTileFromPoint(e.detail.mouse);
+            .start();
 
-                if (!tile) {
-                    return;
-                }
+        my_game.inputs.on('click', (e) => {
+            let tile = Layer.TILES_LAYER.getTileFromPoint(e.detail.mouse);
 
-                if (tile.tile_number > 1) {
-                    tile.setTileNumber(tile.tile_number - 1);
-                }
-            });
+            if (!tile) {
+                return;
+            }
+
+            if (tile.tile_number > 1) {
+                tile.setTileNumber(tile.tile_number - 1);
+            }
+        });
     });

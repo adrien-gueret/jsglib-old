@@ -1,16 +1,9 @@
 "use strict";
 
 import Tile from "jsglib/tile";
+import Animation from "jsglib/animation";
 
 class Sprite {
-    constructor() {
-        this.image = this.constructor.image;
-    }
-
-    getTilesSize() {
-        return this.constructor.getTilesSize();
-    }
-
     static getTilesSize() {
         return {
             width: this.tiles_width || 0,
@@ -89,30 +82,37 @@ class Sprite {
         return this;
     }
 
-    static defineTilesAnimations(...animations) {
-        for (let animation of animations) {
-            animation.tiles.forEach((tile_number, index) => {
-                let current_animated_tile = this.getTile(tile_number, false);
-                let next_tile_number = animation.tiles[index + 1] || animation.tiles[0];
+    static defineTilesAnimations(animations, timer) {
+        this.animations = {};
 
-                current_animated_tile.setAnimation(next_tile_number, animation.time);
-            });
-        }
+        animations.forEach((animation) => {
+            this.animations[animation.name || Symbol()] = Animation.define(timer, animation.tiles, animation.time);
+        });
 
         return this;
     }
 
-    static defineTilesTypes(...types) {
-        for (let type of types) {
+    static getAnimationClass(animation_name) {
+        return this.animations[animation_name] || null;
+    }
+
+    static defineTilesTypes(types) {
+        types.forEach((type) => {
             // TODO
-        }
+        });
 
         return this;
     }
 }
 
+Sprite.image = null;
+Sprite.tiles = [];
+Sprite.tiles_width = 0;
+Sprite.tiles_height = 0;
+Sprite.animations = {};
+
 Sprite.TILES_TYPES = {
-    WALL: Symbol()
+    SOLID: Symbol()
 };
 
 export default Sprite;

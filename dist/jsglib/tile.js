@@ -81,7 +81,6 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
             _this.position = new _point2.default(x, y);
             _this.tile_number = tile_number;
             _this.needs_redraw = true;
-            _this.clock_animation = null;
             _this.is_empty = false;
             return _this;
         }
@@ -89,29 +88,15 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
         _createClass(Tile, [{
             key: "clone",
             value: function clone() {
-                var new_tile = new Tile(this.sprite_class, this.position.x, this.position.y, this.tile_number);
-
-                if (this.animation) {
-                    var _animation = this.animation;
-                    var next_tile_number = _animation.next_tile_number;
-                    var time = _animation.time;
-                    new_tile.animation = {
-                        next_tile_number: next_tile_number,
-                        time: time
-                    };
-                }
-
-                return new_tile;
+                return new Tile(this.sprite_class, this.position.x, this.position.y, this.tile_number);
             }
         }, {
             key: "setTileNumber",
             value: function setTileNumber(tile_number) {
-                this.trigger('clear_animation');
                 var tile = this.sprite_class.getTile(tile_number);
                 this.is_empty = tile.is_empty;
                 this.tile_number = tile_number;
                 this.position = tile.position;
-                this.animation = tile.animation;
                 this.needs_redraw = true;
                 return this;
             }
@@ -119,32 +104,13 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
             key: "draw",
             value: function draw(ctx) {
                 var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-
-                var _this2 = this;
-
                 var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-                var timer = arguments[3];
                 var tiles_size = {
                     width: this.sprite_class.tiles_width,
                     height: this.sprite_class.tiles_height
                 };
-                var dest_x = x * tiles_size.height;
-                var dest_y = y * tiles_size.width;
-                ctx.drawImage(this.sprite_class.image, this.position.x, this.position.y, tiles_size.width, tiles_size.height, dest_x, dest_y, tiles_size.width, tiles_size.height);
-
-                if (this.animation) {
-                    this.trigger('clear_animation');
-                    this.clock_animation = timer.setTimeout(function () {
-                        _this2.setTileNumber(_this2.animation.next_tile_number);
-                    }, this.animation.time);
-                    this.off('clear_animation').on('clear_animation', function () {
-                        if (_this2.clock_animation) {
-                            timer.clearTimeout(_this2.clock_animation);
-                            _this2.clock_animation = null;
-                        }
-                    });
-                }
-
+                ctx.drawImage(this.sprite_class.image, this.position.x, this.position.y, tiles_size.width, tiles_size.height, x, y, tiles_size.width, tiles_size.height);
+                this.trigger('drawn');
                 return this;
             }
         }, {
@@ -154,9 +120,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                     width: this.sprite_class.tiles_width,
                     height: this.sprite_class.tiles_height
                 };
-                var dest_x = x * tiles_size.height;
-                var dest_y = y * tiles_size.width;
-                ctx.clearRect(dest_x, dest_y, tiles_size.width, tiles_size.height);
+                ctx.clearRect(x, y, tiles_size.width, tiles_size.height);
                 return this;
             }
         }, {

@@ -76,7 +76,7 @@ define(["exports", "jsglib/events_handler"], function (exports, _events_handler)
             _this.fps = fps;
             _this.clocks = {};
 
-            _this.on('step', function () {
+            _this.on('frame', function () {
                 _this.checkCounters();
             });
 

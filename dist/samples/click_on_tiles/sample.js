@@ -91,7 +91,8 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
             }
         });
     }).then(function () {
-        my_game.goToRoom(level).start().on('click', function (e) {
+        my_game.goToRoom(level).start();
+        my_game.inputs.on('click', function (e) {
             var tile = _layer2.default.TILES_LAYER.getTileFromPoint(e.detail.mouse);
 
             if (!tile) {

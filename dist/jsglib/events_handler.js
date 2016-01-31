@@ -70,9 +70,12 @@ define(['exports'], function (exports) {
             value: function trigger(event_name) {
                 var data = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
                 var custom_event = new CustomEvent('jsglib.' + event_name, {
-                    detail: data
+                    detail: data,
+                    bubbles: false,
+                    cancelable: true
                 });
-                return this.events_handler.dispatchEvent(custom_event);
+                this.events_handler.dispatchEvent(custom_event);
+                return custom_event;
             }
         }]);
 

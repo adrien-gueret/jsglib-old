@@ -32,7 +32,8 @@ export default class EventsHandler {
     }
 
     trigger(event_name, data = {}) {
-        let custom_event = new CustomEvent('jsglib.' + event_name, {detail: data});
-        return this.events_handler.dispatchEvent(custom_event);
+        let custom_event = new CustomEvent('jsglib.' + event_name, {detail: data, bubbles: false, cancelable: true});
+        this.events_handler.dispatchEvent(custom_event);
+        return custom_event;
     }
 }

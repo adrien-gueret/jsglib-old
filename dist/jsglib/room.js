@@ -98,20 +98,21 @@ define(["exports", "jsglib/events_handler", "jsglib/http"], function (exports, _
                     var _loop = function _loop(layer_name) {
                         var definition = _this2.definition.layers[layer_name];
                         var layer = game.getLayerFromName(layer_name);
-                        layer.tiles_sprite = null;
+                        layer.tiles_sprite_class = null;
                         layer.tiles = [];
 
                         if (definition.tiles) {
                             (function () {
                                 var SpriteClass = game.getClass(definition.sprite_class);
-                                layer.tiles_sprite = new SpriteClass();
+                                layer.tiles_sprite_class = SpriteClass;
                                 definition.tiles.forEach(function (row, row_index) {
                                     layer.tiles[row_index] = layer.tiles[row_index] || [];
                                     row.forEach(function (tile_number, column_index) {
                                         layer.tiles[row_index][column_index] = SpriteClass.getTile(tile_number);
                                     });
                                 });
-                                var tiles_size = layer.tiles_sprite.getTilesSize();
+                                layer.clearTilesAnimations().initTilesAnimations(game.timer);
+                                var tiles_size = layer.tiles_sprite_class.getTilesSize();
                                 _this2.width = Math.max(_this2.width, layer.tiles[0].length * tiles_size.width);
                                 _this2.height = Math.max(_this2.height, layer.tiles.length * tiles_size.height);
                             })();

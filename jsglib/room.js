@@ -23,12 +23,12 @@ export default class Room extends EventsHandler {
             for (let layer_name in this.definition.layers) {
                 let definition = this.definition.layers[layer_name];
                 let layer = game.getLayerFromName(layer_name);
-                layer.tiles_sprite = null;
+                layer.tiles_sprite_class = null;
                 layer.tiles = [];
 
                 if (definition.tiles) {
                     let SpriteClass = game.getClass(definition.sprite_class);
-                    layer.tiles_sprite = new SpriteClass();
+                    layer.tiles_sprite_class = SpriteClass;
 
                     definition.tiles.forEach((row, row_index) => {
                         layer.tiles[row_index] = layer.tiles[row_index] || [];
@@ -38,7 +38,9 @@ export default class Room extends EventsHandler {
                         });
                     });
 
-                    let tiles_size = layer.tiles_sprite.getTilesSize();
+                    layer.clearTilesAnimations().initTilesAnimations(game.timer);
+
+                    let tiles_size = layer.tiles_sprite_class.getTilesSize();
                     this.width = Math.max(this.width, layer.tiles[0].length * tiles_size.width);
                     this.height = Math.max(this.height, layer.tiles.length * tiles_size.height);
                 }

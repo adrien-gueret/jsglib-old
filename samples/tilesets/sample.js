@@ -6,12 +6,12 @@ import Room from "jsglib/room";
 import Layer from "jsglib/layer";
 
 class MainTilesSprite extends Sprite {
-    static initTiles() {
+    static initTiles(timer) {
         this.makeTiles(32, 32)
-            .defineTilesAnimations({
+            .defineTilesAnimations([{
                 tiles: [6, 14],
                 time: 500
-            });
+            }], timer);
         return this;
     }
 }
@@ -32,8 +32,8 @@ Promise.all([
         TilesSnowSprite.loadImage('./tiles_snow.png')
     ])
     .then(() => {
-        TilesPlainSprite.initTiles();
-        TilesSnowSprite.initTiles();
+        TilesPlainSprite.initTiles(my_game.timer);
+        TilesSnowSprite.initTiles(my_game.timer);
         return level1.useDefinition('./level.json');
     })
     .then(() => {
@@ -42,9 +42,9 @@ Promise.all([
             .start();
 
         my_game.container.onclick = () => {
-            let used_sprite = Layer.TILES_LAYER.tiles_sprite;
-            let new_sprite_class = used_sprite instanceof TilesPlainSprite ? TilesSnowSprite : TilesPlainSprite;
-            Layer.TILES_LAYER.tiles_sprite = new new_sprite_class();
+            let used_sprite_class = Layer.TILES_LAYER.tiles_sprite_class;
+            let new_sprite_class = used_sprite_class === TilesPlainSprite ? TilesSnowSprite : TilesPlainSprite;
+            Layer.TILES_LAYER.tiles_sprite_class = new_sprite_class;
 
             Layer.TILES_LAYER.tiles.forEach(row => {
                 row.forEach(tile => {
