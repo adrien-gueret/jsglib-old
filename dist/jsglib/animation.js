@@ -104,13 +104,13 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
                     _this2.animation_index++;
 
                     if (_this2.animation_index < _this2.tiles_numbers.length) {
-                        _this2.trigger('animation_udpate');
+                        _this2.trigger('animation_update');
 
                         _this2.start(time, loop);
                     } else if (loop) {
                         _this2.stop();
 
-                        _this2.trigger('animation_udpate');
+                        _this2.trigger('animation_update');
 
                         _this2.start(time, loop);
                     }

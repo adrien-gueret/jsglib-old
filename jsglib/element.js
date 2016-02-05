@@ -46,7 +46,7 @@ export default class Element extends EventsHandler {
         this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
 
         this.current_animation
-            .on('animation_udpate', () => {
+            .on('animation_update', () => {
                 this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
             })
             .start(time, loop);

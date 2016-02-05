@@ -108,7 +108,7 @@ class Layer {
             this.tiles_animations.push(animation);
 
             animation
-                .on('animation_udpate', () => {
+                .on('animation_update', () => {
                     this.getAllTilesFromNumber(animation.getPreviousTileNumber()).forEach((tile) => {
                         tile.setTileNumber(animation.getCurrentTileNumber());
                     });
