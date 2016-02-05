@@ -120,7 +120,7 @@ define(["exports", "jsglib/point", "jsglib/events_handler"], function (exports, 
 
                 this.current_animation = new animation_class(timer);
                 this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
-                this.current_animation.on('animation_udpate', function () {
+                this.current_animation.on('animation_update', function () {
                     _this2.setCurrentTileNumber(_this2.current_animation.getCurrentTileNumber());
                 }).start(time, loop);
                 return this;
