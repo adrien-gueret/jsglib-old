@@ -1,5 +1,7 @@
 "use strict";
 
+import Point from 'jsglib/point';
+
 class Layer {
     constructor(name) {
         this.name = name;
@@ -43,6 +45,41 @@ class Layer {
         }
 
         return row[Math.floor(point.x / tiles_size.width)] || null;
+    }
+
+    getTilesFromRectangle(rectangle) {
+        let tiles = [];
+
+        if (!this.tiles_sprite_class) {
+            return tiles;
+        }
+
+        let tiles_size = this.tiles_sprite_class.getTilesSize();
+        let x_min = Math.floor(rectangle.position.x / tiles_size.width);
+        let y_min = Math.floor(rectangle.position.y / tiles_size.height);
+        let x_max = Math.floor((rectangle.position.x + rectangle.width - 1) / tiles_size.width);
+        let y_max = Math.floor((rectangle.position.y + rectangle.height - 1) / tiles_size.height);
+
+        for (let x = x_min; x <= x_max; x++) {
+            for (let y = y_min; y <= y_max; y++) {
+                let row = this.tiles[y];
+
+                if (!row) {
+                    continue;
+                }
+
+                let tile = row[x];
+
+                if (tile) {
+                    tiles.push({
+                        tile,
+                        position: new Point(x * tiles_size.width, y * tiles_size.height)
+                    });
+                }
+            }
+        }
+
+        return tiles;
     }
 
     getAllTilesFromNumber(tile_number) {

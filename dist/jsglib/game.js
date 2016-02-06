@@ -97,7 +97,7 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
                 var _this2 = this;
 
                 this.layers = {};
-                layers.forEach(function (layer, key) {
+                layers.reverse().forEach(function (layer, key) {
                     layer.setZindex(key);
                     _this2.layers[layer.name] = layer;
 
@@ -163,10 +163,15 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
                     var layer = _this3.layers[layer_name];
                     layer.elements.forEach(function (element) {
                         element.trigger('frame');
+                        element.move();
+
+                        if (!element.position.equals(element.prev_position)) {
+                            element.checkCollisions(_this3.layers);
+                        }
 
                         if (!element.position.equals(element.prev_position)) {
                             layer.needs_clear = true;
-                            Object.assign(element.prev_position, element.position);
+                            element.prev_position.copy(element.position);
                         }
                     });
                 };

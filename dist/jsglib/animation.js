@@ -136,7 +136,10 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
                     function _class(default_timer) {
                         _classCallCheck(this, _class);
 
-                        return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this, timer || default_timer, tiles_numbers, default_time, name));
+                        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this, timer || default_timer, tiles_numbers, default_time));
+
+                        _this3.name = name;
+                        return _this3;
                     }
 
                     return _class;

@@ -133,7 +133,7 @@ define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile,
 
                 this.animations = {};
                 animations.forEach(function (animation) {
-                    _this2.animations[animation.name || Symbol()] = _animation2.default.define(timer, animation.tiles, animation.time);
+                    _this2.animations[animation.name || Symbol()] = _animation2.default.define(timer, animation.tiles, animation.time, animation.name);
                 });
                 return this;
             }
@@ -145,7 +145,17 @@ define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile,
         }, {
             key: "defineTilesTypes",
             value: function defineTilesTypes(types) {
-                types.forEach(function (type) {});
+                var _this3 = this;
+
+                var keys = Array.prototype.concat(Object.getOwnPropertyNames(types), Object.getOwnPropertySymbols(types));
+                keys.forEach(function (type_name) {
+                    var tiles_numbers = types[type_name];
+                    tiles_numbers.forEach(function (tile_number) {
+                        var tile = _this3.getTile(tile_number, false);
+
+                        tile.type = type_name;
+                    });
+                });
                 return this;
             }
         }]);
@@ -158,9 +168,6 @@ define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile,
     Sprite.tiles_width = 0;
     Sprite.tiles_height = 0;
     Sprite.animations = {};
-    Sprite.TILES_TYPES = {
-        SOLID: Symbol()
-    };
     exports.default = Sprite;
 });
 //# sourceMappingURL=sprite.js.map

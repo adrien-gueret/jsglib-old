@@ -4,14 +4,15 @@ import EventsHandler from "jsglib/events_handler";
 import Point from "jsglib/point";
 
 class Tile extends EventsHandler {
-    constructor(sprite_class, x = 0, y = 0, tile_number = 0) {
+    constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null) {
         super();
 
         this.sprite_class = sprite_class;
-        this.position = new Point(x, y);
+        this.sheet_position = new Point(x, y);
         this.tile_number = tile_number;
         this.needs_redraw = true;
         this.is_empty = false;
+        this.type = type;
     }
 
     static getNewEmptyTile(sprite_class) {
@@ -20,15 +21,20 @@ class Tile extends EventsHandler {
         return tile;
     }
 
+    getSize() {
+        return this.sprite_class.getTilesSize();
+    }
+
     clone() {
-        return new Tile(this.sprite_class, this.position.x, this.position.y, this.tile_number);
+        return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type);
     }
 
     setTileNumber(tile_number) {
         let tile = this.sprite_class.getTile(tile_number);
         this.is_empty = tile.is_empty;
         this.tile_number = tile_number;
-        this.position = tile.position;
+        this.sheet_position = tile.sheet_position;
+        this.type = tile.type;
         this.needs_redraw = true;
 
         return this;
@@ -42,8 +48,8 @@ class Tile extends EventsHandler {
 
         ctx.drawImage(
             this.sprite_class.image,
-            this.position.x,
-            this.position.y,
+            this.sheet_position.x,
+            this.sheet_position.y,
             tiles_size.width,
             tiles_size.height,
             x,
@@ -67,10 +73,13 @@ class Tile extends EventsHandler {
         return this;
     }
 
-    setAnimation(next_tile_number, time) {
-        this.animation = {next_tile_number, time};
-        return this;
+    isSolid() {
+        return this.type === Tile.TYPES.SOLID;
     }
 }
+
+Tile.TYPES = {
+    SOLID: Symbol()
+};
 
 export default Tile;

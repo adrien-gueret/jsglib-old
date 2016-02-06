@@ -41,9 +41,46 @@ define(["exports"], function (exports) {
         }
 
         _createClass(Point, [{
+            key: "copy",
+            value: function copy(point) {
+                this.constructor(point.x, point.y);
+                return this;
+            }
+        }, {
+            key: "clone",
+            value: function clone() {
+                return new Point(this.x, this.y);
+            }
+        }, {
             key: "equals",
             value: function equals(point) {
                 return this.x === point.x && this.y === point.y;
+            }
+        }, {
+            key: "add",
+            value: function add(point) {
+                var new_point = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+                if (new_point) {
+                    return new Point(this.x + point.x, this.y + point.y);
+                }
+
+                this.x += point.x;
+                this.y += point.y;
+                return this;
+            }
+        }, {
+            key: "substract",
+            value: function substract(point) {
+                var new_point = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+                if (new_point) {
+                    return new Point(this.x - point.x, this.y - point.y);
+                }
+
+                this.x -= point.x;
+                this.y -= point.y;
+                return this;
             }
         }]);
 

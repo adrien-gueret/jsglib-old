@@ -1,9 +1,17 @@
-define(['exports'], function (exports) {
+define(['exports', 'jsglib/point'], function (exports, _point) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
+
+    var _point2 = _interopRequireDefault(_point);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -76,6 +84,42 @@ define(['exports'], function (exports) {
                 }
 
                 return row[Math.floor(point.x / tiles_size.width)] || null;
+            }
+        }, {
+            key: 'getTilesFromRectangle',
+            value: function getTilesFromRectangle(rectangle) {
+                var tiles = [];
+
+                if (!this.tiles_sprite_class) {
+                    return tiles;
+                }
+
+                var tiles_size = this.tiles_sprite_class.getTilesSize();
+                var x_min = Math.floor(rectangle.position.x / tiles_size.width);
+                var y_min = Math.floor(rectangle.position.y / tiles_size.height);
+                var x_max = Math.floor((rectangle.position.x + rectangle.width - 1) / tiles_size.width);
+                var y_max = Math.floor((rectangle.position.y + rectangle.height - 1) / tiles_size.height);
+
+                for (var x = x_min; x <= x_max; x++) {
+                    for (var y = y_min; y <= y_max; y++) {
+                        var row = this.tiles[y];
+
+                        if (!row) {
+                            continue;
+                        }
+
+                        var tile = row[x];
+
+                        if (tile) {
+                            tiles.push({
+                                tile: tile,
+                                position: new _point2.default(x * tiles_size.width, y * tiles_size.height)
+                            });
+                        }
+                    }
+                }
+
+                return tiles;
             }
         }, {
             key: 'getAllTilesFromNumber',

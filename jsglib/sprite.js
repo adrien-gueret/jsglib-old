@@ -86,7 +86,7 @@ class Sprite {
         this.animations = {};
 
         animations.forEach((animation) => {
-            this.animations[animation.name || Symbol()] = Animation.define(timer, animation.tiles, animation.time);
+            this.animations[animation.name || Symbol()] = Animation.define(timer, animation.tiles, animation.time, animation.name);
         });
 
         return this;
@@ -97,8 +97,17 @@ class Sprite {
     }
 
     static defineTilesTypes(types) {
-        types.forEach((type) => {
-            // TODO
+        var keys = Array.prototype.concat(
+            Object.getOwnPropertyNames(types),
+            Object.getOwnPropertySymbols(types)
+        );
+
+        keys.forEach((type_name) => {
+            let tiles_numbers = types[type_name];
+            tiles_numbers.forEach((tile_number) => {
+                let tile = this.getTile(tile_number, false);
+                tile.type = type_name;
+            });
         });
 
         return this;
@@ -110,9 +119,5 @@ Sprite.tiles = [];
 Sprite.tiles_width = 0;
 Sprite.tiles_height = 0;
 Sprite.animations = {};
-
-Sprite.TILES_TYPES = {
-    SOLID: Symbol()
-};
 
 export default Sprite;

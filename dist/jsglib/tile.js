@@ -72,23 +72,30 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
             var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
             var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
             var tile_number = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+            var type = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
 
             _classCallCheck(this, Tile);
 
             var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Tile).call(this));
 
             _this.sprite_class = sprite_class;
-            _this.position = new _point2.default(x, y);
+            _this.sheet_position = new _point2.default(x, y);
             _this.tile_number = tile_number;
             _this.needs_redraw = true;
             _this.is_empty = false;
+            _this.type = type;
             return _this;
         }
 
         _createClass(Tile, [{
+            key: "getSize",
+            value: function getSize() {
+                return this.sprite_class.getTilesSize();
+            }
+        }, {
             key: "clone",
             value: function clone() {
-                return new Tile(this.sprite_class, this.position.x, this.position.y, this.tile_number);
+                return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type);
             }
         }, {
             key: "setTileNumber",
@@ -96,7 +103,8 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                 var tile = this.sprite_class.getTile(tile_number);
                 this.is_empty = tile.is_empty;
                 this.tile_number = tile_number;
-                this.position = tile.position;
+                this.sheet_position = tile.sheet_position;
+                this.type = tile.type;
                 this.needs_redraw = true;
                 return this;
             }
@@ -109,7 +117,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                     width: this.sprite_class.tiles_width,
                     height: this.sprite_class.tiles_height
                 };
-                ctx.drawImage(this.sprite_class.image, this.position.x, this.position.y, tiles_size.width, tiles_size.height, x, y, tiles_size.width, tiles_size.height);
+                ctx.drawImage(this.sprite_class.image, this.sheet_position.x, this.sheet_position.y, tiles_size.width, tiles_size.height, x, y, tiles_size.width, tiles_size.height);
                 this.trigger('drawn');
                 return this;
             }
@@ -124,13 +132,9 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
                 return this;
             }
         }, {
-            key: "setAnimation",
-            value: function setAnimation(next_tile_number, time) {
-                this.animation = {
-                    next_tile_number: next_tile_number,
-                    time: time
-                };
-                return this;
+            key: "isSolid",
+            value: function isSolid() {
+                return this.type === Tile.TYPES.SOLID;
             }
         }], [{
             key: "getNewEmptyTile",
@@ -144,6 +148,9 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
         return Tile;
     })(_events_handler2.default);
 
+    Tile.TYPES = {
+        SOLID: Symbol()
+    };
     exports.default = Tile;
 });
 //# sourceMappingURL=tile.js.map

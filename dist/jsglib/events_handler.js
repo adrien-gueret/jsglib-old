@@ -74,6 +74,13 @@ define(['exports'], function (exports) {
                     bubbles: false,
                     cancelable: true
                 });
+                custom_event.propagationStopped = false;
+
+                custom_event.stopPropagation = function () {
+                    this.propagationStopped = true;
+                    CustomEvent.prototype.stopPropagation.apply(this);
+                };
+
                 this.events_handler.dispatchEvent(custom_event);
                 return custom_event;
             }

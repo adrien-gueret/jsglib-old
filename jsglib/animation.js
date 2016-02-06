@@ -48,7 +48,8 @@ class Animation extends EventsHandler {
     static define(timer, tiles_numbers, default_time, name = Symbol()) {
         Animation.classes[name] = class extends Animation {
             constructor(default_timer) {
-                super(timer || default_timer, tiles_numbers, default_time, name);
+                super(timer || default_timer, tiles_numbers, default_time);
+                this.name = name;
             }
         };
 

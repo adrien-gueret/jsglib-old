@@ -24,7 +24,7 @@ export default class Game extends EventsHandler {
     defineLayers(layers) {
         this.layers = {};
 
-        layers.forEach((layer, key) => {
+        layers.reverse().forEach((layer, key) => {
             layer.setZindex(key);
             this.layers[layer.name] = layer;
             this.container.appendChild(layer.canvas);
@@ -88,10 +88,16 @@ export default class Game extends EventsHandler {
 
             layer.elements.forEach((element) => {
                 element.trigger('frame');
+                element.move();
+
+                // Check collisions only if element has moved
+                if (!element.position.equals(element.prev_position)) {
+                    element.checkCollisions(this.layers);
+                }
 
                 if (!element.position.equals(element.prev_position)) {
                     layer.needs_clear = true;
-                    Object.assign(element.prev_position, element.position);
+                    element.prev_position.copy(element.position);
                 }
             });
         }
