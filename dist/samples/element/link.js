@@ -112,6 +112,7 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
             _classCallCheck(this, Link);
 
             var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y));
+            // We must call the parent's constructor
 
             _this2.setSpriteClass(LinkSprite);
 

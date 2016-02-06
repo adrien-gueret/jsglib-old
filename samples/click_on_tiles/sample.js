@@ -5,17 +5,23 @@ import Sprite from "jsglib/sprite";
 import Room from "jsglib/room";
 import Layer from "jsglib/layer";
 
+// Create a new game from a dom element
 var my_game = new Game(document.getElementById('myGame'));
 
+// Our game will have only one room
 var level = new Room();
 
+// Define a class inherited from JSGlib Sprite class
 class TilesSprite extends Sprite {
 }
 
+// Load the only image of the game
 TilesSprite.loadImage('./tiles.png')
     .then(() => {
+        // Image is loaded, we can create tiles from it
         TilesSprite.makeTiles(32, 32, 0);
 
+        // Randomly generate tiles for room definition
         const TOTAL_COLUMNS = 15;
         const TOTAL_ROWS = 10;
         let tiles = [];
@@ -36,6 +42,7 @@ TilesSprite.loadImage('./tiles.png')
             tiles[row_index] = row;
         }
 
+        // Instead of using an external file, we provide a plain object for our level definition
         return level.useDefinition({
             "layers": {
                 "TILES_LAYER": {
@@ -46,17 +53,21 @@ TilesSprite.loadImage('./tiles.png')
         });
     })
     .then(() => {
+        // Level definition is fully loaded, we can go to our room and start the game!
         my_game
             .goToRoom(level)
             .start();
 
+        // When we click on the game...
         my_game.inputs.on('click', (e) => {
+            // Get the clicked tile
             let tile = Layer.TILES_LAYER.getTileFromPoint(e.detail.mouse);
 
             if (!tile) {
                 return;
             }
 
+            // And update its tile number
             if (tile.tile_number > 1) {
                 tile.setTileNumber(tile.tile_number - 1);
             }

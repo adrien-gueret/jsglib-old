@@ -5,6 +5,7 @@ import Inputs from "jsglib/inputs";
 import Layer from "jsglib/layer";
 import Sprite from "jsglib/sprite";
 
+// Sprite class defining tiles and animations for Link
 export class LinkSprite extends Sprite {
     static init(timer) {
         this
@@ -103,23 +104,23 @@ export class Link extends Element {
         // Other specific events related to this current instance
         this
             .on('frame', () => {
-            // On each frame, update instance's speeds according to pressed keys
-            if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.LEFT)) {
-                this.speed.x = -LINK_SPEED;
-            } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.RIGHT)) {
-                this.speed.x = LINK_SPEED;
-            } else {
-                this.speed.x = 0;
-            }
+                // On each frame, update instance's speeds according to pressed keys
+                if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.LEFT)) {
+                    this.speed.x = -LINK_SPEED;
+                } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.RIGHT)) {
+                    this.speed.x = LINK_SPEED;
+                } else {
+                    this.speed.x = 0;
+                }
 
-            if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.UP)) {
-                this.speed.y = -LINK_SPEED;
-            } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.DOWN)) {
-                this.speed.y = LINK_SPEED;
-            } else {
-                this.speed.y = 0;
-            }
-        })
+                if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.UP)) {
+                    this.speed.y = -LINK_SPEED;
+                } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.DOWN)) {
+                    this.speed.y = LINK_SPEED;
+                } else {
+                    this.speed.y = 0;
+                }
+            })
             .on('tile_collision', (e) => {
                 // On collision with solids, use "push" animation according to collided tile position
                 if (e.detail.tile_data.tile.isSolid()) {
@@ -145,7 +146,7 @@ export class Link extends Element {
             .on('no_solids_collision', () => {
                 // When the instance has no collisions with solids, if it's pushing,
                 // change its "push" animation to the corresponding "walk" one
-                switch(this.getAnimationName()) {
+                switch (this.getAnimationName()) {
                     case 'push_left':
                         this.useAnimation('walk_left');
                         break;

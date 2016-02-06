@@ -5,6 +5,7 @@ import Inputs from "jsglib/inputs";
 import Layer from "jsglib/layer";
 import Sprite from "jsglib/sprite";
 
+// Sprite class defining tiles and animations for Link
 export class LinkSprite extends Sprite {
     static init(timer) {
         this
@@ -36,6 +37,7 @@ export class LinkSprite extends Sprite {
 
 export class Link extends Element {
     constructor(x, y, game) {
+        // We must call the parent's constructor
         super(x, y);
 
         this.setSpriteClass(LinkSprite);

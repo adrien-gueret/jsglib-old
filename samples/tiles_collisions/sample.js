@@ -8,14 +8,17 @@ import {Link, LinkSprite} from "./link";
 
 class HouseSpriteSheets extends Sprite {}
 
+// Create a new game from a dom element
 let my_game = new Game(document.getElementById('myGame'));
 
+// Load all images
 Promise
     .all([
         LinkSprite.loadImage('./link.png'),
         HouseSpriteSheets.loadImage('./house_tiles.png')
     ])
     .then(() => {
+        // Images are loaded, we can init their Sprite classes
         LinkSprite.init(my_game.timer);
         HouseSpriteSheets
             .makeTiles(32, 32, 1)
@@ -24,6 +27,8 @@ Promise
             });
 
         let level = new Room();
+
+        // Define our level
         level.useDefinition({
             layers: {
                 TILES_LAYER: {
@@ -42,10 +47,12 @@ Promise
             }
         });
 
+        // When level starts, create an instance of Link
         level.on('start', () => {
             new Link(128, 160, my_game);
         });
 
+        // Start the game!
         my_game
             .goToRoom(level)
             .start();
