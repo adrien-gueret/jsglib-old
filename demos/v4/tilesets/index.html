@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <title>Manipulating tilesets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../../../stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../../../stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../../../stylesheets/github-light.css" media="screen">
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #myGame {
+            border: 10px solid #000;
+            margin: auto;
+            position: relative;
+            background-color: lightblue;
+            box-sizing: content-box;
+        }
+    </style>
+</head>
+<body>
+<section class="page-header">
+    <h1 class="project-name">JSGlib v4</h1>
+    <h2 class="project-tagline">Manipulating tilesets</h2>
+    <a href="../../../" class="btn">Home</a>
+    <a href="https://github.com/adrien-gueret/jsglib/tree/v4/samples/tilesets" class="btn">View on GitHub</a>
+</section>
+
+<section class="main-content">
+    <div id="myGame"></div>
+    <p>Click on the canvas to change tileset.</p>
+</section>
+<script data-main="sample.js"
+        src="//requirejs.org/docs/release/2.1.22/minified/require.js"></script>
+<script>
+    require.config({
+        paths: {
+            jsglib: '../jsglib'
+        }
+    });
+</script>
+</body>
+</html>
