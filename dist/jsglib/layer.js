@@ -187,7 +187,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
 
                     _this2.tiles_animations.push(animation);
 
-                    animation.on('animation_udpate', function () {
+                    animation.on('animation_update', function () {
                         _this2.getAllTilesFromNumber(animation.getPreviousTileNumber()).forEach(function (tile) {
                             tile.setTileNumber(animation.getCurrentTileNumber());
                         });

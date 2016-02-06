@@ -27,11 +27,11 @@ class Animation extends EventsHandler {
             this.animation_index++;
 
             if (this.animation_index < this.tiles_numbers.length) {
-                this.trigger('animation_udpate');
+                this.trigger('animation_update');
                 this.start(time, loop);
             } else if (loop) {
                 this.stop();
-                this.trigger('animation_udpate');
+                this.trigger('animation_update');
                 this.start(time, loop);
             }
         }, time);
