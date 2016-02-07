@@ -82,6 +82,16 @@ define(["exports"], function (exports) {
                 this.y -= point.y;
                 return this;
             }
+        }, {
+            key: "isInRectangle",
+            value: function isInRectangle(rectangle) {
+                return this.x >= rectangle.position.x && this.x < rectangle.position.x + rectangle.width && this.y >= rectangle.position.y && this.y < rectangle.position.y + rectangle.height;
+            }
+        }, {
+            key: "isOverElement",
+            value: function isOverElement(element) {
+                return this.isInRectangle(element.getRectangle());
+            }
         }]);
 
         return Point;

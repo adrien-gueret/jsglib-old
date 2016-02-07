@@ -19,6 +19,19 @@ export default class Game extends EventsHandler {
 
         this.defineLayers(layers);
         this.inputs = new Inputs(this.container);
+
+        this.inputs.on('click', () => {
+            for (let layer_name in this.layers) {
+                let layer = this.layers[layer_name];
+
+                layer.elements.some((element) => {
+                    if (this.inputs.mouse.isOverElement(element)) {
+                        let custom_event = element.trigger('click', {mouse: this.inputs.mouse});
+                        return custom_event.propagationStopped;
+                    }
+                });
+            }
+        });
     }
 
     defineLayers(layers) {

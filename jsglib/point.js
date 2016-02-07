@@ -40,4 +40,15 @@ export default class Point {
 
         return this;
     }
+
+    isInRectangle(rectangle) {
+        return (this.x >= rectangle.position.x &&
+        this.x < rectangle.position.x + rectangle.width &&
+        this.y >= rectangle.position.y &&
+        this.y < rectangle.position.y + rectangle.height);
+    }
+
+    isOverElement(element) {
+        return this.isInRectangle(element.getRectangle());
+    }
 }

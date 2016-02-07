@@ -88,6 +88,21 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
             _this.defineLayers(layers);
 
             _this.inputs = new _inputs2.default(_this.container);
+
+            _this.inputs.on('click', function () {
+                for (var layer_name in _this.layers) {
+                    var layer = _this.layers[layer_name];
+                    layer.elements.some(function (element) {
+                        if (_this.inputs.mouse.isOverElement(element)) {
+                            var custom_event = element.trigger('click', {
+                                mouse: _this.inputs.mouse
+                            });
+                            return custom_event.propagationStopped;
+                        }
+                    });
+                }
+            });
+
             return _this;
         }
 
