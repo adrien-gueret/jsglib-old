@@ -112,7 +112,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
                 var loop = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
                 var timer = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
-                if (this.current_animation) {
+                if (this.current_animation && this.current_animation.is_running) {
                     if (this.getAnimationName() === animation_name) {
                         return this;
                     }

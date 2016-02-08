@@ -79,6 +79,7 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
             _this.tiles_numbers = tiles_numbers;
             _this.animation_index = 0;
             _this.animation_clock = null;
+            _this.is_running = false;
             return _this;
         }
 
@@ -100,6 +101,7 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
 
                 var time = arguments.length <= 0 || arguments[0] === undefined ? this.default_time : arguments[0];
                 var loop = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+                this.is_running = true;
                 this.animation_clock = this.timer.setTimeout(function () {
                     _this2.animation_index++;
 
@@ -113,6 +115,10 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
                         _this2.trigger('animation_update');
 
                         _this2.start(time, loop);
+                    } else {
+                        _this2.stop();
+
+                        _this2.trigger('animation_end');
                     }
                 }, time);
                 return this;
@@ -123,6 +129,7 @@ define(['exports', 'jsglib/events_handler'], function (exports, _events_handler)
                 this.timer.clearTimeout(this.animation_clock);
                 this.animation_clock = null;
                 this.animation_index = 0;
+                this.is_running = false;
                 return this;
             }
         }], [{

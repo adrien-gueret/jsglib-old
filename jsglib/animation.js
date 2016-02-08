@@ -10,6 +10,7 @@ class Animation extends EventsHandler {
         this.tiles_numbers = tiles_numbers;
         this.animation_index = 0;
         this.animation_clock = null;
+        this.is_running = false;
     }
 
     getPreviousTileNumber() {
@@ -23,6 +24,8 @@ class Animation extends EventsHandler {
     }
 
     start(time = this.default_time, loop = true) {
+        this.is_running = true;
+
         this.animation_clock = this.timer.setTimeout(() => {
             this.animation_index++;
 
@@ -33,6 +36,9 @@ class Animation extends EventsHandler {
                 this.stop();
                 this.trigger('animation_update');
                 this.start(time, loop);
+            } else {
+                this.stop();
+                this.trigger('animation_end');
             }
         }, time);
         return this;
@@ -42,6 +48,7 @@ class Animation extends EventsHandler {
         this.timer.clearTimeout(this.animation_clock);
         this.animation_clock = null;
         this.animation_index = 0;
+        this.is_running = false;
         return this;
     }
 

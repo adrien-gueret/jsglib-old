@@ -34,7 +34,7 @@ export default class Element extends EventsHandler {
     }
 
     useAnimation(animation_name, time, loop = true, timer = null) {
-        if (this.current_animation) {
+        if (this.current_animation && this.current_animation.is_running) {
             if (this.getAnimationName() === animation_name) {
                 return this;
             }
@@ -51,7 +51,7 @@ export default class Element extends EventsHandler {
         this.current_animation = new animation_class(timer);
 
         this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
-
+        
         this.current_animation
             .on('animation_update', () => {
                 this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
