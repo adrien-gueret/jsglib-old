@@ -9,29 +9,30 @@ class Inputs extends EventsHandler {
 
         this.mouse = new Point();
         this.keys_pressed = [];
+        this.dom_element = dom_element;
 
-        dom_element.addEventListener('mousemove', (e) => {
+        this.$mouseMoveEventHandler = (e) => {
+            let dom_element = this.dom_element;
             let x = e.pageX;
             let y = e.pageY;
 
             x -= (dom_element.getBoundingClientRect().left + (window.pageXOffset || dom_element.scrollLeft) + (dom_element.clientLeft || 0));
             y -= (dom_element.getBoundingClientRect().top + (window.pageYOffset || dom_element.scrollTop) + (dom_element.clientTop || 0));
 
-            this.mouse.x = Math.floor(x);
-            this.mouse.y = Math.floor(y);
+            this.mouse.set(Math.floor(x), Math.floor(y));
 
             this.trigger('mousemove', {
                 mouse: this.mouse
             })
-        });
+        };
 
-        dom_element.addEventListener('click', () => {
+        this.$clickHandler = () => {
             this.trigger('click', {
                 mouse: this.mouse
             });
-        });
+        };
 
-        document.body.addEventListener('keydown', (e) => {
+        this.$keyDownHandler = (e) => {
             let key = e.which || e.keyCode;
 
             if (this.isKeyPressed(key)) {
@@ -53,9 +54,9 @@ class Inputs extends EventsHandler {
             if (custom_event.defaultPrevented) {
                 e.preventDefault();
             }
-        });
+        };
 
-        document.body.addEventListener('keyup', (e) => {
+        this.$keyUpHandler = (e) => {
             let key = e.which || e.keyCode;
             this.keys_pressed.some((current_key, key_index) => {
                 if (key === current_key) {
@@ -72,7 +73,24 @@ class Inputs extends EventsHandler {
             if (custom_event.defaultPrevented) {
                 e.preventDefault();
             }
-        });
+        };
+
+        dom_element.addEventListener('mousemove', this.$mouseMoveEventHandler);
+        dom_element.addEventListener('click', this.$clickHandler);
+        document.body.addEventListener('keydown', this.$keyDownHandler);
+        document.body.addEventListener('keyup', this.$keyUpHandler);
+    }
+
+    destroy() {
+        this.dom_element.removeEventListener('mousemove', this.$mouseMoveEventHandler);
+        this.dom_element.removeEventListener('click', this.$clickHandler);
+        document.body.removeEventListener('keydown', this.$keyDownHandler);
+        document.body.removeEventListener('keyup', this.$keyUpHandler);
+        this.off();
+        this.dom_element = null;
+        this.mouse = null;
+        this.keys_pressed = [];
+        return this;
     }
 
     isKeyPressed(key) {

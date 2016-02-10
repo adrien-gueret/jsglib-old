@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/events_handler", "jsglib/http"], function (exports, _events_handler, _http) {
+define(["exports", "jsglib/events_handler", "jsglib/rectangle", "jsglib/http"], function (exports, _events_handler, _rectangle, _http) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -8,6 +8,8 @@ define(["exports", "jsglib/events_handler", "jsglib/http"], function (exports, _
     });
 
     var _events_handler2 = _interopRequireDefault(_events_handler);
+
+    var _rectangle2 = _interopRequireDefault(_rectangle);
 
     var _http2 = _interopRequireDefault(_http);
 
@@ -83,6 +85,18 @@ define(["exports", "jsglib/events_handler", "jsglib/http"], function (exports, _
         }
 
         _createClass(Room, [{
+            key: "destroy",
+            value: function destroy() {
+                this.definition = null;
+                this.off();
+                return this;
+            }
+        }, {
+            key: "getRectangle",
+            value: function getRectangle() {
+                return new _rectangle2.default(this.width, this.height);
+            }
+        }, {
             key: "initRoom",
             value: function initRoom(game) {
                 var _this2 = this;

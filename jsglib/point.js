@@ -6,6 +6,11 @@ export default class Point {
         this.y = y;
     }
 
+    set(x, y = x) {
+        this.constructor(x, y);
+        return this;
+    }
+
     copy(point) {
         this.constructor(point.x, point.y);
         return this;
@@ -37,6 +42,17 @@ export default class Point {
 
         this.x -= point.x;
         this.y -= point.y;
+
+        return this;
+    }
+
+    multiply(point, new_point = true) {
+        if (new_point) {
+            return new Point(this.x * point.x, this.y * point.y);
+        }
+
+        this.x *= point.x;
+        this.y *= point.y;
 
         return this;
     }

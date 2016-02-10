@@ -98,22 +98,6 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
                     name: 'walk_right',
                     tiles: [7, 8],
                     time: 150
-                }, {
-                    name: 'push_bottom',
-                    tiles: [9, 10],
-                    time: 150
-                }, {
-                    name: 'push_left',
-                    tiles: [11, 12],
-                    time: 150
-                }, {
-                    name: 'push_top',
-                    tiles: [13, 14],
-                    time: 150
-                }, {
-                    name: 'push_right',
-                    tiles: [15, 16],
-                    time: 150
                 }], timer);
             }
         }]);
@@ -121,25 +105,17 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
         return LinkSprite;
     })(_sprite2.default);
 
-    var LINK_SPEED = 70;
-
     var Link = exports.Link = (function (_Element) {
         _inherits(Link, _Element);
 
         function Link(x, y, game) {
             _classCallCheck(this, Link);
 
-            // Tell which Sprite class to use for displaying
-
             var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y));
             // We must call the parent's constructor
 
             _this2.setSpriteClass(LinkSprite);
 
-            // Tell that this instance must not move on solids
-            _this2.stop_on_solids = true;
-
-            // Attach keyboards events
             game.inputs.on('keydown', function (e) {
                 // Do nothing if pressed key is not an arrow
                 if (!e.detail.is_arrow) {
@@ -148,10 +124,8 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
 
                 e.preventDefault();
 
-                // Update Link's animation if he's not pushing walls
-                if (_this2.getAnimationName().indexOf('push') === -1) {
-                    _this2.switchAnimationByKey(e.detail.key);
-                }
+                // Update Link's animation
+                _this2.switchAnimationByKey(e.detail.key);
             }).on('keyup', function (e) {
                 // Do nothing if released key is not an arrow
                 if (!e.detail.is_arrow) {
@@ -159,73 +133,35 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
                 }
 
                 // Check if another arrow key is still pressed
-                var pressed_arrows = game.inputs.getPressedArrows();
-
-                if (pressed_arrows.length) {
-                    return _this2.switchAnimationByKey(pressed_arrows[0]);
+                for (var key_name in _inputs2.default.KEYS.ARROWS) {
+                    var key = _inputs2.default.KEYS.ARROWS[key_name];
+                    if (game.inputs.isKeyPressed(key)) {
+                        _this2.switchAnimationByKey(key);
+                        return;
+                    }
                 }
 
                 // No arrows keys are pressed: we stop the animation
-                _this2.switchAnimationByKey(e.detail.key);
                 _this2.setCurrentTileNumber(_this2.current_animation.tiles_numbers[0]);
                 _this2.current_animation.stop();
             });
 
-            // Other specific events related to this current instance
             _this2.on('frame', function () {
-                // On each frame, update instance's speeds according to pressed keys
+                // On each frame, move player according to pressed keys
                 if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.LEFT)) {
-                    _this2.speed.x = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.RIGHT)) {
-                    _this2.speed.x = LINK_SPEED;
-                } else {
-                    _this2.speed.x = 0;
+                    _this2.position.x -= 3;
+                }
+
+                if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.RIGHT)) {
+                    _this2.position.x += 3;
                 }
 
                 if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.UP)) {
-                    _this2.speed.y = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.DOWN)) {
-                    _this2.speed.y = LINK_SPEED;
-                } else {
-                    _this2.speed.y = 0;
+                    _this2.position.y -= 3;
                 }
-            }).on('tile_collision', function (e) {
-                // On collision with solids, use "push" animation according to collided tile position
-                if (e.detail.tile_data.tile.isSolid()) {
-                    var this_size = _this2.getSize();
-                    var tile_size = e.detail.tile_data.tile.getSize();
-                    var tile_position = e.detail.tile_data.position;
 
-                    if (tile_position.y + tile_size.height <= _this2.position.y) {
-                        _this2.useAnimation('push_top');
-                        e.stopPropagation();
-                    } else if (_this2.position.y + this_size.height <= tile_position.y) {
-                        _this2.useAnimation('push_bottom');
-                        e.stopPropagation();
-                    } else if (tile_position.x + tile_size.width <= _this2.position.x) {
-                        _this2.useAnimation('push_left');
-                        e.stopPropagation();
-                    } else if (_this2.position.x + this_size.width <= tile_position.x) {
-                        _this2.useAnimation('push_right');
-                        e.stopPropagation();
-                    }
-                }
-            }).on('no_solids_collision', function () {
-                // When the instance has no collisions with solids, if it's pushing,
-                // change its "push" animation to the corresponding "walk" one
-                switch (_this2.getAnimationName()) {
-                    case 'push_left':
-                        _this2.useAnimation('walk_left');
-                        break;
-                    case 'push_top':
-                        _this2.useAnimation('walk_top');
-                        break;
-                    case 'push_right':
-                        _this2.useAnimation('walk_right');
-                        break;
-                    case 'push_bottom':
-                        _this2.useAnimation('walk_bottom');
-                        break;
+                if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.DOWN)) {
+                    _this2.position.y += 3;
                 }
             });
 
@@ -233,8 +169,6 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
             _layer2.default.MAIN_LAYER.addElement(_this2);
             return _this2;
         }
-
-        // Custom method for this class: it updates Link's animation according to pressed arrow key
 
         _createClass(Link, [{
             key: "switchAnimationByKey",

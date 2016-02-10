@@ -55,7 +55,7 @@ export class LinkSprite extends Sprite {
     }
 }
 
-const LINK_SPEED = 3;
+const LINK_SPEED = 70;
 export class Link extends Element {
     constructor(x, y, game) {
         // We must call the parent's constructor

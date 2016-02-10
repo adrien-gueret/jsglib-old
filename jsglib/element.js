@@ -7,7 +7,7 @@ import Rectangle from "jsglib/rectangle";
 export default class Element extends EventsHandler {
     constructor(x, y) {
         super();
-        this.prev_position = new Point(x, y);
+        this.prev_position = new Point(NaN, NaN);
         this.position = new Point(x, y);
         this.layer = null;
         this.sprite_class = null;
@@ -15,11 +15,24 @@ export default class Element extends EventsHandler {
         this.current_animation = null;
         this.speed = new Point();
         this.stop_on_solids = false;
+        this.is_destroyed = false;
+        this.is_inside_room = false;
     }
 
-    setSpriteClass(sprite_class) {
+    destroy() {
+        let custom_event = this.trigger('destroy');
+
+        if (custom_event.defaultPrevented) {
+            return this;
+        }
+
+        this.is_destroyed = true;
+        return this;
+    }
+
+    setSpriteClass(sprite_class, current_tile_number = 1) {
         this.sprite_class = sprite_class;
-        this.current_tile = sprite_class.getTile(1);
+        this.current_tile = sprite_class.getTile(current_tile_number);
         return this;
     }
 
@@ -80,8 +93,16 @@ export default class Element extends EventsHandler {
         return new Rectangle(size.width, size.height, this.position);
     }
 
-    move() {
-        this.position.add(this.speed, false);
+    move(delta) {
+        let deltaPosition = new Point(delta, delta);
+        this.position.add(this.speed.multiply(deltaPosition), false);
+
+        // We don't want elements to have float positions (prevent blurry effects and positions related bugs)
+        let x = this.position.x + 0.5 | 0;
+        let y = this.position.y + 0.5 | 0;
+
+        this.position.set(x, y);
+
         return this;
     }
 

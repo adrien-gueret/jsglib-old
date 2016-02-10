@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Click on elements</title>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=VT323);
+        body {
+            text-align: center;
+        }
+
+        #top_screen {
+            width: 256px;
+            height: 192px;
+            background-image: url(./background.png);
+            position: relative;
+
+            font-family: 'VT323';
+            text-transform: uppercase;
+            color: yellow;
+            text-shadow: 2px 0 0 #000,
+            -2px 0 0 #000,
+            0 2px 0 #000,
+            0 -2px 0 #000,
+            1px 1px #000,
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000;
+        }
+
+        header {
+            height: 59px;
+            line-height: 25px;
+        }
+
+        h3, h4 {
+            margin: 0;
+            padding: 0;
+        }
+
+        h4 {
+            font-size: 2.5rem;
+        }
+
+        #big_head {
+            width: 55px;
+            height: 60px;
+            position: relative;
+            top: -3px;
+            margin: auto;
+            background-image: url(./big_heads.png);
+            background-repeat: no-repeat;
+            background-position: right;
+        }
+
+        footer {
+            text-align: left;
+            position: absolute;
+            bottom: 0;
+            padding: 5px;
+            font-size: 1.2rem;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        #myGame {
+            display: none;
+            border-top: 0;
+        }
+
+        .container {
+            border: 10px solid #000;
+            margin: auto;
+            position: relative;
+            background-color: #313131;
+        }
+    </style>
+</head>
+<body>
+<div id="top_screen" class="container">
+    <header>
+        <h3>Time</h3>
+        <h4 id="timer">--</h4>
+    </header>
+    <div id="big_head"></div>
+    <footer>
+        <p>Points: <span id="points">0</span></p>
+    </footer>
+</div>
+<div id="myGame" class="container"></div>
+<p>
+    Sprites from <em>Super Mario 64 DS</em>, ripped by <b>TJ the Kid</b> for
+    <a href="http://www.spriters-resource.com/ds/supermario64ds/sheet/6856/">The Spriters Resource</a>
+</p>
+<p>
+    Demo inspired by <em>Wanted!</em> mini-game from <a href="http://ms.nintendo-europe.com/supermario64ds/enGB/"><em>Super Mario 64 DS</em></a>.
+</p>
+
+<script data-main="../../dist/samples/click_on_elements/sample.js"
+        src="//requirejs.org/docs/release/2.1.22/minified/require.js"></script>
+<script>
+    require.config({
+        paths: {
+            jsglib: '../../jsglib'
+        }
+    });
+</script>
+</body>
+</html>

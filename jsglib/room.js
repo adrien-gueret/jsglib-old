@@ -1,6 +1,7 @@
 "use strict";
 
 import EventsHandler from "jsglib/events_handler";
+import Rectangle from "jsglib/rectangle";
 import $http from "jsglib/http";
 
 export default class Room extends EventsHandler {
@@ -9,6 +10,16 @@ export default class Room extends EventsHandler {
         this.width = width;
         this.height = height;
         this.definition = null;
+    }
+
+    destroy() {
+        this.definition = null;
+        this.off();
+        return this;
+    }
+
+    getRectangle() {
+        return new Rectangle(this.width, this.height);
     }
 
     initRoom(game) {

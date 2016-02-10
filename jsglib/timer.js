@@ -14,6 +14,12 @@ export default class Timer extends EventsHandler {
         });
     }
 
+    destroy() {
+        this.clocks = {};
+        this.off();
+        return this;
+    }
+
     checkCounters() {
         for (let generated_event_name in this.clocks) {
             let clock = this.clocks[generated_event_name];

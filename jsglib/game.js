@@ -16,6 +16,7 @@ export default class Game extends EventsHandler {
         this.current_room = null;
         this.classes = {};
         this.timer = new Timer(fps);
+        this.is_stopped = false;
 
         this.defineLayers(layers);
         this.inputs = new Inputs(this.container);
@@ -73,7 +74,34 @@ export default class Game extends EventsHandler {
         return this;
     }
 
+    stop() {
+        let custom_event = this.trigger('stop');
+
+        if (custom_event.defaultPrevented) {
+            return this;
+        }
+
+        this.is_stopped = true;
+
+        return this;
+    }
+
     loop() {
+        if (this.is_stopped) {
+            // Reset all properties!
+            this.container = null;
+            this.classes = null;
+            this.layers = {};
+            this.current_room.destroy();
+            this.current_room = null;
+            this.timer.destroy();
+            this.timer = null;
+            this.inputs.destroy();
+            this.inputs = null;
+
+            return this;
+        }
+
         window.requestAnimationFrame(this.loop.bind(this));
 
         let now = Date.now();
@@ -81,12 +109,12 @@ export default class Game extends EventsHandler {
         let interval = 1000 / this.timer.fps;
 
         if (delta <= interval) {
-            this.timer.trigger('frame');
-
             return this;
         }
 
-        this.manageElements();
+        this.timer.trigger('frame');
+
+        this.manageElements(delta / 1000);
 
         this.render();
 
@@ -95,23 +123,48 @@ export default class Game extends EventsHandler {
         return this;
     }
 
-    manageElements() {
+    manageElements(delta) {
         for (let layer_name in this.layers) {
             let layer = this.layers[layer_name];
 
-            layer.elements.forEach((element) => {
+            layer.elements.forEach(element => {
+                if (element.is_destroyed)  {
+                    return;
+                }
+
                 element.trigger('frame');
-                element.move();
+                element.move(delta);
 
                 // Check collisions only if element has moved
                 if (!element.position.equals(element.prev_position)) {
                     element.checkCollisions(this.layers);
                 }
 
-                if (!element.position.equals(element.prev_position)) {
-                    layer.needs_clear = true;
-                    element.prev_position.copy(element.position);
+                if (element.position.equals(element.prev_position)) {
+                    return;
                 }
+
+                // Check if element is inside room
+                if (this.current_room.getRectangle().isCollidedWithRectangle(element.getRectangle())) {
+                    if (!element.is_inside_room) {
+                        element.trigger('enter_room', {room: this.current_room});
+                    }
+                    element.is_inside_room = true;
+                } else {
+                    if (element.is_inside_room) {
+                        element.trigger('leave_room', {room: this.current_room});
+                    }
+                    element.is_inside_room = false;
+                }
+
+                layer.needs_clear = true;
+                element.prev_position.copy(element.position);
+            });
+
+            layer.elements.filter(element => element.is_destroyed).forEach(element => {
+                layer.removeElement(element);
+                element.current_tile = null;
+                element.current_animation = null;
             });
         }
 
