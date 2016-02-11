@@ -54,6 +54,14 @@ define(['exports'], function (exports) {
             value: function off(event_name, callback) {
                 var _this = this;
 
+                if (!event_name) {
+                    for (var name in this.all_callbacks) {
+                        this.off(name);
+                    }
+
+                    return this;
+                }
+
                 if (callback) {
                     this.events_handler.removeEventListener('jsglib.' + event_name, callback, false);
                 } else if (this.all_callbacks[event_name]) {

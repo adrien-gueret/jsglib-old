@@ -75,24 +75,29 @@ define(['exports', 'jsglib/events_handler', 'jsglib/point'], function (exports, 
 
             _this.mouse = new _point2.default();
             _this.keys_pressed = [];
-            dom_element.addEventListener('mousemove', function (e) {
+            _this.dom_element = dom_element;
+
+            _this.$mouseMoveEventHandler = function (e) {
+                var dom_element = _this.dom_element;
                 var x = e.pageX;
                 var y = e.pageY;
                 x -= dom_element.getBoundingClientRect().left + (window.pageXOffset || dom_element.scrollLeft) + (dom_element.clientLeft || 0);
                 y -= dom_element.getBoundingClientRect().top + (window.pageYOffset || dom_element.scrollTop) + (dom_element.clientTop || 0);
-                _this.mouse.x = Math.floor(x);
-                _this.mouse.y = Math.floor(y);
+
+                _this.mouse.set(Math.floor(x), Math.floor(y));
 
                 _this.trigger('mousemove', {
                     mouse: _this.mouse
                 });
-            });
-            dom_element.addEventListener('click', function () {
+            };
+
+            _this.$clickHandler = function () {
                 _this.trigger('click', {
                     mouse: _this.mouse
                 });
-            });
-            document.body.addEventListener('keydown', function (e) {
+            };
+
+            _this.$keyDownHandler = function (e) {
                 var key = e.which || e.keyCode;
 
                 if (_this.isKeyPressed(key)) {
@@ -113,8 +118,9 @@ define(['exports', 'jsglib/events_handler', 'jsglib/point'], function (exports, 
                 if (custom_event.defaultPrevented) {
                     e.preventDefault();
                 }
-            });
-            document.body.addEventListener('keyup', function (e) {
+            };
+
+            _this.$keyUpHandler = function (e) {
                 var key = e.which || e.keyCode;
 
                 _this.keys_pressed.some(function (current_key, key_index) {
@@ -133,11 +139,29 @@ define(['exports', 'jsglib/events_handler', 'jsglib/point'], function (exports, 
                 if (custom_event.defaultPrevented) {
                     e.preventDefault();
                 }
-            });
+            };
+
+            dom_element.addEventListener('mousemove', _this.$mouseMoveEventHandler);
+            dom_element.addEventListener('click', _this.$clickHandler);
+            document.body.addEventListener('keydown', _this.$keyDownHandler);
+            document.body.addEventListener('keyup', _this.$keyUpHandler);
             return _this;
         }
 
         _createClass(Inputs, [{
+            key: 'destroy',
+            value: function destroy() {
+                this.dom_element.removeEventListener('mousemove', this.$mouseMoveEventHandler);
+                this.dom_element.removeEventListener('click', this.$clickHandler);
+                document.body.removeEventListener('keydown', this.$keyDownHandler);
+                document.body.removeEventListener('keyup', this.$keyUpHandler);
+                this.off();
+                this.dom_element = null;
+                this.mouse = null;
+                this.keys_pressed = [];
+                return this;
+            }
+        }, {
             key: 'isKeyPressed',
             value: function isKeyPressed(key) {
                 return this.keys_pressed.indexOf(key) >= 0;

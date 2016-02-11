@@ -84,10 +84,26 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
             _this.current_room = null;
             _this.classes = {};
             _this.timer = new _timer2.default(fps);
+            _this.is_stopped = false;
 
             _this.defineLayers(layers);
 
             _this.inputs = new _inputs2.default(_this.container);
+
+            _this.inputs.on('click', function () {
+                for (var layer_name in _this.layers) {
+                    var layer = _this.layers[layer_name];
+                    layer.elements.some(function (element) {
+                        if (_this.inputs.mouse.isOverElement(element)) {
+                            var custom_event = element.trigger('click', {
+                                mouse: _this.inputs.mouse
+                            });
+                            return custom_event.propagationStopped;
+                        }
+                    });
+                }
+            });
+
             return _this;
         }
 
@@ -132,47 +148,104 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
         }, {
             key: 'start',
             value: function start() {
+                this.trigger('start');
                 this.last_loop_time = Date.now();
                 this.loop();
                 return this;
             }
         }, {
+            key: 'stop',
+            value: function stop() {
+                var custom_event = this.trigger('stop');
+
+                if (custom_event.defaultPrevented) {
+                    return this;
+                }
+
+                this.is_stopped = true;
+                return this;
+            }
+        }, {
             key: 'loop',
             value: function loop() {
+                if (this.is_stopped) {
+                    this.container = null;
+                    this.classes = null;
+                    this.layers = {};
+                    this.current_room.destroy();
+                    this.current_room = null;
+                    this.timer.destroy();
+                    this.timer = null;
+                    this.inputs.destroy();
+                    this.inputs = null;
+                    return this;
+                }
+
                 window.requestAnimationFrame(this.loop.bind(this));
                 var now = Date.now();
                 var delta = now - this.last_loop_time;
                 var interval = 1000 / this.timer.fps;
 
                 if (delta <= interval) {
-                    this.timer.trigger('frame');
                     return this;
                 }
 
-                this.manageElements();
+                this.timer.trigger('frame');
+                this.manageElements(delta / 1000);
                 this.render();
                 this.last_loop_time = now - delta % interval;
                 return this;
             }
         }, {
             key: 'manageElements',
-            value: function manageElements() {
+            value: function manageElements(delta) {
                 var _this3 = this;
 
                 var _loop = function _loop(layer_name) {
                     var layer = _this3.layers[layer_name];
                     layer.elements.forEach(function (element) {
+                        if (element.is_destroyed) {
+                            return;
+                        }
+
                         element.trigger('frame');
-                        element.move();
+                        element.move(delta);
 
                         if (!element.position.equals(element.prev_position)) {
                             element.checkCollisions(_this3.layers);
                         }
 
-                        if (!element.position.equals(element.prev_position)) {
-                            layer.needs_clear = true;
-                            element.prev_position.copy(element.position);
+                        if (element.position.equals(element.prev_position)) {
+                            return;
                         }
+
+                        if (_this3.current_room.getRectangle().isCollidedWithRectangle(element.getRectangle())) {
+                            if (!element.is_inside_room) {
+                                element.trigger('enter_room', {
+                                    room: _this3.current_room
+                                });
+                            }
+
+                            element.is_inside_room = true;
+                        } else {
+                            if (element.is_inside_room) {
+                                element.trigger('leave_room', {
+                                    room: _this3.current_room
+                                });
+                            }
+
+                            element.is_inside_room = false;
+                        }
+
+                        layer.needs_clear = true;
+                        element.prev_position.copy(element.position);
+                    });
+                    layer.elements.filter(function (element) {
+                        return element.is_destroyed;
+                    }).forEach(function (element) {
+                        layer.removeElement(element);
+                        element.current_tile = null;
+                        element.current_animation = null;
                     });
                 };
 

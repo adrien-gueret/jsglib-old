@@ -44,6 +44,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
             this.name = name;
             this.canvas = document.createElement('canvas');
             this.ctx = this.canvas.getContext('2d');
+            this.ctx.imageSmoothingEnabled = false;
             this.canvas.setAttribute('data-name', this.name);
             this.canvas.style.position = 'absolute';
             this.canvas.style.left = 0;

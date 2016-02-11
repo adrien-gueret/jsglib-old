@@ -41,6 +41,13 @@ define(["exports"], function (exports) {
         }
 
         _createClass(Point, [{
+            key: "set",
+            value: function set(x) {
+                var y = arguments.length <= 1 || arguments[1] === undefined ? x : arguments[1];
+                this.constructor(x, y);
+                return this;
+            }
+        }, {
             key: "copy",
             value: function copy(point) {
                 this.constructor(point.x, point.y);
@@ -81,6 +88,29 @@ define(["exports"], function (exports) {
                 this.x -= point.x;
                 this.y -= point.y;
                 return this;
+            }
+        }, {
+            key: "multiply",
+            value: function multiply(point) {
+                var new_point = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+                if (new_point) {
+                    return new Point(this.x * point.x, this.y * point.y);
+                }
+
+                this.x *= point.x;
+                this.y *= point.y;
+                return this;
+            }
+        }, {
+            key: "isInRectangle",
+            value: function isInRectangle(rectangle) {
+                return this.x >= rectangle.position.x && this.x < rectangle.position.x + rectangle.width && this.y >= rectangle.position.y && this.y < rectangle.position.y + rectangle.height;
+            }
+        }, {
+            key: "isOverElement",
+            value: function isOverElement(element) {
+                return this.isInRectangle(element.getRectangle());
             }
         }]);
 

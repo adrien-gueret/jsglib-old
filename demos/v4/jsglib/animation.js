@@ -1,6 +1,4 @@
-function _typeof(obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
-}
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 define(['exports', 'jsglib/events_handler'], function (exports, _events_handler) {
     "use strict";

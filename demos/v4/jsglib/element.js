@@ -1,6 +1,4 @@
-function _typeof(obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
-}
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"], function (exports, _events_handler, _point, _rectangle) {
     "use strict";
@@ -77,7 +75,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
 
             var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this));
 
-            _this.prev_position = new _point2.default(x, y);
+            _this.prev_position = new _point2.default(NaN, NaN);
             _this.position = new _point2.default(x, y);
             _this.layer = null;
             _this.sprite_class = null;
@@ -85,14 +83,29 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
             _this.current_animation = null;
             _this.speed = new _point2.default();
             _this.stop_on_solids = false;
+            _this.is_destroyed = false;
+            _this.is_inside_room = false;
             return _this;
         }
 
         _createClass(Element, [{
+            key: "destroy",
+            value: function destroy() {
+                var custom_event = this.trigger('destroy');
+
+                if (custom_event.defaultPrevented) {
+                    return this;
+                }
+
+                this.is_destroyed = true;
+                return this;
+            }
+        }, {
             key: "setSpriteClass",
             value: function setSpriteClass(sprite_class) {
+                var current_tile_number = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
                 this.sprite_class = sprite_class;
-                this.current_tile = sprite_class.getTile(1);
+                this.current_tile = sprite_class.getTile(current_tile_number);
                 return this;
             }
         }, {
@@ -166,8 +179,12 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
             }
         }, {
             key: "move",
-            value: function move() {
-                this.position.add(this.speed, false);
+            value: function move(delta) {
+                var deltaPosition = new _point2.default(delta, delta);
+                this.position.add(this.speed.multiply(deltaPosition), false);
+                var x = this.position.x + 0.5 | 0;
+                var y = this.position.y + 0.5 | 0;
+                this.position.set(x, y);
                 return this;
             }
         }, {

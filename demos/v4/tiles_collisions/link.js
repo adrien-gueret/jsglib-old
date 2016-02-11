@@ -121,7 +121,7 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
         return LinkSprite;
     })(_sprite2.default);
 
-    var LINK_SPEED = 3;
+    var LINK_SPEED = 70;
 
     var Link = exports.Link = (function (_Element) {
         _inherits(Link, _Element);

@@ -47,13 +47,23 @@ define(["exports", "jsglib/point"], function (exports, _point) {
 
             this.width = width;
             this.height = height;
-            this.position = position.clone() || new _point2.default();
+            this.position = position ? position.clone() : new _point2.default();
         }
 
         _createClass(Rectangle, [{
             key: "getCenter",
             value: function getCenter() {
                 return new _point2.default(this.position.x + this.width / 2, this.position.y + this.height / 2);
+            }
+        }, {
+            key: "isCollidedWithRectangle",
+            value: function isCollidedWithRectangle(rectangle) {
+                return !(rectangle.position.x >= this.position.x + this.width || rectangle.position.x + rectangle.width <= this.position.x || rectangle.position.y >= this.position.y + this.height || rectangle.position.y + rectangle.height <= this.position.y);
+            }
+        }, {
+            key: "containsRectangle",
+            value: function containsRectangle(rectangle) {
+                return rectangle.position.x > this.position.x && rectangle.position.y > this.position.y && rectangle.position.x + rectangle.width < this.position.x + this.width && rectangle.position.y + rectangle.height < this.position.y + this.height;
             }
         }]);
 
