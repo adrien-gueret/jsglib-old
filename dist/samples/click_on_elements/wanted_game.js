@@ -1,13 +1,13 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/element", "jsglib/utils", "./head", "./sprites"], function (exports, _element, _utils, _head, _sprites) {
+define(["exports", "jsglib/game", "jsglib/utils", "./head", "./sprites"], function (exports, _game, _utils, _head, _sprites) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
 
-    var _element2 = _interopRequireDefault(_element);
+    var _game2 = _interopRequireDefault(_game);
 
     var _utils2 = _interopRequireDefault(_utils);
 
@@ -67,44 +67,43 @@ define(["exports", "jsglib/element", "jsglib/utils", "./head", "./sprites"], fun
         if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
     }
 
-    var GameControllor = (function (_Element) {
-        _inherits(GameControllor, _Element);
+    var WantedGame = (function (_Game) {
+        _inherits(WantedGame, _Game);
 
-        function GameControllor(game_timer, room_size) {
-            _classCallCheck(this, GameControllor);
+        function WantedGame(game_container) {
+            _classCallCheck(this, WantedGame);
 
-            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GameControllor).call(this));
+            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(WantedGame).call(this, game_container));
 
-            _this.game_timer = game_timer;
-            _this.room_size = room_size;
             _this.points = 0;
             _this.total_heads = 5;
             _this.time_counter = 30;
 
-            _this.setSpriteClass(_sprites.BigHeadsSprite, _sprites.CHARACTERS_NUMBERS.NONE);
+            _this.on('start', function () {
+                _this.wanted_tile = _sprites.BigHeadsSprite.getTile(_sprites.CHARACTERS_NUMBERS.NONE);
+
+                _this.updateTimer();
+
+                _this.changeCharacter();
+
+                _this.launchTimer();
+            });
 
             return _this;
         }
 
-        _createClass(GameControllor, [{
-            key: "start",
-            value: function start() {
-                this.updateTimer();
-                this.changeCharacter();
-                this.launchTimer(this.game_timer);
-            }
-        }, {
+        _createClass(WantedGame, [{
             key: "launchTimer",
-            value: function launchTimer(timer) {
+            value: function launchTimer() {
                 var _this2 = this;
 
-                timer.setTimeout(function () {
+                this.timer.setTimeout(function () {
                     _this2.time_counter--;
 
                     _this2.updateTimer();
 
                     if (_this2.time_counter) {
-                        _this2.launchTimer(timer);
+                        _this2.launchTimer(_this2.timer);
                     } else {
                         _this2.trigger('stop_timer');
                     }
@@ -121,14 +120,14 @@ define(["exports", "jsglib/element", "jsglib/utils", "./head", "./sprites"], fun
         }, {
             key: "changeCharacter",
             value: function changeCharacter() {
-                var new_tile_number = this.current_tile.tile_number;
+                var new_tile_number = this.wanted_tile.tile_number;
 
-                while (new_tile_number === this.current_tile.tile_number) {
+                while (new_tile_number === this.wanted_tile.tile_number) {
                     new_tile_number = _utils2.default.random(1, 4);
                 }
 
-                this.current_tile.setTileNumber(new_tile_number);
-                var backgroundPosition = "-" + this.current_tile.sheet_position.x + "px " + this.current_tile.sheet_position.y + "px";
+                this.wanted_tile.setTileNumber(new_tile_number);
+                var backgroundPosition = "-" + this.wanted_tile.sheet_position.x + "px " + this.wanted_tile.sheet_position.y + "px";
                 this.trigger('change_character', {
                     backgroundPosition: backgroundPosition
                 });
@@ -140,40 +139,41 @@ define(["exports", "jsglib/element", "jsglib/utils", "./head", "./sprites"], fun
                 var _this3 = this;
 
                 var characters = [_sprites.CHARACTERS_NUMBERS.LUIGI, _sprites.CHARACTERS_NUMBERS.MARIO, _sprites.CHARACTERS_NUMBERS.YOSHI, _sprites.CHARACTERS_NUMBERS.WARIO].filter(function (number) {
-                    return number !== _this3.current_tile.tile_number;
+                    return number !== _this3.wanted_tile.tile_number;
                 });
-                var numbers = [this.current_tile.tile_number];
+                var numbers = [this.wanted_tile.tile_number];
 
                 for (var total = 0, max = this.total_heads - 1; total < max; total++) {
                     numbers.push(characters[_utils2.default.random(0, 2)]);
                 }
 
                 _utils2.default.shuffleArray(numbers).forEach(function (number) {
-                    var head = new _head2.default(_this3.room_size, number);
-                    head.on('click', function (e) {
-                        if (_this3.checkIsWanted(head)) {
+                    var head = new _head2.default(_this3.current_room.getSize(), number);
+
+                    if (_this3.checkIsWanted(head)) {
+                        head.on('click', function (e) {
                             e.stopPropagation();
                             _this3.total_heads += 5;
 
-                            _this3.trigger('next_level', {
+                            _this3.trigger('win_round', {
                                 points: ++_this3.points
                             });
 
                             _this3.changeCharacter();
-                        }
-                    });
+                        });
+                    }
                 });
             }
         }, {
             key: "checkIsWanted",
             value: function checkIsWanted(element) {
-                return this.current_tile.tile_number === element.current_tile.tile_number;
+                return this.wanted_tile.tile_number === element.current_tile.tile_number;
             }
         }]);
 
-        return GameControllor;
-    })(_element2.default);
+        return WantedGame;
+    })(_game2.default);
 
-    exports.default = GameControllor;
+    exports.default = WantedGame;
 });
-//# sourceMappingURL=controllor.js.map
+//# sourceMappingURL=wanted_game.js.map

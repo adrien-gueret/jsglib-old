@@ -21,23 +21,23 @@ export default class Head extends Element {
 
         super(x, y);
 
+        // Randomly set this head speed
         this.speed.set(getRandomSpeed(), getRandomSpeed());
 
         this.setSpriteClass(SmallHeadsSprite, tile_number);
 
+        // When head leaves the room, move it to the opposite side of the room
         this.on('leave_room', (e) => {
-            let this_size = this.getSize();
-
-            if (this.position.y + this_size.height <= 0) {
+            if (this.position.y + head_size.height <= 0) {
                 this.position.y = e.detail.room.height;
             } else if (this.position.y >= e.detail.room.height ) {
-                this.position.y = - this_size.height;
+                this.position.y = - head_size.height;
             }
 
-            if (this.position.x + this_size.width <= 0) {
+            if (this.position.x + head_size.width <= 0) {
                 this.position.x = e.detail.room.width;
             } else if (this.position.x >= e.detail.room.width ) {
-                this.position.x = - this_size.width;
+                this.position.x = - head_size.width;
             }
         });
 

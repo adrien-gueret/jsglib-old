@@ -148,6 +148,7 @@ define(['exports', 'jsglib/layer', 'jsglib/timer', 'jsglib/events_handler', 'jsg
         }, {
             key: 'start',
             value: function start() {
+                this.trigger('start');
                 this.last_loop_time = Date.now();
                 this.loop();
                 return this;

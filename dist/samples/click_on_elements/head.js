@@ -71,18 +71,16 @@ define(["exports", "jsglib/element", "jsglib/layer", "jsglib/utils", "./sprites"
             _this.setSpriteClass(_sprites.SmallHeadsSprite, tile_number);
 
             _this.on('leave_room', function (e) {
-                var this_size = _this.getSize();
-
-                if (_this.position.y + this_size.height <= 0) {
+                if (_this.position.y + head_size.height <= 0) {
                     _this.position.y = e.detail.room.height;
                 } else if (_this.position.y >= e.detail.room.height) {
-                    _this.position.y = -this_size.height;
+                    _this.position.y = -head_size.height;
                 }
 
-                if (_this.position.x + this_size.width <= 0) {
+                if (_this.position.x + head_size.width <= 0) {
                     _this.position.x = e.detail.room.width;
                 } else if (_this.position.x >= e.detail.room.width) {
-                    _this.position.x = -this_size.width;
+                    _this.position.x = -head_size.width;
                 }
             });
 

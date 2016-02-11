@@ -97,6 +97,18 @@ define(["exports", "jsglib/events_handler", "jsglib/rectangle", "jsglib/http"], 
                 return new _rectangle2.default(this.width, this.height);
             }
         }, {
+            key: "getSize",
+            value: function getSize() {
+                var _getRectangle = this.getRectangle();
+
+                var width = _getRectangle.width;
+                var height = _getRectangle.height;
+                return {
+                    width: width,
+                    height: height
+                };
+            }
+        }, {
             key: "initRoom",
             value: function initRoom(game) {
                 var _this2 = this;

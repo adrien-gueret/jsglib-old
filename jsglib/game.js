@@ -69,6 +69,7 @@ export default class Game extends EventsHandler {
     }
 
     start() {
+        this.trigger('start');
         this.last_loop_time = Date.now();
         this.loop();
         return this;

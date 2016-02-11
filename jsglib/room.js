@@ -22,6 +22,11 @@ export default class Room extends EventsHandler {
         return new Rectangle(this.width, this.height);
     }
 
+    getSize() {
+        let {width, height} = this.getRectangle();
+        return {width, height};
+    }
+
     initRoom(game) {
         if (!this.definition) {
             return this;
