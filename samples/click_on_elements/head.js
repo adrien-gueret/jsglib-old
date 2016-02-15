@@ -3,6 +3,7 @@
 import Element from "jsglib/element";
 import Layer from "jsglib/layer";
 import {random, shuffleArray} from "jsglib/utils";
+import Trait_MoveWrap from "jsglib/traits/move_wrap";
 import {SmallHeadsSprite} from "./sprites";
 
 function getRandomSpeed() {
@@ -12,7 +13,7 @@ function getRandomSpeed() {
     return random(0, 1) ? speed : -speed;
 }
 
-export default class Head extends Element {
+class Head extends Element {
     constructor(room_size, tile_number) {
         // Randomly position the head
         let head_size = SmallHeadsSprite.getTilesSize();
@@ -26,22 +27,14 @@ export default class Head extends Element {
 
         this.setSpriteClass(SmallHeadsSprite, tile_number);
 
-        // When head leaves the room, move it to the opposite side of the room
-        this.on('leave_room', (e) => {
-            if (this.position.y + head_size.height <= 0) {
-                this.position.y = e.detail.room.height;
-            } else if (this.position.y >= e.detail.room.height ) {
-                this.position.y = - head_size.height;
-            }
-
-            if (this.position.x + head_size.width <= 0) {
-                this.position.x = e.detail.room.width;
-            } else if (this.position.x >= e.detail.room.width ) {
-                this.position.x = - head_size.width;
-            }
-        });
+        // Thanks to Trait_MoveWrap, tell the head to wrap its position when leaving room
+        this.initMoveWrap();
 
         // Add player to layer in order to display it
         Layer.MAIN_LAYER.addElement(this);
     }
 }
+
+Trait_MoveWrap(Head);
+
+export default Head;
