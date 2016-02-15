@@ -1,53 +1,89 @@
 "use strict";
 
-export default class EventsHandler {
-    constructor() {
-        this.events_handler = document.createElement('div');
-        this.all_callbacks = {};
+class JSGlibEvent {
+    constructor(detail) {
+        this.defaultPrevented = false;
+        this.propagationStopped = false;
+        this.detail = detail;
     }
 
-    on(event_name, callback) {
-        this.events_handler.addEventListener('jsglib.' + event_name, callback, false);
+    stopPropagation() {
+        this.propagationStopped = true;
+    }
 
-        if (!this.all_callbacks[event_name]) {
-            this.all_callbacks[event_name] = [];
+    preventDefault() {
+        this.defaultPrevented = true;
+    }
+}
+
+function initEventsCallback(handler) {
+    if (!handler.$events_callbacks) {
+        handler.$events_callbacks = {};
+    }
+}
+
+export default class EventsHandler {
+    on(event_name, callback) {
+        initEventsCallback(this);
+
+        if (!this.$events_callbacks[event_name]) {
+            this.$events_callbacks[event_name] = [];
         }
 
-        this.all_callbacks[event_name].push(callback);
+        this.$events_callbacks[event_name].push(callback);
 
         return this;
     }
 
     off(event_name, callback) {
+        initEventsCallback(this);
+
         if (!event_name) {
-            for (let name in this.all_callbacks) {
+            for (let name in this.$events_callbacks) {
                 this.off(name);
             }
 
             return this;
         }
 
-        if (callback) {
-            this.events_handler.removeEventListener('jsglib.' + event_name, callback, false);
-        } else if (this.all_callbacks[event_name]) {
-            this.all_callbacks[event_name].forEach(callback => {
-                this.off(event_name, callback);
-            });
-            delete this.all_callbacks[event_name];
+        if (!this.$events_callbacks[event_name]) {
+            return this;
         }
+
+        if (callback) {
+            this.$events_callbacks[event_name].some((event_callback, index) => {
+                if (callback === event_callback) {
+                    this.$events_callbacks[event_name].splice(index, 1);
+                    return true;
+                }
+            });
+
+            if (!this.$events_callbacks[event_name].length) {
+                delete this.$events_callbacks[event_name];
+            }
+
+            return this;
+        }
+
+        delete this.$events_callbacks[event_name];
 
         return this;
     }
 
-    trigger(event_name, data = {}) {
-        let custom_event = new CustomEvent('jsglib.' + event_name, {detail: data, bubbles: false, cancelable: true});
-        custom_event.propagationStopped = false;
-        custom_event.stopPropagation = function () {
-            this.propagationStopped = true;
-            CustomEvent.prototype.stopPropagation.apply(this);
-        };
+    trigger(event_name, detail = {}) {
+        initEventsCallback(this);
 
-        this.events_handler.dispatchEvent(custom_event);
+        let custom_event = new JSGlibEvent(detail);
+
+        if (!this.$events_callbacks[event_name]) {
+            return custom_event;
+        }
+
+        this.$events_callbacks[event_name].some(callback => {
+            callback(custom_event);
+            return custom_event.propagationStopped;
+        });
+
         return custom_event;
     }
 }
