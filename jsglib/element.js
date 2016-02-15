@@ -97,10 +97,12 @@ class Element {
         this.position.add(this.speed.multiply(deltaPosition), false);
 
         // We don't want elements to have float positions (prevent blurry effects and positions related bugs)
-        let x = this.position.x + 0.5 | 0;
-        let y = this.position.y + 0.5 | 0;
+        let {x, y} = this.position;
 
-        this.position.set(x, y);
+        x += x < 0 ? -.5 : .5;
+        y += y < 0 ? -.5 : .5;
+
+        this.position.set(x | 0, y | 0);
 
         return this;
     }

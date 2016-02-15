@@ -151,9 +151,12 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
             value: function move(delta) {
                 var deltaPosition = new _point2.default(delta, delta);
                 this.position.add(this.speed.multiply(deltaPosition), false);
-                var x = this.position.x + 0.5 | 0;
-                var y = this.position.y + 0.5 | 0;
-                this.position.set(x, y);
+                var _position = this.position;
+                var x = _position.x;
+                var y = _position.y;
+                x += x < 0 ? -.5 : .5;
+                y += y < 0 ? -.5 : .5;
+                this.position.set(x | 0, y | 0);
                 return this;
             }
         }, {

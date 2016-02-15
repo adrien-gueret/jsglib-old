@@ -9,7 +9,7 @@ let Trait_MoveWrap = Trait({
             throw new TypeError('Trait_MoveWrap: trying to init move wrap feature on non-Element instance');
         }
 
-        // When head leaves the room, move it to the opposite side of the room
+        // When instance leaves the room, move it to the opposite side of the room
         this.on('leave_room', (e) => {
             let size = this.getSize();
 
