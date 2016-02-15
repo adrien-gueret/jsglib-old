@@ -1,6 +1,4 @@
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
-define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"], function (exports, _events_handler, _point, _rectangle) {
+define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/rectangle"], function (exports, _events_handler, _point, _rectangle) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -43,49 +41,20 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
         };
     })();
 
-    function _possibleConstructorReturn(self, call) {
-        if (!self) {
-            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-        }
-
-        return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
-    }
-
-    function _inherits(subClass, superClass) {
-        if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-        }
-
-        subClass.prototype = Object.create(superClass && superClass.prototype, {
-            constructor: {
-                value: subClass,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-        if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-    }
-
-    var Element = (function (_EventsHandler) {
-        _inherits(Element, _EventsHandler);
-
+    var Element = (function () {
         function Element(x, y) {
             _classCallCheck(this, Element);
 
-            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this));
-
-            _this.prev_position = new _point2.default(NaN, NaN);
-            _this.position = new _point2.default(x, y);
-            _this.layer = null;
-            _this.sprite_class = null;
-            _this.current_tile = null;
-            _this.current_animation = null;
-            _this.speed = new _point2.default();
-            _this.stop_on_solids = false;
-            _this.is_destroyed = false;
-            _this.is_inside_room = false;
-            return _this;
+            this.prev_position = new _point2.default(NaN, NaN);
+            this.position = new _point2.default(x, y);
+            this.layer = null;
+            this.sprite_class = null;
+            this.current_tile = null;
+            this.current_animation = null;
+            this.speed = new _point2.default();
+            this.stop_on_solids = false;
+            this.is_destroyed = false;
+            this.is_inside_room = false;
         }
 
         _createClass(Element, [{
@@ -122,7 +91,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
         }, {
             key: "useAnimation",
             value: function useAnimation(animation_name, time) {
-                var _this2 = this;
+                var _this = this;
 
                 var loop = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
                 var timer = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -144,7 +113,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
                 this.current_animation = new animation_class(timer);
                 this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
                 this.current_animation.on('animation_update', function () {
-                    _this2.setCurrentTileNumber(_this2.current_animation.getCurrentTileNumber());
+                    _this.setCurrentTileNumber(_this.current_animation.getCurrentTileNumber());
                 }).start(time, loop);
                 return this;
             }
@@ -182,15 +151,18 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
             value: function move(delta) {
                 var deltaPosition = new _point2.default(delta, delta);
                 this.position.add(this.speed.multiply(deltaPosition), false);
-                var x = this.position.x + 0.5 | 0;
-                var y = this.position.y + 0.5 | 0;
-                this.position.set(x, y);
+                var _position = this.position;
+                var x = _position.x;
+                var y = _position.y;
+                x += x < 0 ? -.5 : .5;
+                y += y < 0 ? -.5 : .5;
+                this.position.set(x | 0, y | 0);
                 return this;
             }
         }, {
             key: "checkCollisions",
             value: function checkCollisions(layers) {
-                var _this3 = this;
+                var _this2 = this;
 
                 var has_solid_collision = false;
 
@@ -204,7 +176,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
                     }
 
                     collisions_data.tiles.some(function (tile_data) {
-                        var custom_event = _this3.trigger('tile_collision', {
+                        var custom_event = _this2.trigger('tile_collision', {
                             tile_data: tile_data
                         });
 
@@ -270,8 +242,9 @@ define(["exports", "jsglib/events_handler", "jsglib/point", "jsglib/rectangle"],
         }]);
 
         return Element;
-    })(_events_handler2.default);
+    })();
 
+    (0, _events_handler2.default)(Element);
     exports.default = Element;
 });
 //# sourceMappingURL=element.js.map

@@ -1,6 +1,4 @@
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
-define(["exports", "jsglib/events_handler"], function (exports, _events_handler) {
+define(["exports", "jsglib/traits/events_handler"], function (exports, _events_handler) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -39,48 +37,19 @@ define(["exports", "jsglib/events_handler"], function (exports, _events_handler)
         };
     })();
 
-    function _possibleConstructorReturn(self, call) {
-        if (!self) {
-            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-        }
-
-        return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
-    }
-
-    function _inherits(subClass, superClass) {
-        if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-        }
-
-        subClass.prototype = Object.create(superClass && superClass.prototype, {
-            constructor: {
-                value: subClass,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-        if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-    }
-
-    var Timer = (function (_EventsHandler) {
-        _inherits(Timer, _EventsHandler);
-
+    var Timer = (function () {
         function Timer() {
+            var _this = this;
+
             var fps = arguments.length <= 0 || arguments[0] === undefined ? 30 : arguments[0];
 
             _classCallCheck(this, Timer);
 
-            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Timer).call(this));
-
-            _this.fps = fps;
-            _this.clocks = {};
-
-            _this.on('frame', function () {
+            this.fps = fps;
+            this.clocks = {};
+            this.on('frame', function () {
                 _this.checkCounters();
             });
-
-            return _this;
         }
 
         _createClass(Timer, [{
@@ -124,8 +93,9 @@ define(["exports", "jsglib/events_handler"], function (exports, _events_handler)
         }]);
 
         return Timer;
-    })(_events_handler2.default);
+    })();
 
+    (0, _events_handler2.default)(Timer);
     exports.default = Timer;
 });
 //# sourceMappingURL=timer.js.map

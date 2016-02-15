@@ -1,4 +1,4 @@
-define(['exports', 'jsglib/point'], function (exports, _point) {
+define(["exports", "jsglib/point"], function (exports, _point) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -58,20 +58,20 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
         }
 
         _createClass(Layer, [{
-            key: 'setSize',
+            key: "setSize",
             value: function setSize(width, height) {
                 this.canvas.width = width;
                 this.canvas.height = height;
                 return this;
             }
         }, {
-            key: 'setZindex',
+            key: "setZindex",
             value: function setZindex(new_zindex) {
                 this.canvas.style.zIndex = new_zindex;
                 return this;
             }
         }, {
-            key: 'getTileFromPoint',
+            key: "getTileFromPoint",
             value: function getTileFromPoint(point) {
                 if (!this.tiles_sprite_class) {
                     return null;
@@ -87,7 +87,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return row[Math.floor(point.x / tiles_size.width)] || null;
             }
         }, {
-            key: 'getTilesFromRectangle',
+            key: "getTilesFromRectangle",
             value: function getTilesFromRectangle(rectangle) {
                 var tiles = [];
 
@@ -123,7 +123,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return tiles;
             }
         }, {
-            key: 'getAllTilesFromNumber',
+            key: "getAllTilesFromNumber",
             value: function getAllTilesFromNumber(tile_number) {
                 var tiles = [];
                 this.tiles.forEach(function (row) {
@@ -136,7 +136,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return tiles;
             }
         }, {
-            key: 'addElement',
+            key: "addElement",
             value: function addElement(element) {
                 if (element.layer) {
                     element.layer.removeElement(element);
@@ -148,7 +148,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return this;
             }
         }, {
-            key: 'removeElement',
+            key: "removeElement",
             value: function removeElement(element_to_remove) {
                 var _this = this;
 
@@ -164,7 +164,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return this;
             }
         }, {
-            key: 'clearTilesAnimations',
+            key: "clearTilesAnimations",
             value: function clearTilesAnimations() {
                 this.tiles_animations.forEach(function (animation) {
                     animation.stop();
@@ -173,7 +173,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return this;
             }
         }, {
-            key: 'initTilesAnimations',
+            key: "initTilesAnimations",
             value: function initTilesAnimations(timer) {
                 var _this2 = this;
 
@@ -197,7 +197,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return this;
             }
         }, {
-            key: 'draw',
+            key: "draw",
             value: function draw() {
                 var _this3 = this;
 
@@ -239,7 +239,7 @@ define(['exports', 'jsglib/point'], function (exports, _point) {
                 return this;
             }
         }, {
-            key: 'clear',
+            key: "clear",
             value: function clear() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 return this;
