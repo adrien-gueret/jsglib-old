@@ -1,12 +1,11 @@
 "use strict";
 
-import EventsHandler from 'jsglib/events_handler';
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 import Point from "jsglib/point";
 import Rectangle from "jsglib/rectangle";
 
-export default class Element extends EventsHandler {
+class Element {
     constructor(x, y) {
-        super();
         this.prev_position = new Point(NaN, NaN);
         this.position = new Point(x, y);
         this.layer = null;
@@ -184,3 +183,7 @@ export default class Element extends EventsHandler {
         this.position.copy(new_position);
     }
 }
+
+Trait_EventsHandler(Element);
+
+export default Element;

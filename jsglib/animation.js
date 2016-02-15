@@ -1,10 +1,9 @@
 "use strict";
 
-import EventsHandler from 'jsglib/events_handler';
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 
-class Animation extends EventsHandler {
+class Animation {
     constructor(timer, tiles_numbers = [], default_time = 500) {
-        super();
         this.timer = timer;
         this.default_time = default_time;
         this.tiles_numbers = tiles_numbers;
@@ -65,5 +64,7 @@ class Animation extends EventsHandler {
 }
 
 Animation.classes = {};
+
+Trait_EventsHandler(Animation);
 
 export default Animation;

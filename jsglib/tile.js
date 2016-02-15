@@ -1,12 +1,10 @@
 "use strict";
 
-import EventsHandler from "jsglib/events_handler";
 import Point from "jsglib/point";
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 
-class Tile extends EventsHandler {
+class Tile {
     constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null) {
-        super();
-
         this.sprite_class = sprite_class;
         this.sheet_position = new Point(x, y);
         this.tile_number = tile_number;
@@ -81,5 +79,7 @@ class Tile extends EventsHandler {
 Tile.TYPES = {
     SOLID: Symbol()
 };
+
+Trait_EventsHandler(Tile);
 
 export default Tile;

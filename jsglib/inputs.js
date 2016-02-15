@@ -1,12 +1,10 @@
 "use strict";
 
-import EventsHandler from 'jsglib/events_handler';
-import Point from 'jsglib/point';
+import Trait_EventsHandler from "jsglib/traits/events_handler";
+import Point from "jsglib/point";
 
-class Inputs extends EventsHandler {
+class Inputs {
     constructor(dom_element) {
-        super();
-
         this.mouse = new Point();
         this.keys_pressed = [];
         this.dom_element = dom_element;
@@ -153,5 +151,7 @@ Inputs.KEYS = {
     Y: 89,
     Z: 90
 };
+
+Trait_EventsHandler(Inputs);
 
 export default Inputs;

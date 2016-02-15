@@ -1,17 +1,16 @@
 "use strict";
 
-import Layer from 'jsglib/layer';
-import Timer from 'jsglib/timer';
-import EventsHandler from 'jsglib/events_handler';
-import Inputs from 'jsglib/inputs';
+import Layer from "jsglib/layer";
+import Timer from "jsglib/timer";
+import Inputs from "jsglib/inputs";
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 
-export default class Game extends EventsHandler {
+class Game {
     constructor(game_container, layers = [
         Layer.MAIN_LAYER,
         Layer.TILES_LAYER,
         Layer.BACKGROUND_LAYER
     ], fps = 30) {
-        super();
         this.container = game_container;
         this.current_room = null;
         this.classes = {};
@@ -206,3 +205,7 @@ export default class Game extends EventsHandler {
         return this;
     }
 }
+
+Trait_EventsHandler(Game);
+
+export default Game;

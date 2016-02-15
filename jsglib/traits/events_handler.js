@@ -1,5 +1,7 @@
 "use strict";
 
+import Trait from "jsglib/trait";
+
 class JSGlibEvent {
     constructor(detail) {
         this.defaultPrevented = false;
@@ -22,7 +24,7 @@ function initEventsCallback(handler) {
     }
 }
 
-export default class EventsHandler {
+let Trait_EventsHandler = Trait({
     on(event_name, callback) {
         initEventsCallback(this);
 
@@ -33,7 +35,7 @@ export default class EventsHandler {
         this.$events_callbacks[event_name].push(callback);
 
         return this;
-    }
+    },
 
     off(event_name, callback) {
         initEventsCallback(this);
@@ -68,7 +70,7 @@ export default class EventsHandler {
         delete this.$events_callbacks[event_name];
 
         return this;
-    }
+    },
 
     trigger(event_name, detail = {}) {
         initEventsCallback(this);
@@ -86,4 +88,6 @@ export default class EventsHandler {
 
         return custom_event;
     }
-}
+});
+
+export default Trait_EventsHandler;

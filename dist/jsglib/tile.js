@@ -1,15 +1,13 @@
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
-define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, _events_handler, _point) {
+define(["exports", "jsglib/point", "jsglib/traits/events_handler"], function (exports, _point, _events_handler) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
 
-    var _events_handler2 = _interopRequireDefault(_events_handler);
-
     var _point2 = _interopRequireDefault(_point);
+
+    var _events_handler2 = _interopRequireDefault(_events_handler);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -41,33 +39,7 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
         };
     })();
 
-    function _possibleConstructorReturn(self, call) {
-        if (!self) {
-            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-        }
-
-        return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
-    }
-
-    function _inherits(subClass, superClass) {
-        if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-        }
-
-        subClass.prototype = Object.create(superClass && superClass.prototype, {
-            constructor: {
-                value: subClass,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-        if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-    }
-
-    var Tile = (function (_EventsHandler) {
-        _inherits(Tile, _EventsHandler);
-
+    var Tile = (function () {
         function Tile(sprite_class) {
             var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
             var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
@@ -76,15 +48,12 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
 
             _classCallCheck(this, Tile);
 
-            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Tile).call(this));
-
-            _this.sprite_class = sprite_class;
-            _this.sheet_position = new _point2.default(x, y);
-            _this.tile_number = tile_number;
-            _this.needs_redraw = true;
-            _this.is_empty = false;
-            _this.type = type;
-            return _this;
+            this.sprite_class = sprite_class;
+            this.sheet_position = new _point2.default(x, y);
+            this.tile_number = tile_number;
+            this.needs_redraw = true;
+            this.is_empty = false;
+            this.type = type;
         }
 
         _createClass(Tile, [{
@@ -146,11 +115,12 @@ define(["exports", "jsglib/events_handler", "jsglib/point"], function (exports, 
         }]);
 
         return Tile;
-    })(_events_handler2.default);
+    })();
 
     Tile.TYPES = {
         SOLID: Symbol()
     };
+    (0, _events_handler2.default)(Tile);
     exports.default = Tile;
 });
 //# sourceMappingURL=tile.js.map

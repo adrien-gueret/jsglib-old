@@ -1,11 +1,9 @@
 "use strict";
 
-import EventsHandler from "jsglib/events_handler";
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 
-export default class Timer extends EventsHandler {
+class Timer {
     constructor(fps = 30) {
-        super();
-
         this.fps = fps;
         this.clocks = {};
 
@@ -47,3 +45,7 @@ export default class Timer extends EventsHandler {
         return this.off(generated_event_name);
     }
 }
+
+Trait_EventsHandler(Timer);
+
+export default Timer;

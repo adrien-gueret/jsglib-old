@@ -1,12 +1,11 @@
 "use strict";
 
-import EventsHandler from "jsglib/events_handler";
 import Rectangle from "jsglib/rectangle";
 import $http from "jsglib/http";
+import Trait_EventsHandler from "jsglib/traits/events_handler";
 
-export default class Room extends EventsHandler {
+class Room {
     constructor(width = 0, height = 0) {
-        super();
         this.width = width;
         this.height = height;
         this.definition = null;
@@ -85,3 +84,7 @@ export default class Room extends EventsHandler {
         return new Promise(promise);
     }
 }
+
+Trait_EventsHandler(Room);
+
+export default Room;

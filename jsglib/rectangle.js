@@ -1,6 +1,6 @@
 "use strict";
 
-import Point from 'jsglib/point';
+import Point from "jsglib/point";
 
 export default class Rectangle {
     constructor(width = 0, height = 0, position) {
