@@ -1,9 +1,9 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Sprite from "jsglib/sprite";
-import Room from "jsglib/room";
-import Layer from "jsglib/layer";
+import Game from "jsglib/core/game";
+import Sprite from "jsglib/core/sprite";
+import Room from "jsglib/core/room";
+import Layer from "jsglib/core/layer";
 
 // Create a new game from a dom element
 var my_game = new Game(document.getElementById('myGame'));

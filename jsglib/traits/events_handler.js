@@ -1,6 +1,6 @@
 "use strict";
 
-import Trait from "jsglib/trait";
+import Trait from "jsglib/core/trait";
 
 class JSGlibEvent {
     constructor(detail) {

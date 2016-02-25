@@ -1,7 +1,7 @@
 "use strict";
 
-import Tile from "jsglib/tile";
-import Animation from "jsglib/animation";
+import Tile from "jsglib/core/tile";
+import Animation from "jsglib/core/animation";
 
 class Sprite {
     static getTilesSize() {

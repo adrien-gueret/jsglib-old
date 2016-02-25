@@ -1,9 +1,9 @@
 "use strict";
 
 import Trait_EventsHandler from "jsglib/traits/events_handler";
-import Point from "jsglib/point";
-import Rectangle from "jsglib/rectangle";
-import {degreeToRadian, radianToDegree} from "jsglib/utils";
+import Point from "jsglib/core/point";
+import Rectangle from "jsglib/core/rectangle";
+import {degreeToRadian, radianToDegree} from "jsglib/core/utils";
 
 class Element {
     constructor(x, y) {

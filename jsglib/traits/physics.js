@@ -1,8 +1,8 @@
 "use strict";
 
-import Trait from "jsglib/trait";
-import Element from "jsglib/element";
-import Point from "jsglib/point";
+import Trait from "jsglib/core/trait";
+import Element from "jsglib/core/element";
+import Point from "jsglib/core/point";
 
 let Trait_Physics = Trait({
     initPhysics(gravity = new Point(0, 10)) {

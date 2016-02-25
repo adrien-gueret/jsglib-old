@@ -1,7 +1,7 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Utils from "jsglib/utils";
+import Game from "jsglib/core/game";
+import Utils from "jsglib/core/utils";
 import Head from "./head";
 import {BigHeadsSprite, SmallHeadsSprite, CHARACTERS_NUMBERS} from "./sprites";
 

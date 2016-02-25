@@ -1,7 +1,7 @@
 "use strict";
 
-import Rectangle from "jsglib/rectangle";
-import $http from "jsglib/http";
+import Rectangle from "jsglib/core/rectangle";
+import $http from "jsglib/core/http";
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 
 class Room {

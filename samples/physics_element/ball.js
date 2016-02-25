@@ -1,11 +1,11 @@
 "use strict";
 
-import Element from "jsglib/element";
-import Inputs from "jsglib/inputs";
-import Layer from "jsglib/layer";
-import Sprite from "jsglib/sprite";
-import Point from "jsglib/point";
-import {random} from "jsglib/utils";
+import Element from "jsglib/core/element";
+import Inputs from "jsglib/core/inputs";
+import Layer from "jsglib/core/layer";
+import Sprite from "jsglib/core/sprite";
+import Point from "jsglib/core/point";
+import {random} from "jsglib/core/utils";
 import Trait_Physics from "jsglib/traits/physics";
 
 // Sprite class defining tiles and animations for the ball

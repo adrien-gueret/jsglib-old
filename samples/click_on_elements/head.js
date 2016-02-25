@@ -1,8 +1,8 @@
 "use strict";
 
-import Element from "jsglib/element";
-import Layer from "jsglib/layer";
-import {random, shuffleArray} from "jsglib/utils";
+import Element from "jsglib/core/element";
+import Layer from "jsglib/core/layer";
+import {random, shuffleArray} from "jsglib/core/utils";
 import Trait_MoveWrap from "jsglib/traits/move_wrap";
 import {SmallHeadsSprite} from "./sprites";
 

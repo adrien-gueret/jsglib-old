@@ -1,9 +1,9 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Sprite from "jsglib/sprite";
-import Room from "jsglib/room";
-import Layer from "jsglib/layer";
+import Game from "jsglib/core/game";
+import Sprite from "jsglib/core/sprite";
+import Room from "jsglib/core/room";
+import Layer from "jsglib/core/layer";
 
 // Define a class inherited from JSGlib Sprite class
 class MainTilesSprite extends Sprite {

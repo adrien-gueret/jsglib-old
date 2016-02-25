@@ -1,6 +1,6 @@
 "use strict";
 
-import Point from "jsglib/point";
+import Point from "jsglib/core/point";
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 
 class Tile {

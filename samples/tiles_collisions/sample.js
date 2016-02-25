@@ -1,9 +1,9 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Room from "jsglib/room";
-import Sprite from "jsglib/sprite";
-import Tile from "jsglib/tile";
+import Game from "jsglib/core/game";
+import Room from "jsglib/core/room";
+import Sprite from "jsglib/core/sprite";
+import Tile from "jsglib/core/tile";
 import {Link, LinkSprite} from "./link";
 
 class HouseSpriteSheets extends Sprite {}

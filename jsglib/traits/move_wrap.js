@@ -1,7 +1,7 @@
 "use strict";
 
-import Trait from "jsglib/trait";
-import Element from "jsglib/element";
+import Trait from "jsglib/core/trait";
+import Element from "jsglib/core/element";
 
 let Trait_MoveWrap = Trait({
     initMoveWrap(wrap_horizontally = true, wrap_vertically = true) {

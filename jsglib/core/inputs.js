@@ -1,7 +1,7 @@
 "use strict";
 
 import Trait_EventsHandler from "jsglib/traits/events_handler";
-import Point from "jsglib/point";
+import Point from "jsglib/core/point";
 
 class Inputs {
     constructor(dom_element) {

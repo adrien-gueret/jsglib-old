@@ -1,8 +1,8 @@
 "use strict";
 
-import Layer from "jsglib/layer";
-import Timer from "jsglib/timer";
-import Inputs from "jsglib/inputs";
+import Layer from "jsglib/core/layer";
+import Timer from "jsglib/core/timer";
+import Inputs from "jsglib/core/inputs";
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 
 class Game {

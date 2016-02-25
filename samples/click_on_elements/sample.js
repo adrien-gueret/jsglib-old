@@ -1,8 +1,8 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Room from "jsglib/room";
-import Layer from "jsglib/layer";
+import Game from "jsglib/core/game";
+import Room from "jsglib/core/room";
+import Layer from "jsglib/core/layer";
 import WantedGame from "./wanted_game";
 import {BigHeadsSprite, SmallHeadsSprite} from "./sprites";
 

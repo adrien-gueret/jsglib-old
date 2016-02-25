@@ -1,9 +1,9 @@
 "use strict";
 
-import Element from "jsglib/element";
-import Inputs from "jsglib/inputs";
-import Layer from "jsglib/layer";
-import Sprite from "jsglib/sprite";
+import Element from "jsglib/core/element";
+import Inputs from "jsglib/core/inputs";
+import Layer from "jsglib/core/layer";
+import Sprite from "jsglib/core/sprite";
 
 // Sprite class defining tiles and animations for Link
 export class LinkSprite extends Sprite {

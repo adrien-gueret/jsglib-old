@@ -1,7 +1,7 @@
 "use strict";
 
-import Game from "jsglib/game";
-import Room from "jsglib/room";
+import Game from "jsglib/core/game";
+import Room from "jsglib/core/room";
 import {Link, LinkSprite} from "./link";
 
 // Create a new game from a dom element

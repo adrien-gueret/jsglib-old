@@ -1,6 +1,6 @@
 "use strict";
 
-import Sprite from "jsglib/sprite";
+import Sprite from "jsglib/core/sprite";
 
 export const CHARACTERS_NUMBERS = {
     LUIGI: 1,
