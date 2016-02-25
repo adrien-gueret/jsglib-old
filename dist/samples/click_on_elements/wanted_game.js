@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/game", "jsglib/utils", "./head", "./sprites"], function (exports, _game, _utils, _head, _sprites) {
+define(["exports", "jsglib/core/game", "jsglib/core/utils", "./head", "./sprites"], function (exports, _game, _utils, _head, _sprites) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {

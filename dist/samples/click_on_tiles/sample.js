@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function (_game, _sprite, _room, _layer) {
+define(["jsglib/core/game", "jsglib/core/sprite", "jsglib/core/room", "jsglib/core/layer"], function (_game, _sprite, _room, _layer) {
     "use strict";
 
     var _game2 = _interopRequireDefault(_game);
