@@ -1,4 +1,4 @@
-define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/rectangle"], function (exports, _events_handler, _point, _rectangle) {
+define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/rectangle", "jsglib/utils"], function (exports, _events_handler, _point, _rectangle, _utils) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -47,11 +47,14 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
 
             this.prev_position = new _point2.default(NaN, NaN);
             this.position = new _point2.default(x, y);
+            this.transform_origin = new _point2.default();
+            this.rotation = 0;
             this.layer = null;
             this.sprite_class = null;
             this.current_tile = null;
             this.current_animation = null;
             this.speed = new _point2.default();
+            this.acceleration = new _point2.default();
             this.stop_on_solids = false;
             this.is_destroyed = false;
             this.is_inside_room = false;
@@ -135,9 +138,22 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
                 };
             }
         }, {
+            key: "getDirection",
+            value: function getDirection() {
+                var to_degree = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+                var direction = Math.atan2(-this.speed.y, this.speed.x);
+                return to_degree ? (0, _utils.radianToDegree)(direction) : direction;
+            }
+        }, {
             key: "draw",
             value: function draw(ctx) {
-                this.current_tile.draw(ctx, this.position.x, this.position.y);
+                var transform_origin = this.position.add(this.transform_origin, true);
+                var draw_position = this.position.subtract(transform_origin, true);
+                ctx.save();
+                ctx.translate(transform_origin.x, transform_origin.y);
+                ctx.rotate((0, _utils.degreeToRadian)(this.rotation));
+                this.current_tile.draw(ctx, draw_position.x, draw_position.y);
+                ctx.restore();
                 return this;
             }
         }, {
@@ -147,16 +163,21 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
                 return new _rectangle2.default(size.width, size.height, this.position);
             }
         }, {
+            key: "setTransformOriginToCenter",
+            value: function setTransformOriginToCenter() {
+                var _getSize = this.getSize();
+
+                var width = _getSize.width;
+                var height = _getSize.height;
+                this.transform_origin.set(width / 2, height / 2);
+                return this;
+            }
+        }, {
             key: "move",
-            value: function move(delta) {
-                var deltaPosition = new _point2.default(delta, delta);
-                this.position.add(this.speed.multiply(deltaPosition), false);
-                var _position = this.position;
-                var x = _position.x;
-                var y = _position.y;
-                x += x < 0 ? -.5 : .5;
-                y += y < 0 ? -.5 : .5;
-                this.position.set(x | 0, y | 0);
+            value: function move(delta_time) {
+                var delta_position = new _point2.default(delta_time, delta_time);
+                this.speed.add(this.acceleration);
+                this.position.add(this.speed.multiply(delta_position, true));
                 return this;
             }
         }, {
@@ -165,6 +186,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
                 var _this2 = this;
 
                 var has_solid_collision = false;
+                var solid_tiles = [];
 
                 for (var layer_name in layers) {
                     var layer = layers[layer_name];
@@ -172,6 +194,9 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
 
                     if (this.stop_on_solids && collisions_data.solid_collision) {
                         has_solid_collision = true;
+                        solid_tiles = solid_tiles.concat(collisions_data.tiles.filter(function (tile_data) {
+                            return tile_data.tile.isSolid();
+                        }));
                         this.refinePosition(layer, this.checkTilesCollisions);
                     }
 
@@ -186,6 +211,10 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
 
                 if (!has_solid_collision) {
                     this.trigger('no_solids_collision');
+                } else {
+                    this.trigger('solids_collision', {
+                        tiles: solid_tiles
+                    });
                 }
             }
         }, {
@@ -212,7 +241,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point", "jsglib/recta
         }, {
             key: "refinePosition",
             value: function refinePosition(layer, checkCollisionsMethod) {
-                var delta_position = this.position.substract(this.prev_position);
+                var delta_position = this.position.subtract(this.prev_position);
                 var limit_x = Math.abs(delta_position.x);
                 var limit_y = Math.abs(delta_position.y);
                 var delta_x = Math.sign(delta_position.x);

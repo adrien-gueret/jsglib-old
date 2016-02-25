@@ -150,22 +150,22 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
 
                 window.requestAnimationFrame(this.loop.bind(this));
                 var now = Date.now();
-                var delta = now - this.last_loop_time;
+                var delta_time = now - this.last_loop_time;
                 var interval = 1000 / this.timer.fps;
 
-                if (delta <= interval) {
+                if (delta_time <= interval) {
                     return this;
                 }
 
                 this.timer.trigger('frame');
-                this.manageElements(delta / 1000);
+                this.manageElements(delta_time / 1000);
                 this.render();
-                this.last_loop_time = now - delta % interval;
+                this.last_loop_time = now - delta_time % interval;
                 return this;
             }
         }, {
             key: "manageElements",
-            value: function manageElements(delta) {
+            value: function manageElements(delta_time) {
                 var _this3 = this;
 
                 var _loop = function _loop(layer_name) {
@@ -175,8 +175,11 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                             return;
                         }
 
-                        element.trigger('frame');
-                        element.move(delta);
+                        element.trigger('frame', {
+                            delta_time: delta_time
+                        });
+                        element.move(delta_time);
+                        element.position.round();
 
                         if (!element.position.equals(element.prev_position)) {
                             element.checkCollisions(_this3.layers);
@@ -206,6 +209,9 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
 
                         layer.needs_clear = true;
                         element.prev_position.copy(element.position);
+                        element.trigger('end_frame', {
+                            delta_time: delta_time
+                        });
                     });
                     layer.elements.filter(function (element) {
                         return element.is_destroyed;
