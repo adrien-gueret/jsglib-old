@@ -105,35 +105,37 @@ class Game {
         window.requestAnimationFrame(this.loop.bind(this));
 
         let now = Date.now();
-        let delta = now - this.last_loop_time;
+        let delta_time = now - this.last_loop_time;
         let interval = 1000 / this.timer.fps;
 
-        if (delta <= interval) {
+        if (delta_time <= interval) {
             return this;
         }
 
         this.timer.trigger('frame');
 
-        this.manageElements(delta / 1000);
+        this.manageElements(delta_time / 1000);
 
         this.render();
 
-        this.last_loop_time = now - (delta % interval);
+        this.last_loop_time = now - (delta_time % interval);
 
         return this;
     }
 
-    manageElements(delta) {
+    manageElements(delta_time) {
         for (let layer_name in this.layers) {
             let layer = this.layers[layer_name];
 
             layer.elements.forEach(element => {
-                if (element.is_destroyed)  {
+                if (element.is_destroyed) {
                     return;
                 }
 
-                element.trigger('frame');
-                element.move(delta);
+                element.trigger('frame', {delta_time});
+                element.move(delta_time);
+                // We don't want elements to have float positions (prevent blurry effects and positions related bugs)
+                element.position.round();
 
                 // Check collisions only if element has moved
                 if (!element.position.equals(element.prev_position)) {
@@ -159,6 +161,8 @@ class Game {
 
                 layer.needs_clear = true;
                 element.prev_position.copy(element.position);
+
+                element.trigger('end_frame', {delta_time});
             });
 
             layer.elements.filter(element => element.is_destroyed).forEach(element => {

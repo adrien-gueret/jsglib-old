@@ -25,9 +25,24 @@ export function shuffleArray(array) {
     return shuffled_array;
 }
 
+export function degreeToRadian(degree) {
+    return (360 - degree) * Math.PI / 180;
+}
+
+export function radianToDegree(radian) {
+    let degree = -radian / (Math.PI / 180) + 360;
+
+    while (degree < 0) {
+        degree += 360;
+    }
+
+    return degree % 360;
+}
+
 let Utils = {
     random,
-    shuffleArray
+    shuffleArray,
+    degreeToRadian
 };
 
 export default Utils;

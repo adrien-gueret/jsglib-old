@@ -3,16 +3,20 @@
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 import Point from "jsglib/point";
 import Rectangle from "jsglib/rectangle";
+import {degreeToRadian, radianToDegree} from "jsglib/utils";
 
 class Element {
     constructor(x, y) {
         this.prev_position = new Point(NaN, NaN);
         this.position = new Point(x, y);
+        this.transform_origin = new Point();
+        this.rotation = 0;
         this.layer = null;
         this.sprite_class = null;
         this.current_tile = null;
         this.current_animation = null;
         this.speed = new Point();
+        this.acceleration = new Point();
         this.stop_on_solids = false;
         this.is_destroyed = false;
         this.is_inside_room = false;
@@ -63,7 +67,7 @@ class Element {
         this.current_animation = new animation_class(timer);
 
         this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
-        
+
         this.current_animation
             .on('animation_update', () => {
                 this.setCurrentTileNumber(this.current_animation.getCurrentTileNumber());
@@ -74,7 +78,7 @@ class Element {
     }
 
     getAnimationName() {
-       return this.current_animation ? this.current_animation.name : '';
+        return this.current_animation ? this.current_animation.name : '';
     }
 
     getSize() {
@@ -82,8 +86,23 @@ class Element {
         return {width, height};
     }
 
+    getDirection(to_degree = true) {
+        let direction = Math.atan2(-this.speed.y, this.speed.x);
+        return to_degree ? radianToDegree(direction) : direction;
+    }
+
     draw(ctx) {
-        this.current_tile.draw(ctx, this.position.x, this.position.y);
+        let transform_origin = this.position.add(this.transform_origin, true);
+        let draw_position = this.position.subtract(transform_origin, true);
+
+        ctx.save();
+        ctx.translate(transform_origin.x, transform_origin.y);
+        ctx.rotate(degreeToRadian(this.rotation));
+
+        this.current_tile.draw(ctx, draw_position.x, draw_position.y);
+
+        ctx.restore();
+
         return this;
     }
 
@@ -92,23 +111,22 @@ class Element {
         return new Rectangle(size.width, size.height, this.position);
     }
 
-    move(delta) {
-        let deltaPosition = new Point(delta, delta);
-        this.position.add(this.speed.multiply(deltaPosition), false);
+    setTransformOriginToCenter() {
+        let {width, height} = this.getSize();
+        this.transform_origin.set(width / 2, height / 2);
+        return this;
+    }
 
-        // We don't want elements to have float positions (prevent blurry effects and positions related bugs)
-        let {x, y} = this.position;
-
-        x += x < 0 ? -.5 : .5;
-        y += y < 0 ? -.5 : .5;
-
-        this.position.set(x | 0, y | 0);
-
+    move(delta_time) {
+        let delta_position = new Point(delta_time, delta_time);
+        this.speed.add(this.acceleration);
+        this.position.add(this.speed.multiply(delta_position, true));
         return this;
     }
 
     checkCollisions(layers) {
-        var has_solid_collision = false;
+        let has_solid_collision = false;
+        let solid_tiles = [];
 
         for (var layer_name in layers) {
             let layer = layers[layer_name];
@@ -119,6 +137,7 @@ class Element {
             // Check collisions with solid tiles
             if (this.stop_on_solids && collisions_data.solid_collision) {
                 has_solid_collision = true;
+                solid_tiles = solid_tiles.concat(collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid()));
                 this.refinePosition(layer, this.checkTilesCollisions);
             }
 
@@ -131,6 +150,10 @@ class Element {
 
         if (!has_solid_collision) {
             this.trigger('no_solids_collision');
+        } else {
+            this.trigger('solids_collision', {
+                tiles: solid_tiles
+            });
         }
     }
 
@@ -155,7 +178,7 @@ class Element {
     }
 
     refinePosition(layer, checkCollisionsMethod) {
-        let delta_position = this.position.substract(this.prev_position);
+        let delta_position = this.position.subtract(this.prev_position);
         let limit_x = Math.abs(delta_position.x);
         let limit_y = Math.abs(delta_position.y);
         let delta_x = Math.sign(delta_position.x);

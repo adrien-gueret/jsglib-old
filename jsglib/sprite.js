@@ -11,10 +11,14 @@ class Sprite {
         };
     }
 
+    static hasTiles() {
+        return this.tiles.length > 0;
+    }
+
     static getTile(tile_number, clone = true) {
         tile_number--;
 
-        if (tile_number < 0) {
+        if (!this.hasTiles() || tile_number < 0) {
             return Tile.getNewEmptyTile(this);
         }
 
@@ -38,6 +42,7 @@ class Sprite {
             this.image = new Image();
 
             this.image.onload = () => {
+                this.makeTiles(this.image.naturalWidth, this.image.naturalHeight, 0);
                 resolve(this.image);
             };
 
