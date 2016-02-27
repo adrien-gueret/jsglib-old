@@ -56,7 +56,7 @@ define(["exports"], function (exports) {
                 }
 
                 if (!isNaN(this.x_max)) {
-                    this.x = Math.min(this.x, this.x_min);
+                    this.x = Math.min(this.x, this.x_max);
                 }
 
                 if (!isNaN(this.y_min)) {
@@ -64,7 +64,7 @@ define(["exports"], function (exports) {
                 }
 
                 if (!isNaN(this.y_max)) {
-                    this.y = Math.min(this.y, this.y_min);
+                    this.y = Math.min(this.y, this.y_max);
                 }
 
                 return this;

@@ -27,8 +27,6 @@ class Ball extends Element {
         let {height, width} = this.getSize();
         this.position.set(game.current_room.width / 2 - width / 2, height);
 
-        // TODO: for gravity, check for a combinaison Point/Force to move to
-
         // Init physics on this instance thanks to Trait_Physics!
         let gravity = new Point(0, 10);
         this.initPhysics(gravity);

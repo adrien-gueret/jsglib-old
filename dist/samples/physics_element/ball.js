@@ -87,7 +87,9 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
 
                         _this2.position.set(game.current_room.width / 2 - width / 2, height);
 
-                        _this2.initPhysics();
+                        var gravity = new _point2.default(0, 10);
+
+                        _this2.initPhysics(gravity);
 
                         _this2.bounce_factor.set(.8);
 

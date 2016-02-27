@@ -27,7 +27,8 @@ define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/poin
                 throw new TypeError('Trait_Physics: trying to init gravity feature on non-Element instance');
             }
 
-            this.$forces = [gravity];
+            this.gravity = gravity;
+            this.$forces = [this.gravity];
             this.$impulses = [];
             this.bounce_factor = new _point2.default(0);
             this.on('solids_collision', function (e) {
