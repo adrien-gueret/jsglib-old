@@ -1,4 +1,4 @@
-define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile, _animation) {
+define(["exports", "jsglib/core/tile", "jsglib/core/animation"], function (exports, _tile, _animation) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -53,12 +53,17 @@ define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile,
                 };
             }
         }, {
+            key: "hasTiles",
+            value: function hasTiles() {
+                return this.tiles.length > 0;
+            }
+        }, {
             key: "getTile",
             value: function getTile(tile_number) {
                 var clone = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
                 tile_number--;
 
-                if (tile_number < 0) {
+                if (!this.hasTiles() || tile_number < 0) {
                     return _tile2.default.getNewEmptyTile(this);
                 }
 
@@ -83,6 +88,8 @@ define(["exports", "jsglib/tile", "jsglib/animation"], function (exports, _tile,
                     _this.image = new Image();
 
                     _this.image.onload = function () {
+                        _this.makeTiles(_this.image.naturalWidth, _this.image.naturalHeight, 0);
+
                         resolve(_this.image);
                     };
 

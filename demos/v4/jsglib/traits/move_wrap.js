@@ -1,4 +1,4 @@
-define(["exports", "jsglib/trait", "jsglib/element"], function (exports, _trait, _element) {
+define(["exports", "jsglib/core/trait", "jsglib/core/element"], function (exports, _trait, _element) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {

@@ -1,4 +1,4 @@
-define(["jsglib/game", "jsglib/room", "./link"], function (_game, _room, _link) {
+define(["jsglib/core/game", "jsglib/core/room", "./link"], function (_game, _room, _link) {
     "use strict";
 
     var _game2 = _interopRequireDefault(_game);

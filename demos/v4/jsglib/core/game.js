@@ -1,4 +1,4 @@
-define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/traits/events_handler"], function (exports, _layer3, _timer, _inputs, _events_handler) {
+define(["exports", "jsglib/core/layer", "jsglib/core/timer", "jsglib/core/inputs", "jsglib/traits/events_handler"], function (exports, _layer3, _timer, _inputs, _events_handler) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -56,6 +56,7 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
             this.current_room = null;
             this.classes = {};
             this.timer = new _timer2.default(fps);
+            this.is_paused = false;
             this.is_stopped = false;
             this.defineLayers(layers);
             this.inputs = new _inputs2.default(this.container);
@@ -71,6 +72,11 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                         }
                     });
                 }
+            }).on('window_blur', this.togglePause.bind(this, true)).on('window_focus', this.togglePause.bind(this, false));
+            this.on('pause_disabled', function () {
+                _this.last_loop_time = Date.now();
+
+                _this.$launchLoop();
             });
         }
 
@@ -117,7 +123,7 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
             value: function start() {
                 this.trigger('start');
                 this.last_loop_time = Date.now();
-                this.loop();
+                this.$loop();
                 return this;
             }
         }, {
@@ -133,8 +139,24 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                 return this;
             }
         }, {
-            key: "loop",
-            value: function loop() {
+            key: "togglePause",
+            value: function togglePause(force_pause) {
+                this.is_paused = force_pause === undefined ? !this.is_paused : force_pause;
+                this.trigger(this.is_paused ? 'pause_enabled' : 'pause_disabled');
+                return this;
+            }
+        }, {
+            key: "$launchLoop",
+            value: function $launchLoop() {
+                window.requestAnimationFrame(this.$loop.bind(this));
+            }
+        }, {
+            key: "$loop",
+            value: function $loop() {
+                if (this.is_paused) {
+                    return this;
+                }
+
                 if (this.is_stopped) {
                     this.container = null;
                     this.classes = null;
@@ -148,24 +170,24 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                     return this;
                 }
 
-                window.requestAnimationFrame(this.loop.bind(this));
+                this.$launchLoop();
                 var now = Date.now();
-                var delta = now - this.last_loop_time;
+                var delta_time = now - this.last_loop_time;
                 var interval = 1000 / this.timer.fps;
 
-                if (delta <= interval) {
+                if (delta_time <= interval) {
                     return this;
                 }
 
                 this.timer.trigger('frame');
-                this.manageElements(delta / 1000);
-                this.render();
-                this.last_loop_time = now - delta % interval;
+                this.$manageElements(delta_time / 1000);
+                this.$render();
+                this.last_loop_time = now - delta_time % interval;
                 return this;
             }
         }, {
-            key: "manageElements",
-            value: function manageElements(delta) {
+            key: "$manageElements",
+            value: function $manageElements(delta_time) {
                 var _this3 = this;
 
                 var _loop = function _loop(layer_name) {
@@ -175,8 +197,11 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                             return;
                         }
 
-                        element.trigger('frame');
-                        element.move(delta);
+                        element.trigger('frame', {
+                            delta_time: delta_time
+                        });
+                        element.move(delta_time);
+                        element.position.round();
 
                         if (!element.position.equals(element.prev_position)) {
                             element.checkCollisions(_this3.layers);
@@ -206,6 +231,9 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
 
                         layer.needs_clear = true;
                         element.prev_position.copy(element.position);
+                        element.trigger('end_frame', {
+                            delta_time: delta_time
+                        });
                     });
                     layer.elements.filter(function (element) {
                         return element.is_destroyed;
@@ -223,8 +251,8 @@ define(["exports", "jsglib/layer", "jsglib/timer", "jsglib/inputs", "jsglib/trai
                 return this;
             }
         }, {
-            key: "render",
-            value: function render() {
+            key: "$render",
+            value: function $render() {
                 for (var layer_name in this.layers) {
                     var _layer = this.layers[layer_name];
                     var force_redraw = false;

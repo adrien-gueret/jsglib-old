@@ -1,4 +1,4 @@
-define(["exports", "jsglib/point", "jsglib/traits/events_handler"], function (exports, _point, _events_handler) {
+define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], function (exports, _point, _events_handler) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {

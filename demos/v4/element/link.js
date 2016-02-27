@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sprite"], function (exports, _element, _inputs, _layer, _sprite) {
+define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _element, _inputs, _layer, _sprite) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -112,6 +112,7 @@ define(["exports", "jsglib/element", "jsglib/inputs", "jsglib/layer", "jsglib/sp
             _classCallCheck(this, Link);
 
             var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y));
+            // We must call the parent's constructor
 
             _this2.setSpriteClass(LinkSprite);
 

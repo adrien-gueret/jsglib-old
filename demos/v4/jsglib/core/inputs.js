@@ -1,4 +1,4 @@
-define(["exports", "jsglib/traits/events_handler", "jsglib/point"], function (exports, _events_handler, _point) {
+define(["exports", "jsglib/traits/events_handler", "jsglib/core/point"], function (exports, _events_handler, _point) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -113,10 +113,20 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point"], function (ex
                 }
             };
 
+            this.$windowFocusHandler = function () {
+                _this.trigger('window_focus');
+            };
+
+            this.$windowBlurHandler = function () {
+                _this.trigger('window_blur');
+            };
+
             dom_element.addEventListener('mousemove', this.$mouseMoveEventHandler);
             dom_element.addEventListener('click', this.$clickHandler);
             document.body.addEventListener('keydown', this.$keyDownHandler);
             document.body.addEventListener('keyup', this.$keyUpHandler);
+            window.addEventListener('focus', this.$windowFocusHandler);
+            window.addEventListener('blur', this.$windowBlurHandler);
         }
 
         _createClass(Inputs, [{
@@ -126,6 +136,8 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/point"], function (ex
                 this.dom_element.removeEventListener('click', this.$clickHandler);
                 document.body.removeEventListener('keydown', this.$keyDownHandler);
                 document.body.removeEventListener('keyup', this.$keyUpHandler);
+                window.removeEventListener('focus', this.$windowFocusHandler);
+                window.removeEventListener('blur', this.$windowBlurHandler);
                 this.off();
                 this.dom_element = null;
                 this.mouse = null;

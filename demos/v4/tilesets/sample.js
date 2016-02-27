@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function (_game, _sprite, _room, _layer) {
+define(["jsglib/core/game", "jsglib/core/sprite", "jsglib/core/room", "jsglib/core/layer"], function (_game, _sprite, _room, _layer) {
     "use strict";
 
     var _game2 = _interopRequireDefault(_game);
@@ -77,7 +77,8 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
         _createClass(MainTilesSprite, null, [{
             key: "initTiles",
             value: function initTiles(timer) {
-                this.makeTiles(32, 32).defineTilesAnimations([{
+                this.makeTiles(32, 32);
+                this.defineTilesAnimations([{
                     tiles: [6, 14],
                     time: 500
                 }], timer);
@@ -122,8 +123,7 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
         return level1.useDefinition('./level.json');
     }).then(function () {
         my_game.goToRoom(level1).start();
-
-        my_game.container.onclick = function () {
+        my_game.inputs.on('click', function () {
             var used_sprite_class = _layer2.default.TILES_LAYER.tiles_sprite_class;
             var new_sprite_class = used_sprite_class === TilesPlainSprite ? TilesSnowSprite : TilesPlainSprite;
             _layer2.default.TILES_LAYER.tiles_sprite_class = new_sprite_class;
@@ -139,7 +139,7 @@ define(["jsglib/game", "jsglib/sprite", "jsglib/room", "jsglib/layer"], function
             });
 
             _layer2.default.TILES_LAYER.draw(my_game.timer, true);
-        };
+        });
     });
 });
 //# sourceMappingURL=sample.js.map

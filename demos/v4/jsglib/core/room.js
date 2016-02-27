@@ -1,4 +1,4 @@
-define(["exports", "jsglib/rectangle", "jsglib/http", "jsglib/traits/events_handler"], function (exports, _rectangle, _http, _events_handler) {
+define(["exports", "jsglib/core/rectangle", "jsglib/core/http", "jsglib/traits/events_handler"], function (exports, _rectangle, _http, _events_handler) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {

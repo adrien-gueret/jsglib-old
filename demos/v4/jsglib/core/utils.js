@@ -6,6 +6,8 @@ define(["exports"], function (exports) {
     });
     exports.random = random;
     exports.shuffleArray = shuffleArray;
+    exports.degreeToRadian = degreeToRadian;
+    exports.radianToDegree = radianToDegree;
 
     function random(min, max) {
         if (min > max) {
@@ -32,9 +34,24 @@ define(["exports"], function (exports) {
         return shuffled_array;
     }
 
+    function degreeToRadian(degree) {
+        return (360 - degree) * Math.PI / 180;
+    }
+
+    function radianToDegree(radian) {
+        var degree = -radian / (Math.PI / 180) + 360;
+
+        while (degree < 0) {
+            degree += 360;
+        }
+
+        return degree % 360;
+    }
+
     var Utils = {
         random: random,
-        shuffleArray: shuffleArray
+        shuffleArray: shuffleArray,
+        degreeToRadian: degreeToRadian
     };
     exports.default = Utils;
 });
