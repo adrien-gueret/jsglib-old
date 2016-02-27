@@ -9,7 +9,7 @@ class Inputs {
         this.keys_pressed = [];
         this.dom_element = dom_element;
 
-        this.$mouseMoveEventHandler = (e) => {
+        this.$mouseMoveEventHandler = e => {
             let dom_element = this.dom_element;
             let x = e.pageX;
             let y = e.pageY;
@@ -30,7 +30,7 @@ class Inputs {
             });
         };
 
-        this.$keyDownHandler = (e) => {
+        this.$keyDownHandler = e => {
             let key = e.which || e.keyCode;
 
             if (this.isKeyPressed(key)) {
@@ -54,7 +54,7 @@ class Inputs {
             }
         };
 
-        this.$keyUpHandler = (e) => {
+        this.$keyUpHandler = e => {
             let key = e.which || e.keyCode;
             this.keys_pressed.some((current_key, key_index) => {
                 if (key === current_key) {
@@ -73,10 +73,20 @@ class Inputs {
             }
         };
 
+        this.$windowFocusHandler = () => {
+          this.trigger('window_focus');
+        };
+
+        this.$windowBlurHandler = () => {
+            this.trigger('window_blur');
+        };
+
         dom_element.addEventListener('mousemove', this.$mouseMoveEventHandler);
         dom_element.addEventListener('click', this.$clickHandler);
         document.body.addEventListener('keydown', this.$keyDownHandler);
         document.body.addEventListener('keyup', this.$keyUpHandler);
+        window.addEventListener('focus', this.$windowFocusHandler);
+        window.addEventListener('blur', this.$windowBlurHandler);
     }
 
     destroy() {
@@ -84,6 +94,8 @@ class Inputs {
         this.dom_element.removeEventListener('click', this.$clickHandler);
         document.body.removeEventListener('keydown', this.$keyDownHandler);
         document.body.removeEventListener('keyup', this.$keyUpHandler);
+        window.removeEventListener('focus', this.$windowFocusHandler);
+        window.removeEventListener('blur', this.$windowBlurHandler);
         this.off();
         this.dom_element = null;
         this.mouse = null;

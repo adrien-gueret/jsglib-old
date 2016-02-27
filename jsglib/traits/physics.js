@@ -10,7 +10,8 @@ let Trait_Physics = Trait({
             throw new TypeError('Trait_Physics: trying to init gravity feature on non-Element instance');
         }
 
-        this.$forces = [gravity];
+        this.gravity = gravity;
+        this.$forces = [this.gravity];
         this.$impulses = [];
         this.bounce_factor = new Point(0);
 

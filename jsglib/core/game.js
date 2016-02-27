@@ -15,22 +15,31 @@ class Game {
         this.current_room = null;
         this.classes = {};
         this.timer = new Timer(fps);
+        this.is_paused = false;
         this.is_stopped = false;
 
         this.defineLayers(layers);
         this.inputs = new Inputs(this.container);
 
-        this.inputs.on('click', () => {
-            for (let layer_name in this.layers) {
-                let layer = this.layers[layer_name];
+        this.inputs
+            .on('click', () => {
+                for (let layer_name in this.layers) {
+                    let layer = this.layers[layer_name];
 
-                layer.elements.some((element) => {
-                    if (this.inputs.mouse.isOverElement(element)) {
-                        let custom_event = element.trigger('click', {mouse: this.inputs.mouse});
-                        return custom_event.propagationStopped;
-                    }
-                });
-            }
+                    layer.elements.some((element) => {
+                        if (this.inputs.mouse.isOverElement(element)) {
+                            let custom_event = element.trigger('click', {mouse: this.inputs.mouse});
+                            return custom_event.propagationStopped;
+                        }
+                    });
+                }
+            })
+            .on('window_blur', this.togglePause.bind(this, true))
+            .on('window_focus', this.togglePause.bind(this, false));
+
+        this.on('pause_disabled', () => {
+            this.last_loop_time = Date.now();
+            this.$launchLoop();
         });
     }
 
@@ -70,7 +79,7 @@ class Game {
     start() {
         this.trigger('start');
         this.last_loop_time = Date.now();
-        this.loop();
+        this.$loop();
         return this;
     }
 
@@ -86,7 +95,23 @@ class Game {
         return this;
     }
 
-    loop() {
+    togglePause(force_pause) {
+        this.is_paused = force_pause === undefined ? !this.is_paused : force_pause;
+
+        this.trigger(this.is_paused ? 'pause_enabled' : 'pause_disabled');
+
+        return this;
+    }
+
+    $launchLoop() {
+        window.requestAnimationFrame(this.$loop.bind(this));
+    }
+
+    $loop() {
+        if (this.is_paused) {
+            return this;
+        }
+
         if (this.is_stopped) {
             // Reset all properties!
             this.container = null;
@@ -102,7 +127,7 @@ class Game {
             return this;
         }
 
-        window.requestAnimationFrame(this.loop.bind(this));
+        this.$launchLoop();
 
         let now = Date.now();
         let delta_time = now - this.last_loop_time;
@@ -114,16 +139,16 @@ class Game {
 
         this.timer.trigger('frame');
 
-        this.manageElements(delta_time / 1000);
+        this.$manageElements(delta_time / 1000);
 
-        this.render();
+        this.$render();
 
         this.last_loop_time = now - (delta_time % interval);
 
         return this;
     }
 
-    manageElements(delta_time) {
+    $manageElements(delta_time) {
         for (let layer_name in this.layers) {
             let layer = this.layers[layer_name];
 
@@ -175,7 +200,7 @@ class Game {
         return this;
     }
 
-    render() {
+    $render() {
         for (let layer_name in this.layers) {
             let layer = this.layers[layer_name];
             let force_redraw = false;

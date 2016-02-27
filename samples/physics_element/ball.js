@@ -30,7 +30,8 @@ class Ball extends Element {
         // TODO: for gravity, check for a combinaison Point/Force to move to
 
         // Init physics on this instance thanks to Trait_Physics!
-        this.initPhysics();
+        let gravity = new Point(0, 10);
+        this.initPhysics(gravity);
 
         // Set this ball bounce factor (property from Trait_Physics)
         this.bounce_factor.set(.8);
