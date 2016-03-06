@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite", "jsglib/core/point", "jsglib/core/utils", "jsglib/traits/physics"], function (exports, _element, _inputs, _layer, _sprite, _point, _utils, _physics) {
+define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _platform_player, _layer, _sprite) {
         "use strict";
 
         Object.defineProperty(exports, "__esModule", {
@@ -8,17 +8,11 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
         });
         exports.Ball = exports.BallSprite = undefined;
 
-        var _element2 = _interopRequireDefault(_element);
-
-        var _inputs2 = _interopRequireDefault(_inputs);
+        var _platform_player2 = _interopRequireDefault(_platform_player);
 
         var _layer2 = _interopRequireDefault(_layer);
 
         var _sprite2 = _interopRequireDefault(_sprite);
-
-        var _point2 = _interopRequireDefault(_point);
-
-        var _physics2 = _interopRequireDefault(_physics);
 
         function _interopRequireDefault(obj) {
                 return obj && obj.__esModule ? obj : {
@@ -68,17 +62,20 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
                 return BallSprite;
         })(_sprite2.default);
 
-        var Ball = (function (_Element) {
-                _inherits(Ball, _Element);
+        var Ball = exports.Ball = (function (_PlatformPlayer) {
+                _inherits(Ball, _PlatformPlayer);
 
                 function Ball(game) {
                         _classCallCheck(this, Ball);
 
-                        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this));
+                        // Indicate the sprite class to use
 
-                        _this2.stop_on_solids = true;
+                        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this, 0, 0, game.inputs));
+                        // We must call the parent's constructor
 
                         _this2.setSpriteClass(BallSprite);
+
+                        // Set an initial position (center horizontally the new ball)
 
                         var _this2$getSize = _this2.getSize();
 
@@ -87,27 +84,12 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
 
                         _this2.position.set(game.current_room.width / 2 - width / 2, height);
 
-                        _this2.initPhysics();
-
-                        _this2.bounce_factor.set(.8);
-
-                        game.inputs.on('click', function (e) {
-                                var element_mouse_delta_position = _this2.getRectangle().getCenter().subtract(e.detail.mouse);
-
-                                var impulse = new _point2.default(5, 5).multiply(element_mouse_delta_position).minimum(-200).maximum(200);
-
-                                _this2.applyImpulse(impulse);
-                        });
-
+                        // Add player to layer in order to display it
                         _layer2.default.MAIN_LAYER.addElement(_this2);
-
                         return _this2;
                 }
 
                 return Ball;
-        })(_element2.default);
-
-        (0, _physics2.default)(Ball);
-        exports.Ball = Ball;
+        })(_platform_player2.default);
 });
 //# sourceMappingURL=ball.js.map

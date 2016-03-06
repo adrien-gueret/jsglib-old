@@ -231,9 +231,6 @@ define(["exports", "jsglib/core/layer", "jsglib/core/timer", "jsglib/core/inputs
 
                         layer.needs_clear = true;
                         element.prev_position.copy(element.position);
-                        element.trigger('end_frame', {
-                            delta_time: delta_time
-                        });
                     });
                     layer.elements.filter(function (element) {
                         return element.is_destroyed;
