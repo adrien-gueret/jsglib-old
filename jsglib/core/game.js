@@ -186,8 +186,6 @@ class Game {
 
                 layer.needs_clear = true;
                 element.prev_position.copy(element.position);
-
-                element.trigger('end_frame', {delta_time});
             });
 
             layer.elements.filter(element => element.is_destroyed).forEach(element => {

@@ -28,8 +28,7 @@ class Ball extends Element {
         this.position.set(game.current_room.width / 2 - width / 2, height);
 
         // Init physics on this instance thanks to Trait_Physics!
-        let gravity = new Point(0, 10);
-        this.initPhysics(gravity);
+        this.initPhysics();
 
         // Set this ball bounce factor (property from Trait_Physics)
         this.bounce_factor.set(.8);
