@@ -4,7 +4,7 @@ import PlatformPlayer from "jsglib/platformer/platform_player";
 import Layer from "jsglib/core/layer";
 import Sprite from "jsglib/core/sprite";
 
-// Sprite class defining tiles and animations for the ball
+// Sprite class for the ball
 export class BallSprite extends Sprite {
 }
 

@@ -4,13 +4,14 @@ import Point from "jsglib/core/point";
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 
 class Tile {
-    constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null) {
+    constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null, slope_point = null) {
         this.sprite_class = sprite_class;
         this.sheet_position = new Point(x, y);
         this.tile_number = tile_number;
         this.needs_redraw = true;
         this.is_empty = false;
         this.type = type;
+        this.slope_point = slope_point;
     }
 
     static getNewEmptyTile(sprite_class) {
@@ -24,7 +25,14 @@ class Tile {
     }
 
     clone() {
-        return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type);
+        return new Tile(
+            this.sprite_class,
+            this.sheet_position.x,
+            this.sheet_position.y,
+            this.tile_number,
+            this.type,
+            this.slope_point
+        );
     }
 
     setTileNumber(tile_number) {
@@ -33,6 +41,7 @@ class Tile {
         this.tile_number = tile_number;
         this.sheet_position = tile.sheet_position;
         this.type = tile.type;
+        this.slope_point = tile.slope_point;
         this.needs_redraw = true;
 
         return this;
@@ -72,12 +81,44 @@ class Tile {
     }
 
     isSolid() {
-        return this.type === Tile.TYPES.SOLID;
+        return this.type === Tile.TYPES.SOLID || this.isSlope();
+    }
+
+    isSlope() {
+        return this.slope_point !== null;
+    }
+
+    getContactY(x, tile_position) {
+        let x_on_tile = this.getXOnTile(x, tile_position.x);
+        let y_on_tile = this.getYFromSlope(x_on_tile);
+
+        if (isNaN(y_on_tile)) {
+            return NaN;
+        }
+
+        return tile_position.y + y_on_tile;
+    }
+
+    getXOnTile(target_x, tile_x) {
+        return (target_x - tile_x) / this.getSize().width;
+    }
+
+    getYFromSlope(x_on_tile) {
+        if (!this.isSlope()) {
+            return 0;
+        }
+
+        if (x_on_tile < 0 || x_on_tile > 1) {
+            return NaN;
+        }
+
+        return (1 - x_on_tile) * this.slope_point.x + x_on_tile * this.slope_point.y;
     }
 }
 
 Tile.TYPES = {
-    SOLID: Symbol()
+    SOLID: Symbol(),
+    SLOPE: Symbol()
 };
 
 Trait_EventsHandler(Tile);

@@ -135,10 +135,22 @@ class Element {
             let collisions_data = this.checkTilesCollisions(layer);
 
             // Check collisions with solid tiles
-            if (this.stop_on_solids && collisions_data.solid_collision) {
+            if (this.stop_on_solids && collisions_data.solids_collisions) {
                 has_solid_collision = true;
-                solid_tiles = solid_tiles.concat(collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid()));
-                this.refinePosition(layer, this.checkTilesCollisions);
+
+                let new_solid_tiles = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
+                solid_tiles = solid_tiles.concat(new_solid_tiles);
+
+                let slopes_tiles = new_solid_tiles.filter(tile_data => tile_data.tile.isSlope());
+                let slope_refinement_performed = false;
+
+                if (slopes_tiles.length) {
+                    slope_refinement_performed = this.refinePositionOnSlopes(slopes_tiles);
+                }
+
+                if (!slope_refinement_performed) {
+                    this.refinePosition(layer, this.checkTilesCollisions);
+                }
             }
 
             // Trigger collision events for each tile
@@ -160,7 +172,9 @@ class Element {
     checkTilesCollisions(layer, position = this.position) {
         let data = {
             tiles: [],
-            solid_collision: false
+            solids_collisions: false,
+            slopes_collisions: false,
+            only_slopes_collisions: false
         };
 
         if (!layer.tiles.length) {
@@ -172,13 +186,16 @@ class Element {
 
         data.tiles = layer.getTilesFromRectangle(rectangle);
 
-        data.solid_collision = data.tiles.some(tile_data => tile_data.tile.isSolid());
+        let solids_tiles = data.tiles.filter(tile_data => tile_data.tile.isSolid());
+        data.solids_collisions = solids_tiles.length > 0;
+        data.slopes_collisions = data.solids_collisions && solids_tiles.some(tile_data => tile_data.tile.isSlope());
+        data.only_slopes_collisions = data.slopes_collisions && solids_tiles.every(tile_data => tile_data.tile.isSlope());
 
         return data;
     }
 
     refinePosition(layer, checkCollisionsMethod) {
-        let delta_position = this.position.subtract(this.prev_position);
+        let delta_position = this.position.subtract(this.prev_position, true);
         let limit_x = Math.abs(delta_position.x);
         let limit_y = Math.abs(delta_position.y);
         let delta_x = Math.sign(delta_position.x);
@@ -189,7 +206,8 @@ class Element {
         for (let x = 0; x < limit_x; x++) {
             new_position.x += delta_x;
 
-            if (checkCollisionsMethod.call(this, layer, new_position).solid_collision) {
+            let collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+            if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                 new_position.x -= delta_x;
                 break;
             }
@@ -199,13 +217,40 @@ class Element {
         for (let y = 0; y < limit_y; y++) {
             new_position.y += delta_y;
 
-            if (checkCollisionsMethod.call(this, layer, new_position).solid_collision) {
+            let collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+            if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                 new_position.y -= delta_y;
                 break;
             }
         }
 
         this.position.copy(new_position);
+
+        return this;
+    }
+
+    refinePositionOnSlopes(slopes_tiles_data) {
+        let new_position = this.position.clone();
+        let height = this.getSize().height;
+        let center_x = this.getRectangle().getCenter().x;
+
+        return slopes_tiles_data.some(slope_data => {
+            let y_contact = slope_data.tile.getContactY(center_x, slope_data.position);
+
+            if (isNaN(y_contact)) {
+                return false;
+            }
+
+            new_position.y = y_contact - height - 1;
+
+            if (new_position.y - this.position.y >= 0) {
+                return true;
+            }
+
+            this.position.copy(new_position).round();
+
+            return true;
+        });
     }
 }
 

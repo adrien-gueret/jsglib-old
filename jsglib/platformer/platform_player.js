@@ -21,7 +21,7 @@ class PlatformPlayer extends Element {
         this.movements_resistance.x = 10;
 
         this.acceleration.minimum(-ACCELERATION_LIMIT).maximum(ACCELERATION_LIMIT);
-        this.speed.minimum(-MAX_SPEED, -Y_SPEED_LIMIT).maximum(MAX_SPEED, Y_SPEED_LIMIT);
+        this.speed.minimum(-MAX_SPEED, -Y_SPEED_LIMIT).maximum(MAX_SPEED, Y_SPEED_LIMIT * 2);
         this.acceleration_delta = new Point(3, 0);
 
         inputs.on('keydown', e => {
@@ -46,7 +46,7 @@ class PlatformPlayer extends Element {
                 this.acceleration.x = Math.max(0, this.acceleration.x);
             }
 
-            if (inputs.isKeyPressed(Inputs.KEYS.ARROWS.UP)) {
+            if (this.speed.y < 0 && inputs.isKeyPressed(Inputs.KEYS.ARROWS.UP)) {
                 this.applyImpulse(new Point(0, -JUMP_VARIATION));
             }
         });

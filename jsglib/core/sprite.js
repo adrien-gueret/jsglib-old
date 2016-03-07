@@ -117,6 +117,15 @@ class Sprite {
 
         return this;
     }
+
+    static defineTilesSlopes(slopes_definitions) {
+        for(let tile_number in slopes_definitions) {
+            let tile = this.getTile(tile_number, false);
+            tile.type = Tile.TYPES.SLOPE;
+            tile.slope_point = slopes_definitions[tile_number];
+        }
+        return this;
+    }
 }
 
 Sprite.image = null;

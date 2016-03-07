@@ -23,19 +23,19 @@ let Trait_Physics = Trait({
 
         this.on('solids_collision', e => {
             let this_size = this.getSize();
+            let center_x = this.getRectangle().getCenter().x;
             let impulse = new Point();
 
-            this.on_ground = false;
-
             // Check if element is on ground
-            e.detail.tiles.some(tile_data => {
+            this.on_ground = e.detail.tiles.some(tile_data => {
                 let tile_position = tile_data.position;
-                let tile_size = tile_data.tile.getSize();
+                let contact_y = tile_data.tile.getContactY(center_x, tile_position);
 
-                if (this.position.y + this_size.height <= tile_position.y) {
-                    this.on_ground = true;
-                    return true;
+                if (isNaN(contact_y)) {
+                    return false;
                 }
+
+                return this.position.y + this_size.height <= contact_y;
             });
 
             e.detail.tiles.some(tile_data => {
