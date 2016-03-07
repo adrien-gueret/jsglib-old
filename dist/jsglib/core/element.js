@@ -198,17 +198,12 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                             return tile_data.tile.isSolid();
                         });
                         solid_tiles = solid_tiles.concat(new_solid_tiles);
-                        var slopes_tiles = new_solid_tiles.filter(function (tile_data) {
-                            return tile_data.tile.isSlope();
-                        });
-                        var slope_refinement_performed = false;
+                        this.refinePosition(layer, this.checkTilesCollisions);
 
-                        if (slopes_tiles.length) {
-                            slope_refinement_performed = this.refinePositionOnSlopes(slopes_tiles);
-                        }
-
-                        if (!slope_refinement_performed) {
-                            this.refinePosition(layer, this.checkTilesCollisions);
+                        if (collisions_data.slopes_collisions) {
+                            this.refinePositionOnSlopes(new_solid_tiles.filter(function (tile_data) {
+                                return tile_data.tile.isSlope();
+                            }));
                         }
                     }
 
