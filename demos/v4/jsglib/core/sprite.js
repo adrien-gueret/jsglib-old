@@ -165,6 +165,17 @@ define(["exports", "jsglib/core/tile", "jsglib/core/animation"], function (expor
                 });
                 return this;
             }
+        }, {
+            key: "defineTilesSlopes",
+            value: function defineTilesSlopes(slopes_definitions) {
+                for (var tile_number in slopes_definitions) {
+                    var tile = this.getTile(tile_number, false);
+                    tile.type = _tile2.default.TYPES.SLOPE;
+                    tile.slope_point = slopes_definitions[tile_number];
+                }
+
+                return this;
+            }
         }]);
 
         return Sprite;
