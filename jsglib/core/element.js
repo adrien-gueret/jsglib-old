@@ -141,15 +141,10 @@ class Element {
                 let new_solid_tiles = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
                 solid_tiles = solid_tiles.concat(new_solid_tiles);
 
-                let slopes_tiles = new_solid_tiles.filter(tile_data => tile_data.tile.isSlope());
-                let slope_refinement_performed = false;
+                this.refinePosition(layer, this.checkTilesCollisions);
 
-                if (slopes_tiles.length) {
-                    slope_refinement_performed = this.refinePositionOnSlopes(slopes_tiles);
-                }
-
-                if (!slope_refinement_performed) {
-                    this.refinePosition(layer, this.checkTilesCollisions);
+                if (collisions_data.slopes_collisions) {
+                    this.refinePositionOnSlopes(new_solid_tiles.filter(tile_data => tile_data.tile.isSlope()));
                 }
             }
 
