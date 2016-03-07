@@ -181,6 +181,28 @@ class Element {
 
         data.tiles = layer.getTilesFromRectangle(rectangle);
 
+        let end_slope_tile = data.tiles.filter(tile_data => tile_data.tile.isEndSlope())[0];
+
+        // If collision with "end of slope" tile, ignore solid directly next to this tile
+        if (end_slope_tile) {
+            let contact_y = end_slope_tile.tile.getContactY(rectangle.getCenter().x, end_slope_tile.position);
+
+            // Ignore only if element can interact with this slope
+            if (!isNaN(contact_y)) {
+                let delta = end_slope_tile.tile.getSize().width;
+
+                if (end_slope_tile.tile.slope_point.x === 0) {
+                    delta *= -1;
+                }
+
+                data.tiles = data.tiles.filter(tile_data => {
+                    return !(tile_data.tile.isSolid() &&
+                    tile_data.position.y === end_slope_tile.position.y &&
+                    tile_data.position.x === end_slope_tile.position.x + delta);
+                });
+            }
+        }
+
         let solids_tiles = data.tiles.filter(tile_data => tile_data.tile.isSolid());
         data.solids_collisions = solids_tiles.length > 0;
         data.slopes_collisions = data.solids_collisions && solids_tiles.some(tile_data => tile_data.tile.isSlope());

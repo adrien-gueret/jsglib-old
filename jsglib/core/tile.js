@@ -88,6 +88,10 @@ class Tile {
         return this.slope_point !== null;
     }
 
+    isEndSlope() {
+        return this.isSlope() && (this.slope_point.x === 0 || this.slope_point.y === 0);
+    }
+
     getContactY(x, tile_position) {
         let x_on_tile = this.getXOnTile(x, tile_position.x);
         let y_on_tile = this.getYFromSlope(x_on_tile);
