@@ -39,16 +39,18 @@ define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/poin
             this.on('solids_collision', function (e) {
                 var this_size = _this.getSize();
 
-                var impulse = new _point2.default();
-                _this.on_ground = false;
-                e.detail.tiles.some(function (tile_data) {
-                    var tile_position = tile_data.position;
-                    var tile_size = tile_data.tile.getSize();
+                var center_x = _this.getRectangle().getCenter().x;
 
-                    if (_this.position.y + this_size.height <= tile_position.y) {
-                        _this.on_ground = true;
-                        return true;
+                var impulse = new _point2.default();
+                _this.on_ground = e.detail.tiles.some(function (tile_data) {
+                    var tile_position = tile_data.position;
+                    var contact_y = tile_data.tile.getContactY(center_x, tile_position);
+
+                    if (isNaN(contact_y)) {
+                        return false;
                     }
+
+                    return _this.position.y + this_size.height <= contact_y;
                 });
                 e.detail.tiles.some(function (tile_data) {
                     var tile_position = tile_data.position;

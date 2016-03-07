@@ -192,12 +192,24 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                     var layer = layers[layer_name];
                     var collisions_data = this.checkTilesCollisions(layer);
 
-                    if (this.stop_on_solids && collisions_data.solid_collision) {
+                    if (this.stop_on_solids && collisions_data.solids_collisions) {
                         has_solid_collision = true;
-                        solid_tiles = solid_tiles.concat(collisions_data.tiles.filter(function (tile_data) {
+                        var new_solid_tiles = collisions_data.tiles.filter(function (tile_data) {
                             return tile_data.tile.isSolid();
-                        }));
-                        this.refinePosition(layer, this.checkTilesCollisions);
+                        });
+                        solid_tiles = solid_tiles.concat(new_solid_tiles);
+                        var slopes_tiles = new_solid_tiles.filter(function (tile_data) {
+                            return tile_data.tile.isSlope();
+                        });
+                        var slope_refinement_performed = false;
+
+                        if (slopes_tiles.length) {
+                            slope_refinement_performed = this.refinePositionOnSlopes(slopes_tiles);
+                        }
+
+                        if (!slope_refinement_performed) {
+                            this.refinePosition(layer, this.checkTilesCollisions);
+                        }
                     }
 
                     collisions_data.tiles.some(function (tile_data) {
@@ -223,7 +235,9 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 var position = arguments.length <= 1 || arguments[1] === undefined ? this.position : arguments[1];
                 var data = {
                     tiles: [],
-                    solid_collision: false
+                    solids_collisions: false,
+                    slopes_collisions: false,
+                    only_slopes_collisions: false
                 };
 
                 if (!layer.tiles.length) {
@@ -233,15 +247,22 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 var rectangle = this.getRectangle();
                 rectangle.position.copy(position);
                 data.tiles = layer.getTilesFromRectangle(rectangle);
-                data.solid_collision = data.tiles.some(function (tile_data) {
+                var solids_tiles = data.tiles.filter(function (tile_data) {
                     return tile_data.tile.isSolid();
+                });
+                data.solids_collisions = solids_tiles.length > 0;
+                data.slopes_collisions = data.solids_collisions && solids_tiles.some(function (tile_data) {
+                    return tile_data.tile.isSlope();
+                });
+                data.only_slopes_collisions = data.slopes_collisions && solids_tiles.every(function (tile_data) {
+                    return tile_data.tile.isSlope();
                 });
                 return data;
             }
         }, {
             key: "refinePosition",
             value: function refinePosition(layer, checkCollisionsMethod) {
-                var delta_position = this.position.subtract(this.prev_position);
+                var delta_position = this.position.subtract(this.prev_position, true);
                 var limit_x = Math.abs(delta_position.x);
                 var limit_y = Math.abs(delta_position.y);
                 var delta_x = Math.sign(delta_position.x);
@@ -250,8 +271,9 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 for (var x = 0; x < limit_x; x++) {
                     new_position.x += delta_x;
+                    var collisions_data = checkCollisionsMethod.call(this, layer, new_position);
 
-                    if (checkCollisionsMethod.call(this, layer, new_position).solid_collision) {
+                    if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                         new_position.x -= delta_x;
                         break;
                     }
@@ -259,14 +281,42 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 for (var y = 0; y < limit_y; y++) {
                     new_position.y += delta_y;
+                    var collisions_data = checkCollisionsMethod.call(this, layer, new_position);
 
-                    if (checkCollisionsMethod.call(this, layer, new_position).solid_collision) {
+                    if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                         new_position.y -= delta_y;
                         break;
                     }
                 }
 
                 this.position.copy(new_position);
+                return this;
+            }
+        }, {
+            key: "refinePositionOnSlopes",
+            value: function refinePositionOnSlopes(slopes_tiles_data) {
+                var _this3 = this;
+
+                var new_position = this.position.clone();
+                var height = this.getSize().height;
+                var center_x = this.getRectangle().getCenter().x;
+                return slopes_tiles_data.some(function (slope_data) {
+                    var y_contact = slope_data.tile.getContactY(center_x, slope_data.position);
+
+                    if (isNaN(y_contact)) {
+                        return false;
+                    }
+
+                    new_position.y = y_contact - height - 1;
+
+                    if (new_position.y - _this3.position.y >= 0) {
+                        return true;
+                    }
+
+                    _this3.position.copy(new_position).round();
+
+                    return true;
+                });
             }
         }]);
 

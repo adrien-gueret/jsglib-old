@@ -71,7 +71,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
 
             _this.acceleration.minimum(-ACCELERATION_LIMIT).maximum(ACCELERATION_LIMIT);
 
-            _this.speed.minimum(-MAX_SPEED, -Y_SPEED_LIMIT).maximum(MAX_SPEED, Y_SPEED_LIMIT);
+            _this.speed.minimum(-MAX_SPEED, -Y_SPEED_LIMIT).maximum(MAX_SPEED, Y_SPEED_LIMIT * 2);
 
             _this.acceleration_delta = new _point2.default(3, 0);
             inputs.on('keydown', function (e) {
@@ -99,7 +99,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
                     _this.acceleration.x = Math.max(0, _this.acceleration.x);
                 }
 
-                if (inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.UP)) {
+                if (_this.speed.y < 0 && inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.UP)) {
                     _this.applyImpulse(new _point2.default(0, -JUMP_VARIATION));
                 }
             });

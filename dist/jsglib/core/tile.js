@@ -45,6 +45,7 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
             var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
             var tile_number = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
             var type = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
+            var slope_point = arguments.length <= 5 || arguments[5] === undefined ? null : arguments[5];
 
             _classCallCheck(this, Tile);
 
@@ -54,6 +55,7 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
             this.needs_redraw = true;
             this.is_empty = false;
             this.type = type;
+            this.slope_point = slope_point;
         }
 
         _createClass(Tile, [{
@@ -64,7 +66,7 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
         }, {
             key: "clone",
             value: function clone() {
-                return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type);
+                return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type, this.slope_point);
             }
         }, {
             key: "setTileNumber",
@@ -74,6 +76,7 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
                 this.tile_number = tile_number;
                 this.sheet_position = tile.sheet_position;
                 this.type = tile.type;
+                this.slope_point = tile.slope_point;
                 this.needs_redraw = true;
                 return this;
             }
@@ -103,7 +106,42 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
         }, {
             key: "isSolid",
             value: function isSolid() {
-                return this.type === Tile.TYPES.SOLID;
+                return this.type === Tile.TYPES.SOLID || this.isSlope();
+            }
+        }, {
+            key: "isSlope",
+            value: function isSlope() {
+                return this.slope_point !== null;
+            }
+        }, {
+            key: "getContactY",
+            value: function getContactY(x, tile_position) {
+                var x_on_tile = this.getXOnTile(x, tile_position.x);
+                var y_on_tile = this.getYFromSlope(x_on_tile);
+
+                if (isNaN(y_on_tile)) {
+                    return NaN;
+                }
+
+                return tile_position.y + y_on_tile;
+            }
+        }, {
+            key: "getXOnTile",
+            value: function getXOnTile(target_x, tile_x) {
+                return (target_x - tile_x) / this.getSize().width;
+            }
+        }, {
+            key: "getYFromSlope",
+            value: function getYFromSlope(x_on_tile) {
+                if (!this.isSlope()) {
+                    return 0;
+                }
+
+                if (x_on_tile < 0 || x_on_tile > 1) {
+                    return NaN;
+                }
+
+                return (1 - x_on_tile) * this.slope_point.x + x_on_tile * this.slope_point.y;
             }
         }], [{
             key: "getNewEmptyTile",
@@ -118,7 +156,8 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
     })();
 
     Tile.TYPES = {
-        SOLID: Symbol()
+        SOLID: Symbol(),
+        SLOPE: Symbol()
     };
     (0, _events_handler2.default)(Tile);
     exports.default = Tile;
