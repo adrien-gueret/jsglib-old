@@ -242,6 +242,28 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 var rectangle = this.getRectangle();
                 rectangle.position.copy(position);
                 data.tiles = layer.getTilesFromRectangle(rectangle);
+                var end_slope_tile = data.tiles.filter(function (tile_data) {
+                    return tile_data.tile.isEndSlope();
+                })[0];
+
+                if (end_slope_tile) {
+                    var contact_y = end_slope_tile.tile.getContactY(rectangle.getCenter().x, end_slope_tile.position);
+
+                    if (!isNaN(contact_y)) {
+                        (function () {
+                            var delta = end_slope_tile.tile.getSize().width;
+
+                            if (end_slope_tile.tile.slope_point.x === 0) {
+                                delta *= -1;
+                            }
+
+                            data.tiles = data.tiles.filter(function (tile_data) {
+                                return !(tile_data.tile.isSolid() && tile_data.position.y === end_slope_tile.position.y && tile_data.position.x === end_slope_tile.position.x + delta);
+                            });
+                        })();
+                    }
+                }
+
                 var solids_tiles = data.tiles.filter(function (tile_data) {
                     return tile_data.tile.isSolid();
                 });
