@@ -114,6 +114,11 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
                 return this.slope_point !== null;
             }
         }, {
+            key: "isEndSlope",
+            value: function isEndSlope() {
+                return this.isSlope() && (this.slope_point.x === 0 || this.slope_point.y === 0);
+            }
+        }, {
             key: "getContactY",
             value: function getContactY(x, tile_position) {
                 var x_on_tile = this.getXOnTile(x, tile_position.x);
