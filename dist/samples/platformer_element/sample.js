@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/core/tile", "jsglib/core/point", "./ball"], function (_game, _room, _sprite, _tile, _point, _ball) {
+define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/core/tile", "jsglib/core/point", "./ball", "./star"], function (_game, _room, _sprite, _tile, _point, _ball, _star) {
     "use strict";
 
     var _game2 = _interopRequireDefault(_game);
@@ -77,24 +77,33 @@ define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/co
     })(_sprite2.default);
 
     var my_game = new _game2.default(document.getElementById('myGame'));
-    Promise.all([_ball.BallSprite.loadImage('./ball.png'), TilesSprite.loadImage('./tiles.png')]).then(function () {
+    Promise.all([_ball.BallSprite.loadImage('./ball.png'), TilesSprite.loadImage('./tiles.png'), _star.StarSprite.loadImage('./star.png')]).then(function () {
         TilesSprite.makeTiles(32, 32, 1).defineTilesTypes(_defineProperty({}, _tile2.default.TYPES.SOLID, new Array(13).fill(0).map(function (value, index) {
             return index + 1;
         }))).defineTilesSlopes({
             16: new _point2.default(16, 0),
             18: new _point2.default(31, 16)
         });
+
+        _star.StarSprite.makeTiles(34, 33, 0).defineTilesAnimations([{
+            name: 'main',
+            tiles: [1, 2, 3, 4, 5]
+        }], my_game.timer);
+
         var level = new _room2.default();
         level.useDefinition({
             layers: {
                 TILES_LAYER: {
                     sprite_class: TilesSprite,
-                    tiles: [[4, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 6], [8, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 16, 2, 2, 2, 2, 10], [9, 2, 3, 0, 0, 0, 14, 15, 0, 18, 16, 17, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 1, 2, 17, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 9, 2, 2, 2, 2, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]]
+                    tiles: [[4, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 6], [8, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 16, 2, 2, 2, 2, 10], [9, 2, 3, 0, 0, 0, 14, 15, 0, 18, 16, 17, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 1, 2, 17, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 9, 2, 2, 2, 2, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]],
+                    elements: [{
+                        class_name: _ball.Ball
+                    }, {
+                        class_name: _star.Star,
+                        position: [120, 32]
+                    }]
                 }
             }
-        });
-        level.on('start', function () {
-            new _ball.Ball(my_game);
         });
         my_game.goToRoom(level).start();
     });

@@ -65,12 +65,12 @@ define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "js
         var Ball = exports.Ball = (function (_PlatformPlayer) {
                 _inherits(Ball, _PlatformPlayer);
 
-                function Ball(game) {
+                function Ball(x, y, game) {
                         _classCallCheck(this, Ball);
 
                         // Indicate the sprite class to use
 
-                        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this, 0, 0, game.inputs));
+                        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this, x, y, game.inputs));
                         // We must call the parent's constructor
 
                         _this2.setSpriteClass(BallSprite);

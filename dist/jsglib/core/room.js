@@ -17,6 +17,44 @@ define(["exports", "jsglib/core/rectangle", "jsglib/core/http", "jsglib/traits/e
         };
     }
 
+    var _slicedToArray = (function () {
+        function sliceIterator(arr, i) {
+            var _arr = [];
+            var _n = true;
+            var _d = false;
+            var _e = undefined;
+
+            try {
+                for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+                    _arr.push(_s.value);
+
+                    if (i && _arr.length === i) break;
+                }
+            } catch (err) {
+                _d = true;
+                _e = err;
+            } finally {
+                try {
+                    if (!_n && _i["return"]) _i["return"]();
+                } finally {
+                    if (_d) throw _e;
+                }
+            }
+
+            return _arr;
+        }
+
+        return function (arr, i) {
+            if (Array.isArray(arr)) {
+                return arr;
+            } else if (Symbol.iterator in Object(arr)) {
+                return sliceIterator(arr, i);
+            } else {
+                throw new TypeError("Invalid attempt to destructure non-iterable instance");
+            }
+        };
+    })();
+
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
             throw new TypeError("Cannot call a class as a function");
@@ -111,6 +149,24 @@ define(["exports", "jsglib/core/rectangle", "jsglib/core/http", "jsglib/traits/e
                                 _this.width = Math.max(_this.width, layer.tiles[0].length * tiles_size.width);
                                 _this.height = Math.max(_this.height, layer.tiles.length * tiles_size.height);
                             })();
+                        }
+
+                        if (definition.elements) {
+                            definition.elements.forEach(function (element_data) {
+                                var class_element = game.getClass(element_data.class_name);
+
+                                if (!class_element) {
+                                    throw new ReferenceError("Class \"" + element_data.class_name + "\" found in room definition is " + 'not declared or not registered in current game.');
+                                }
+
+                                var _ref = element_data.position || [];
+
+                                var _ref2 = _slicedToArray(_ref, 2);
+
+                                var x = _ref2[0];
+                                var y = _ref2[1];
+                                new class_element(x, y, game);
+                            });
                         }
                     };
 
