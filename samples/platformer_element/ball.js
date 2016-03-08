@@ -9,9 +9,9 @@ export class BallSprite extends Sprite {
 }
 
 export class Ball extends PlatformPlayer {
-    constructor(game) {
+    constructor(x, y, game) {
         // We must call the parent's constructor
-        super(0, 0, game.inputs);
+        super(x, y, game.inputs);
 
         // Indicate the sprite class to use
         this.setSpriteClass(BallSprite);

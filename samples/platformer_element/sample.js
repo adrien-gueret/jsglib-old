@@ -6,6 +6,7 @@ import Sprite from "jsglib/core/sprite";
 import Tile from "jsglib/core/tile";
 import Point from "jsglib/core/point";
 import {Ball, BallSprite} from "./ball";
+import {Star, StarSprite} from "./star";
 
 class TilesSprite extends Sprite {
 }
@@ -16,7 +17,8 @@ let my_game = new Game(document.getElementById('myGame'));
 // Load images
 Promise.all([
         BallSprite.loadImage('./ball.png'),
-        TilesSprite.loadImage('./tiles.png')
+        TilesSprite.loadImage('./tiles.png'),
+        StarSprite.loadImage('./star.png')
     ])
     .then(() => {
         TilesSprite
@@ -30,6 +32,15 @@ Promise.all([
                 16: new Point(16, 0),
                 18: new Point(31, 16)
             });
+
+        StarSprite
+            .makeTiles(34, 33, 0)
+            .defineTilesAnimations([
+                {
+                    name: 'main',
+                    tiles: [1, 2, 3, 4, 5]
+                }
+            ], my_game.timer);
 
         // Our game will have only one room
         let level = new Room();
@@ -48,14 +59,19 @@ Promise.all([
                         [7, 7, 8, 0, 0, 0, 0, 1, 2, 17, 7, 7, 7, 7, 7, 7, 7, 7],
                         [7, 7, 8, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
                         [7, 7, 9, 2, 2, 2, 2, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+                    ],
+                    // Auto-creating elements when level starts
+                    elements: [
+                        {
+                            class_name: Ball
+                        },
+                        {
+                            class_name: Star,
+                            position: [120, 32]
+                        }
                     ]
                 }
             }
-        });
-
-        // When level will start, create a new instance of our element
-        level.on('start', () => {
-            new Ball(my_game);
         });
 
         my_game

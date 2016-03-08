@@ -59,6 +59,20 @@ class Room {
                     this.width = Math.max(this.width, layer.tiles[0].length * tiles_size.width);
                     this.height = Math.max(this.height, layer.tiles.length * tiles_size.height);
                 }
+
+                if (definition.elements) {
+                    definition.elements.forEach(element_data => {
+                        let class_element = game.getClass(element_data.class_name);
+
+                        if (!class_element) {
+                            throw new ReferenceError(`Class "${element_data.class_name}" found in room definition is ` +
+                                'not declared or not registered in current game.');
+                        }
+
+                        let [x, y] = element_data.position || [];
+                        new class_element(x, y, game);
+                    });
+                }
             }
         } else {
             this.width = this.definition.width;
