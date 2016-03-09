@@ -97,10 +97,23 @@ define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/co
                     sprite_class: TilesSprite,
                     tiles: [[4, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 6], [8, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6], [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 16, 2, 2, 2, 2, 10], [9, 2, 3, 0, 0, 0, 14, 15, 0, 18, 16, 17, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 1, 2, 17, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 8, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7], [7, 7, 9, 2, 2, 2, 2, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]],
                     elements: [{
-                        class_name: _ball.Ball
+                        class_name: _ball.Ball,
+                        position: [216, 119]
                     }, {
                         class_name: _star.Star,
-                        position: [120, 32]
+                        position: [32, 96]
+                    }, {
+                        class_name: _star.Star,
+                        position: [160, 64]
+                    }, {
+                        class_name: _star.Star,
+                        position: [128, 192]
+                    }, {
+                        class_name: _star.Star,
+                        position: [352, 64]
+                    }, {
+                        class_name: _star.Star,
+                        position: [512, 32]
                     }]
                 }
             }

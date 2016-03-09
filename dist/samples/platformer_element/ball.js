@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _platform_player, _layer, _sprite) {
+define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "jsglib/core/sprite", "./star"], function (exports, _platform_player, _layer, _sprite, _star) {
         "use strict";
 
         Object.defineProperty(exports, "__esModule", {
@@ -75,14 +75,10 @@ define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "js
 
                         _this2.setSpriteClass(BallSprite);
 
-                        // Set an initial position (center horizontally the new ball)
-
-                        var _this2$getSize = _this2.getSize();
-
-                        var height = _this2$getSize.height;
-                        var width = _this2$getSize.width;
-
-                        _this2.position.set(game.current_room.width / 2 - width / 2, height);
+                        // @TODO: check why animations of ALL stars is stopped
+                        _this2.onCollision(_star.Star, function (element) {
+                                return element.destroy();
+                        });
 
                         // Add player to layer in order to display it
                         _layer2.default.MAIN_LAYER.addElement(_this2);

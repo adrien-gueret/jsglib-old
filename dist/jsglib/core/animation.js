@@ -121,7 +121,10 @@ define(["exports", "jsglib/traits/events_handler"], function (exports, _events_h
         }, {
             key: "stop",
             value: function stop() {
-                this.timer.clearTimeout(this.animation_clock);
+                if (this.animation_clock) {
+                    this.timer.clearTimeout(this.animation_clock);
+                }
+
                 this.animation_clock = null;
                 this.animation_index = 0;
                 this.is_running = false;
