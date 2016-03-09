@@ -58,6 +58,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
             this.stop_on_solids = false;
             this.is_destroyed = false;
             this.is_inside_room = false;
+            this.is_solid = false;
         }
 
         _createClass(Element, [{
@@ -67,6 +68,11 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 if (custom_event.defaultPrevented) {
                     return this;
+                }
+
+                if (this.current_animation) {
+                    this.current_animation.stop();
+                    this.current_animation = null;
                 }
 
                 this.is_destroyed = true;
@@ -187,6 +193,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 var has_solid_collision = false;
                 var solid_tiles = [];
+                var solid_elements = [];
 
                 for (var layer_name in layers) {
                     var layer = layers[layer_name];
@@ -214,13 +221,32 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                         return custom_event.propagationStopped;
                     });
+                    collisions_data = this.checkElementsCollisions(layer);
+
+                    if (this.stop_on_solids && collisions_data.solids_collisions) {
+                        has_solid_collision = true;
+                        var new_solid_elements = collisions_data.elements.filter(function (element) {
+                            return element.is_solid;
+                        });
+                        solid_elements = solid_elements.concat(new_solid_elements);
+                        this.refinePosition(layer, this.checkElementsCollisions);
+                    }
+
+                    collisions_data.elements.some(function (element) {
+                        var custom_event = _this2.trigger('collision', {
+                            element: element
+                        });
+
+                        return custom_event.propagationStopped;
+                    });
                 }
 
                 if (!has_solid_collision) {
                     this.trigger('no_solids_collision');
                 } else {
                     this.trigger('solids_collision', {
-                        tiles: solid_tiles
+                        tiles: solid_tiles,
+                        elements: solid_elements
                     });
                 }
             }
@@ -277,6 +303,35 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 return data;
             }
         }, {
+            key: "checkElementsCollisions",
+            value: function checkElementsCollisions(layer) {
+                var _this3 = this;
+
+                var position = arguments.length <= 1 || arguments[1] === undefined ? this.position : arguments[1];
+                var data = {
+                    elements: [],
+                    solids_collisions: false
+                };
+
+                if (!layer.elements.length) {
+                    return data;
+                }
+
+                var rectangle = this.getRectangle();
+                rectangle.position.copy(position);
+                data.elements = layer.elements.filter(function (element) {
+                    if (element === _this3) {
+                        return false;
+                    }
+
+                    return rectangle.isCollidedWithRectangle(element.getRectangle());
+                });
+                data.solids_collisions = data.elements.some(function (element) {
+                    return element.is_solid;
+                });
+                return data;
+            }
+        }, {
             key: "refinePosition",
             value: function refinePosition(layer, checkCollisionsMethod) {
                 var delta_position = this.position.subtract(this.prev_position, true);
@@ -312,7 +367,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
         }, {
             key: "refinePositionOnSlopes",
             value: function refinePositionOnSlopes(slopes_tiles_data) {
-                var _this3 = this;
+                var _this4 = this;
 
                 var new_position = this.position.clone();
                 var height = this.getSize().height;
@@ -326,14 +381,26 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                     new_position.y = y_contact - height - 1;
 
-                    if (new_position.y - _this3.position.y >= 0) {
+                    if (new_position.y - _this4.position.y >= 0) {
                         return true;
                     }
 
-                    _this3.position.copy(new_position).round();
+                    _this4.position.copy(new_position).round();
 
                     return true;
                 });
+            }
+        }, {
+            key: "onCollision",
+            value: function onCollision(targetClass, callback) {
+                this.on('collision', function (e) {
+                    var element = e.detail.element;
+
+                    if (element instanceof targetClass) {
+                        callback(element, e);
+                    }
+                });
+                return this;
             }
         }]);
 
