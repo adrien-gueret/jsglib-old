@@ -20,6 +20,7 @@ class Element {
         this.stop_on_solids = false;
         this.is_destroyed = false;
         this.is_inside_room = false;
+        this.is_solid = false;
     }
 
     destroy() {
@@ -27,6 +28,11 @@ class Element {
 
         if (custom_event.defaultPrevented) {
             return this;
+        }
+
+        if (this.current_animation) {
+            this.current_animation.stop();
+            this.current_animation = null;
         }
 
         this.is_destroyed = true;
@@ -127,6 +133,7 @@ class Element {
     checkCollisions(layers) {
         let has_solid_collision = false;
         let solid_tiles = [];
+        let solid_elements = [];
 
         for (var layer_name in layers) {
             let layer = layers[layer_name];
@@ -149,8 +156,27 @@ class Element {
             }
 
             // Trigger collision events for each tile
-            collisions_data.tiles.some((tile_data) => {
+            collisions_data.tiles.some(tile_data => {
                 let custom_event = this.trigger('tile_collision', {tile_data});
+                return custom_event.propagationStopped;
+            });
+
+            // Then check collisions with other elements
+            collisions_data = this.checkElementsCollisions(layer);
+
+            // Check collisions with solid elements
+            if (this.stop_on_solids && collisions_data.solids_collisions) {
+                has_solid_collision = true;
+
+                let new_solid_elements = collisions_data.elements.filter(element => element.is_solid);
+                solid_elements = solid_elements.concat(new_solid_elements);
+
+                this.refinePosition(layer, this.checkElementsCollisions);
+            }
+
+            // Trigger collision events for each element
+            collisions_data.elements.some(element => {
+                let custom_event = this.trigger('collision', {element});
                 return custom_event.propagationStopped;
             });
         }
@@ -159,7 +185,8 @@ class Element {
             this.trigger('no_solids_collision');
         } else {
             this.trigger('solids_collision', {
-                tiles: solid_tiles
+                tiles: solid_tiles,
+                elements: solid_elements
             });
         }
     }
@@ -207,6 +234,32 @@ class Element {
         data.solids_collisions = solids_tiles.length > 0;
         data.slopes_collisions = data.solids_collisions && solids_tiles.some(tile_data => tile_data.tile.isSlope());
         data.only_slopes_collisions = data.slopes_collisions && solids_tiles.every(tile_data => tile_data.tile.isSlope());
+
+        return data;
+    }
+
+    checkElementsCollisions(layer, position = this.position) {
+        let data = {
+            elements: [],
+            solids_collisions: false
+        };
+
+        if (!layer.elements.length) {
+            return data;
+        }
+
+        let rectangle = this.getRectangle();
+        rectangle.position.copy(position);
+
+        data.elements = layer.elements.filter(element => {
+            if (element === this) {
+                return false;
+            }
+
+            return rectangle.isCollidedWithRectangle(element.getRectangle());
+        });
+
+        data.solids_collisions = data.elements.some(element => element.is_solid);
 
         return data;
     }
@@ -268,6 +321,18 @@ class Element {
 
             return true;
         });
+    }
+
+    onCollision(targetClass, callback) {
+        this.on('collision', e => {
+            let element = e.detail.element;
+
+            if (element instanceof targetClass) {
+                callback(element, e);
+            }
+        });
+
+        return this;
     }
 }
 

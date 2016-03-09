@@ -62,13 +62,12 @@ Promise.all([
                     ],
                     // Auto-creating elements when level starts
                     elements: [
-                        {
-                            class_name: Ball
-                        },
-                        {
-                            class_name: Star,
-                            position: [120, 32]
-                        }
+                        {class_name: Ball, position: [216, 119]},
+                        {class_name: Star, position: [32, 96]},
+                        {class_name: Star, position: [160, 64]},
+                        {class_name: Star, position: [128, 192]},
+                        {class_name: Star, position: [352, 64]},
+                        {class_name: Star, position: [512, 32]}
                     ]
                 }
             }

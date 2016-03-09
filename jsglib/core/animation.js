@@ -44,7 +44,10 @@ class Animation {
     }
 
     stop() {
-        this.timer.clearTimeout(this.animation_clock);
+        if (this.animation_clock) {
+            this.timer.clearTimeout(this.animation_clock);
+        }
+
         this.animation_clock = null;
         this.animation_index = 0;
         this.is_running = false;
