@@ -149,21 +149,6 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point"], functio
             value: function isKeyPressed(key) {
                 return this.keys_pressed.indexOf(key) >= 0;
             }
-        }, {
-            key: "getPressedArrows",
-            value: function getPressedArrows() {
-                var arrows_keys = [];
-
-                for (var key_name in Inputs.KEYS.ARROWS) {
-                    var key = Inputs.KEYS.ARROWS[key_name];
-
-                    if (this.isKeyPressed(key)) {
-                        arrows_keys.push(key);
-                    }
-                }
-
-                return arrows_keys;
-            }
         }]);
 
         return Inputs;

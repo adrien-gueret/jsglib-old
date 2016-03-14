@@ -75,7 +75,6 @@ define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "js
 
                         _this2.setSpriteClass(BallSprite);
 
-                        // @TODO: check why animations of ALL stars is stopped
                         _this2.onCollision(_star.Star, function (element) {
                                 return element.destroy();
                         });

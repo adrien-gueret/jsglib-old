@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _element, _inputs, _layer, _sprite) {
+define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _rpg_core, _rpg_player, _inputs, _layer, _sprite) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -8,7 +8,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
     });
     exports.Link = exports.LinkSprite = undefined;
 
-    var _element2 = _interopRequireDefault(_element);
+    var _rpg_player2 = _interopRequireDefault(_rpg_player);
 
     var _inputs2 = _interopRequireDefault(_inputs);
 
@@ -20,6 +20,21 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
         return obj && obj.__esModule ? obj : {
             default: obj
         };
+    }
+
+    function _defineProperty(obj, key, value) {
+        if (key in obj) {
+            Object.defineProperty(obj, key, {
+                value: value,
+                enumerable: true,
+                configurable: true,
+                writable: true
+            });
+        } else {
+            obj[key] = value;
+        }
+
+        return obj;
     }
 
     function _classCallCheck(instance, Constructor) {
@@ -83,7 +98,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
             key: "init",
             value: function init(timer) {
                 this.makeTiles(32, 32, 2).defineTilesAnimations([{
-                    name: 'walk_bottom',
+                    name: 'walk_down',
                     tiles: [1, 2],
                     time: 150
                 }, {
@@ -91,7 +106,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
                     tiles: [3, 4],
                     time: 150
                 }, {
-                    name: 'walk_top',
+                    name: 'walk_up',
                     tiles: [5, 6],
                     time: 150
                 }, {
@@ -99,7 +114,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
                     tiles: [7, 8],
                     time: 150
                 }, {
-                    name: 'push_bottom',
+                    name: 'push_down',
                     tiles: [9, 10],
                     time: 150
                 }, {
@@ -107,7 +122,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
                     tiles: [11, 12],
                     time: 150
                 }, {
-                    name: 'push_top',
+                    name: 'push_up',
                     tiles: [13, 14],
                     time: 150
                 }, {
@@ -121,111 +136,86 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
         return LinkSprite;
     })(_sprite2.default);
 
-    var LINK_SPEED = 70;
-
-    var Link = exports.Link = (function (_Element) {
-        _inherits(Link, _Element);
+    var Link = exports.Link = (function (_RpgPlayer) {
+        _inherits(Link, _RpgPlayer);
 
         function Link(x, y, game) {
+            var _this2$initKeysMap;
+
             _classCallCheck(this, Link);
 
             // Tell which Sprite class to use for displaying
 
-            var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y));
+            var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y, game.inputs));
             // We must call the parent's constructor
 
             _this2.setSpriteClass(LinkSprite);
 
-            // Tell that this instance must not move on solids
-            _this2.stop_on_solids = true;
+            // RpgPlayer uses Trait_KeysMapping: we can bind keys to some actions
+            // Here, we allow moving with arrows or ZQSD
+            _this2.initKeysMap((_this2$initKeysMap = {}, _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_LEFT, [_inputs2.default.KEYS.ARROWS.LEFT, _inputs2.default.KEYS.Q]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_RIGHT, [_inputs2.default.KEYS.ARROWS.RIGHT, _inputs2.default.KEYS.D]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_UP, [_inputs2.default.KEYS.ARROWS.UP, _inputs2.default.KEYS.Z]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_DOWN, [_inputs2.default.KEYS.ARROWS.DOWN, _inputs2.default.KEYS.S]), _this2$initKeysMap));
 
-            // Attach keyboards events
-            game.inputs.on('keydown', function (e) {
-                // Do nothing if pressed key is not an arrow
-                if (!e.detail.is_arrow) {
-                    return;
-                }
+            // == Events definitions ==
+            _this2.on('rpg.solid_collision', function (e) {
+                // We want to handle collision only on first collided solid found
+                e.stopPropagation();
 
-                e.preventDefault();
+                // Use a "push" animation on solid collision
+                switch (e.detail.direction) {
+                    case _rpg_core.DIRECTIONS.UP:
+                        _this2.useAnimation('push_up');
+                        break;
 
-                // Update Link's animation if he's not pushing walls
-                if (_this2.getAnimationName().indexOf('push') === -1) {
-                    _this2.switchAnimationByKey(e.detail.key);
-                }
-            }).on('keyup', function (e) {
-                // Do nothing if released key is not an arrow
-                if (!e.detail.is_arrow) {
-                    return;
-                }
+                    case _rpg_core.DIRECTIONS.DOWN:
+                        _this2.useAnimation('push_down');
+                        break;
 
-                // Check if another arrow key is still pressed
-                var pressed_arrows = game.inputs.getPressedArrows();
-
-                if (pressed_arrows.length) {
-                    return _this2.switchAnimationByKey(pressed_arrows[0]);
-                }
-
-                // No arrows keys are pressed: we stop the animation
-                _this2.switchAnimationByKey(e.detail.key);
-                _this2.setCurrentTileNumber(_this2.current_animation.tiles_numbers[0]);
-                _this2.current_animation.stop();
-            });
-
-            // Other specific events related to this current instance
-            _this2.on('frame', function () {
-                // On each frame, update instance's speeds according to pressed keys
-                if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.LEFT)) {
-                    _this2.speed.x = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.RIGHT)) {
-                    _this2.speed.x = LINK_SPEED;
-                } else {
-                    _this2.speed.x = 0;
-                }
-
-                if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.UP)) {
-                    _this2.speed.y = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(_inputs2.default.KEYS.ARROWS.DOWN)) {
-                    _this2.speed.y = LINK_SPEED;
-                } else {
-                    _this2.speed.y = 0;
-                }
-            }).on('tile_collision', function (e) {
-                // On collision with solids, use "push" animation according to collided tile position
-                if (e.detail.tile_data.tile.isSolid()) {
-                    var this_size = _this2.getSize();
-                    var tile_size = e.detail.tile_data.tile.getSize();
-                    var tile_position = e.detail.tile_data.position;
-
-                    if (tile_position.y + tile_size.height <= _this2.position.y) {
-                        _this2.useAnimation('push_top');
-                        e.stopPropagation();
-                    } else if (_this2.position.y + this_size.height <= tile_position.y) {
-                        _this2.useAnimation('push_bottom');
-                        e.stopPropagation();
-                    } else if (tile_position.x + tile_size.width <= _this2.position.x) {
+                    case _rpg_core.DIRECTIONS.LEFT:
                         _this2.useAnimation('push_left');
-                        e.stopPropagation();
-                    } else if (_this2.position.x + this_size.width <= tile_position.x) {
+                        break;
+
+                    case _rpg_core.DIRECTIONS.RIGHT:
                         _this2.useAnimation('push_right');
-                        e.stopPropagation();
-                    }
+                        break;
                 }
             }).on('no_solids_collision', function () {
-                // When the instance has no collisions with solids, if it's pushing,
+                // When Link has no collisions with solids, if it's pushing,
                 // change its "push" animation to the corresponding "walk" one
                 switch (_this2.getAnimationName()) {
                     case 'push_left':
                         _this2.useAnimation('walk_left');
                         break;
-                    case 'push_top':
-                        _this2.useAnimation('walk_top');
+                    case 'push_up':
+                        _this2.useAnimation('walk_up');
                         break;
                     case 'push_right':
                         _this2.useAnimation('walk_right');
                         break;
-                    case 'push_bottom':
-                        _this2.useAnimation('walk_bottom');
+                    case 'push_down':
+                        _this2.useAnimation('walk_down');
                         break;
+                }
+            }).on('rpg.moving_key_up', function (e) {
+                if (e.detail.pressed_moving_key) {
+                    _this2.switchAnimationByKey(e.detail.pressed_moving_key);
+                    return;
+                }
+
+                // No moving keys are pressed: we stop the animation
+                _this2.switchAnimationByKey(e.detail.key);
+                _this2.setCurrentTileNumber(_this2.current_animation.tiles_numbers[0]);
+                _this2.current_animation.stop();
+            });
+
+            game.inputs.on('keydown', function (e) {
+                // Do nothing if released key is not a moving one
+                if (!_this2.isMovingKey(e.detail.key)) {
+                    return;
+                }
+
+                // Update player animation if he's not pushing walls
+                if (_this2.getAnimationName().indexOf('push') === -1) {
+                    _this2.switchAnimationByKey(e.detail.key);
                 }
             });
 
@@ -234,27 +224,19 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
             return _this2;
         }
 
-        // Custom method for this class: it updates Link's animation according to pressed arrow key
+        // Custom method for this class: it updates Link's animation according to pressed moving key
 
         _createClass(Link, [{
             key: "switchAnimationByKey",
             value: function switchAnimationByKey(key) {
-                switch (key) {
-                    case _inputs2.default.KEYS.ARROWS.LEFT:
-                        this.useAnimation('walk_left');
-                        break;
-
-                    case _inputs2.default.KEYS.ARROWS.UP:
-                        this.useAnimation('walk_top');
-                        break;
-
-                    case _inputs2.default.KEYS.ARROWS.RIGHT:
-                        this.useAnimation('walk_right');
-                        break;
-
-                    case _inputs2.default.KEYS.ARROWS.DOWN:
-                        this.useAnimation('walk_bottom');
-                        break;
+                if (this.isKeyBindedToAction(key, _rpg_player2.default.ACTIONS.MOVE_LEFT)) {
+                    this.useAnimation('walk_left');
+                } else if (this.isKeyBindedToAction(key, _rpg_player2.default.ACTIONS.MOVE_UP)) {
+                    this.useAnimation('walk_up');
+                } else if (this.isKeyBindedToAction(key, _rpg_player2.default.ACTIONS.MOVE_RIGHT)) {
+                    this.useAnimation('walk_right');
+                } else if (this.isKeyBindedToAction(key, _rpg_player2.default.ACTIONS.MOVE_DOWN)) {
+                    this.useAnimation('walk_down');
                 }
 
                 return this;
@@ -262,6 +244,8 @@ define(["exports", "jsglib/core/element", "jsglib/core/inputs", "jsglib/core/lay
         }]);
 
         return Link;
-    })(_element2.default);
+    })(_rpg_player2.default);
+
+    Link.SPEED = 80;
 });
 //# sourceMappingURL=link.js.map

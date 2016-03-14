@@ -59,7 +59,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
 
             var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PlatformPlayer).call(this, x, y));
 
-            var MAX_SPEED = _this.constructor.MAX_SPEED || PlatformPlayer.MAX_SPEED;
+            var MAX_SPEED = _this.constructor.MAX_SPEED;
             var ACCELERATION_LIMIT = MAX_SPEED / 4;
             var Y_SPEED_LIMIT = MAX_SPEED * 2;
             var JUMP_VARIATION = MAX_SPEED / ACCELERATION_LIMIT;
