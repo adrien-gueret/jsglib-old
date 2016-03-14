@@ -1,6 +1,7 @@
 "use strict";
 
-import Element from "jsglib/core/element";
+import {DIRECTIONS} from "jsglib/rpg/rpg_core";
+import RpgPlayer from "jsglib/rpg/rpg_player";
 import Inputs from "jsglib/core/inputs";
 import Layer from "jsglib/core/layer";
 import Sprite from "jsglib/core/sprite";
@@ -12,7 +13,7 @@ export class LinkSprite extends Sprite {
             .makeTiles(32, 32, 2)
             .defineTilesAnimations([
                 {
-                    name: 'walk_bottom',
+                    name: 'walk_down',
                     tiles: [1, 2],
                     time: 150
                 },
@@ -22,7 +23,7 @@ export class LinkSprite extends Sprite {
                     time: 150
                 },
                 {
-                    name: 'walk_top',
+                    name: 'walk_up',
                     tiles: [5, 6],
                     time: 150
                 },
@@ -32,7 +33,7 @@ export class LinkSprite extends Sprite {
                     time: 150
                 },
                 {
-                    name: 'push_bottom',
+                    name: 'push_down',
                     tiles: [9, 10],
                     time: 150
                 },
@@ -42,7 +43,7 @@ export class LinkSprite extends Sprite {
                     time: 150
                 },
                 {
-                    name: 'push_top',
+                    name: 'push_up',
                     tiles: [13, 14],
                     time: 150
                 },
@@ -55,137 +56,107 @@ export class LinkSprite extends Sprite {
     }
 }
 
-const LINK_SPEED = 70;
-export class Link extends Element {
+export class Link extends RpgPlayer {
     constructor(x, y, game) {
         // We must call the parent's constructor
-        super(x, y);
+        super(x, y, game.inputs);
 
         // Tell which Sprite class to use for displaying
         this.setSpriteClass(LinkSprite);
 
-        // Tell that this instance must not move on solids
-        this.stop_on_solids = true;
+        // RpgPlayer uses Trait_KeysMapping: we can bind keys to some actions
+        // Here, we allow moving with arrows or ZQSD
+        this.initKeysMap({
+            [RpgPlayer.ACTIONS.MOVE_LEFT]: [Inputs.KEYS.ARROWS.LEFT, Inputs.KEYS.Q],
+            [RpgPlayer.ACTIONS.MOVE_RIGHT]: [Inputs.KEYS.ARROWS.RIGHT, Inputs.KEYS.D],
+            [RpgPlayer.ACTIONS.MOVE_UP]: [Inputs.KEYS.ARROWS.UP, Inputs.KEYS.Z],
+            [RpgPlayer.ACTIONS.MOVE_DOWN]: [Inputs.KEYS.ARROWS.DOWN, Inputs.KEYS.S]
+        });
 
-        // Attach keyboards events
-        game.inputs
-            .on('keydown', (e) => {
-                // Do nothing if pressed key is not an arrow
-                if (!e.detail.is_arrow) {
-                    return;
-                }
+        // == Events definitions ==
+        this.on('rpg.solid_collision', e => {
+                // We want to handle collision only on first collided solid found
+                e.stopPropagation();
 
-                e.preventDefault();
+                // Use a "push" animation on solid collision
+                switch (e.detail.direction) {
+                    case DIRECTIONS.UP:
+                        this.useAnimation('push_up');
+                        break;
 
-                // Update Link's animation if he's not pushing walls
-                if (this.getAnimationName().indexOf('push') === -1) {
-                    this.switchAnimationByKey(e.detail.key);
-                }
-            })
-            .on('keyup', (e) => {
-                // Do nothing if released key is not an arrow
-                if (!e.detail.is_arrow) {
-                    return;
-                }
+                    case DIRECTIONS.DOWN:
+                        this.useAnimation('push_down');
+                        break;
 
-                // Check if another arrow key is still pressed
-                let pressed_arrows = game.inputs.getPressedArrows();
-
-                if (pressed_arrows.length) {
-                    return this.switchAnimationByKey(pressed_arrows[0]);
-                }
-
-                // No arrows keys are pressed: we stop the animation
-                this.switchAnimationByKey(e.detail.key);
-                this.setCurrentTileNumber(this.current_animation.tiles_numbers[0]);
-                this.current_animation.stop();
-            });
-
-        // Other specific events related to this current instance
-        this
-            .on('frame', () => {
-                // On each frame, update instance's speeds according to pressed keys
-                if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.LEFT)) {
-                    this.speed.x = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.RIGHT)) {
-                    this.speed.x = LINK_SPEED;
-                } else {
-                    this.speed.x = 0;
-                }
-
-                if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.UP)) {
-                    this.speed.y = -LINK_SPEED;
-                } else if (game.inputs.isKeyPressed(Inputs.KEYS.ARROWS.DOWN)) {
-                    this.speed.y = LINK_SPEED;
-                } else {
-                    this.speed.y = 0;
-                }
-            })
-            .on('tile_collision', (e) => {
-                // On collision with solids, use "push" animation according to collided tile position
-                if (e.detail.tile_data.tile.isSolid()) {
-                    let this_size = this.getSize();
-                    let tile_size = e.detail.tile_data.tile.getSize();
-                    let tile_position = e.detail.tile_data.position;
-
-                    if (tile_position.y + tile_size.height <= this.position.y) {
-                        this.useAnimation('push_top');
-                        e.stopPropagation();
-                    } else if (this.position.y + this_size.height <= tile_position.y) {
-                        this.useAnimation('push_bottom');
-                        e.stopPropagation();
-                    } else if (tile_position.x + tile_size.width <= this.position.x) {
+                    case DIRECTIONS.LEFT:
                         this.useAnimation('push_left');
-                        e.stopPropagation();
-                    } else if (this.position.x + this_size.width <= tile_position.x) {
+                        break;
+
+                    case DIRECTIONS.RIGHT:
                         this.useAnimation('push_right');
-                        e.stopPropagation();
-                    }
+                        break;
                 }
             })
             .on('no_solids_collision', () => {
-                // When the instance has no collisions with solids, if it's pushing,
+                // When Link has no collisions with solids, if it's pushing,
                 // change its "push" animation to the corresponding "walk" one
                 switch (this.getAnimationName()) {
                     case 'push_left':
                         this.useAnimation('walk_left');
                         break;
-                    case 'push_top':
-                        this.useAnimation('walk_top');
+                    case 'push_up':
+                        this.useAnimation('walk_up');
                         break;
                     case 'push_right':
                         this.useAnimation('walk_right');
                         break;
-                    case 'push_bottom':
-                        this.useAnimation('walk_bottom');
+                    case 'push_down':
+                        this.useAnimation('walk_down');
                         break;
                 }
+            })
+            .on('rpg.moving_key_up', e => {
+                if (e.detail.pressed_moving_key) {
+                    this.switchAnimationByKey(e.detail.pressed_moving_key);
+                    return;
+                }
+
+                // No moving keys are pressed: we stop the animation
+                this.switchAnimationByKey(e.detail.key);
+                this.setCurrentTileNumber(this.current_animation.tiles_numbers[0]);
+                this.current_animation.stop();
             });
+
+        game.inputs.on('keydown', e => {
+            // Do nothing if released key is not a moving one
+            if (!this.isMovingKey(e.detail.key)) {
+                return;
+            }
+
+            // Update player animation if he's not pushing walls
+            if (this.getAnimationName().indexOf('push') === -1) {
+                this.switchAnimationByKey(e.detail.key);
+            }
+        });
 
         // Add player to layer in order to display it
         Layer.MAIN_LAYER.addElement(this);
     }
 
-    // Custom method for this class: it updates Link's animation according to pressed arrow key
+    // Custom method for this class: it updates Link's animation according to pressed moving key
     switchAnimationByKey(key) {
-        switch (key) {
-            case Inputs.KEYS.ARROWS.LEFT:
-                this.useAnimation('walk_left');
-                break;
-
-            case Inputs.KEYS.ARROWS.UP:
-                this.useAnimation('walk_top');
-                break;
-
-            case Inputs.KEYS.ARROWS.RIGHT:
-                this.useAnimation('walk_right');
-                break;
-
-            case Inputs.KEYS.ARROWS.DOWN:
-                this.useAnimation('walk_bottom');
-                break;
+        if (this.isKeyBindedToAction(key, RpgPlayer.ACTIONS.MOVE_LEFT)) {
+            this.useAnimation('walk_left');
+        } else if (this.isKeyBindedToAction(key, RpgPlayer.ACTIONS.MOVE_UP)) {
+            this.useAnimation('walk_up');
+        } else if (this.isKeyBindedToAction(key, RpgPlayer.ACTIONS.MOVE_RIGHT)) {
+            this.useAnimation('walk_right');
+        } else if (this.isKeyBindedToAction(key, RpgPlayer.ACTIONS.MOVE_DOWN)) {
+            this.useAnimation('walk_down');
         }
 
         return this;
     }
 }
+
+Link.SPEED = 80;

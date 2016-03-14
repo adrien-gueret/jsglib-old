@@ -106,19 +106,6 @@ class Inputs {
     isKeyPressed(key) {
         return this.keys_pressed.indexOf(key) >= 0;
     }
-
-    getPressedArrows() {
-        let arrows_keys = [];
-
-        for (let key_name in Inputs.KEYS.ARROWS) {
-            let key = Inputs.KEYS.ARROWS[key_name];
-            if (this.isKeyPressed(key)) {
-                arrows_keys.push(key);
-            }
-        }
-
-        return arrows_keys;
-    }
 }
 
 Inputs.KEYS = {

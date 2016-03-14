@@ -17,7 +17,6 @@ export class Ball extends PlatformPlayer {
         // Indicate the sprite class to use
         this.setSpriteClass(BallSprite);
 
-        // @TODO: check why animations of ALL stars is stopped
         this.onCollision(Star, element => element.destroy());
 
         // Add player to layer in order to display it

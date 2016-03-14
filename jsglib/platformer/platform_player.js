@@ -9,7 +9,7 @@ class PlatformPlayer extends Element {
     constructor(x, y, inputs) {
         super(x, y);
 
-        const MAX_SPEED = this.constructor.MAX_SPEED;
+        const MAX_SPEED = this.constructor.MAX_SPEED || PlatformPlayer.MAX_SPEED;
         const ACCELERATION_LIMIT = MAX_SPEED / 4;
         const Y_SPEED_LIMIT = MAX_SPEED * 2;
         const JUMP_VARIATION = MAX_SPEED / ACCELERATION_LIMIT;
