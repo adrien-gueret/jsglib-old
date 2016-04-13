@@ -1,4 +1,4 @@
-define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/core/rectangle", "jsglib/core/utils"], function (exports, _events_handler, _point, _rectangle, _utils) {
+define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/core/rectangle", "jsglib/core/mask", "jsglib/core/utils"], function (exports, _events_handler, _point, _rectangle, _mask, _utils) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -10,6 +10,8 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
     var _point2 = _interopRequireDefault(_point);
 
     var _rectangle2 = _interopRequireDefault(_rectangle);
+
+    var _mask2 = _interopRequireDefault(_mask);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -55,10 +57,10 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
             this.current_animation = null;
             this.speed = new _point2.default();
             this.acceleration = new _point2.default();
-            this.stop_on_solids = false;
             this.is_destroyed = false;
             this.is_inside_room = false;
             this.is_solid = false;
+            this.stop_on_solids = false;
         }
 
         _createClass(Element, [{
@@ -187,73 +189,106 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 return this;
             }
         }, {
+            key: "getCurrentMasks",
+            value: function getCurrentMasks() {
+                return this.current_tile.hasMasks() ? this.current_tile.masks : [_mask2.default.createFromRectangle(this.getRectangle(), this.is_solid, this.stop_on_solids)];
+            }
+        }, {
             key: "checkCollisions",
             value: function checkCollisions(layers) {
                 var _this2 = this;
 
                 var has_solid_collision = false;
-                var solid_tiles = [];
-                var solid_elements = [];
+                var solid_tiles_collisions = [];
+                var solid_elements_collisions = [];
+                var solid_masks_collisions = [];
+                this.getCurrentMasks().forEach(function (mask) {
+                    for (var layer_name in layers) {
+                        var layer = layers[layer_name];
 
-                for (var layer_name in layers) {
-                    var layer = layers[layer_name];
-                    var collisions_data = this.checkTilesCollisions(layer);
+                        var collisions_data = _this2.checkTilesCollisions(layer, mask);
 
-                    if (this.stop_on_solids && collisions_data.solids_collisions) {
-                        has_solid_collision = true;
-                        var new_solid_tiles = collisions_data.tiles.filter(function (tile_data) {
-                            return tile_data.tile.isSolid();
-                        });
-                        solid_tiles = solid_tiles.concat(new_solid_tiles);
-                        this.refinePosition(layer, this.checkTilesCollisions);
+                        if (mask.stop_on_solids && collisions_data.solids_collisions) {
+                            has_solid_collision = true;
+                            var new_solid_tiles = collisions_data.tiles.filter(function (tile_data) {
+                                return tile_data.tile.isSolid();
+                            });
+                            new_solid_tiles = new_solid_tiles.map(function (solid_tile_data) {
+                                return {
+                                    mask: mask,
+                                    solid_tile_data: solid_tile_data
+                                };
+                            });
+                            solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_tiles);
 
-                        if (collisions_data.slopes_collisions) {
-                            this.refinePositionOnSlopes(new_solid_tiles.filter(function (tile_data) {
-                                return tile_data.tile.isSlope();
-                            }));
+                            _this2.refinePosition(layer, mask, _this2.checkTilesCollisions);
+
+                            if (collisions_data.slopes_collisions) {
+                                _this2.refinePositionOnSlopes(new_solid_tiles.filter(function (tile_data) {
+                                    return tile_data.tile.isSlope();
+                                }));
+                            }
                         }
+
+                        collisions_data.tiles.some(function (tile_data) {
+                            var custom_event = _this2.trigger('tile_collision', {
+                                tile_data: tile_data,
+                                mask: mask
+                            });
+
+                            return custom_event.propagationStopped;
+                        });
+                        collisions_data = _this2.checkElementsCollisions(layer, mask);
+
+                        if (mask.stop_on_solids && collisions_data.solids_collisions) {
+                            has_solid_collision = true;
+                            collisions_data.collisions.forEach(function (collision) {
+                                if (collision.element.is_solid) {
+                                    solid_elements_collisions.push({
+                                        mask: mask,
+                                        solid_element: collision.element
+                                    });
+                                }
+
+                                var new_solid_masks = collision.masks.filter(function (mask) {
+                                    return mask.is_solid;
+                                });
+                                new_solid_masks = new_solid_masks.map(function (solid_mask) {
+                                    return {
+                                        mask: mask,
+                                        solid_mask: solid_mask
+                                    };
+                                });
+                                solid_masks_collisions = solid_masks_collisions.concat(new_solid_masks);
+                            });
+
+                            _this2.refinePosition(layer, mask, _this2.checkElementsCollisions);
+                        }
+
+                        collisions_data.collisions.some(function (collision) {
+                            var custom_event = _this2.trigger('collision', {
+                                collision: collision
+                            });
+
+                            return custom_event.propagationStopped;
+                        });
                     }
-
-                    collisions_data.tiles.some(function (tile_data) {
-                        var custom_event = _this2.trigger('tile_collision', {
-                            tile_data: tile_data
-                        });
-
-                        return custom_event.propagationStopped;
-                    });
-                    collisions_data = this.checkElementsCollisions(layer);
-
-                    if (this.stop_on_solids && collisions_data.solids_collisions) {
-                        has_solid_collision = true;
-                        var new_solid_elements = collisions_data.elements.filter(function (element) {
-                            return element.is_solid;
-                        });
-                        solid_elements = solid_elements.concat(new_solid_elements);
-                        this.refinePosition(layer, this.checkElementsCollisions);
-                    }
-
-                    collisions_data.elements.some(function (element) {
-                        var custom_event = _this2.trigger('collision', {
-                            element: element
-                        });
-
-                        return custom_event.propagationStopped;
-                    });
-                }
+                });
 
                 if (!has_solid_collision) {
                     this.trigger('no_solids_collision');
                 } else {
                     this.trigger('solids_collision', {
-                        tiles: solid_tiles,
-                        elements: solid_elements
+                        tiles_collisions: solid_tiles_collisions,
+                        elements_collisions: solid_elements_collisions,
+                        masks_collisions: solid_masks_collisions
                     });
                 }
             }
         }, {
             key: "checkTilesCollisions",
-            value: function checkTilesCollisions(layer) {
-                var position = arguments.length <= 1 || arguments[1] === undefined ? this.position : arguments[1];
+            value: function checkTilesCollisions(layer, mask) {
+                var position = arguments.length <= 2 || arguments[2] === undefined ? this.position : arguments[2];
                 var data = {
                     tiles: [],
                     solids_collisions: false,
@@ -265,8 +300,8 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                     return data;
                 }
 
-                var rectangle = this.getRectangle();
-                rectangle.position.copy(position);
+                var rectangle = mask.clone();
+                rectangle.position.add(position);
                 data.tiles = layer.getTilesFromRectangle(rectangle);
                 var end_slope_tile = data.tiles.filter(function (tile_data) {
                     return tile_data.tile.isEndSlope();
@@ -304,12 +339,12 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
             }
         }, {
             key: "checkElementsCollisions",
-            value: function checkElementsCollisions(layer) {
+            value: function checkElementsCollisions(layer, mask) {
                 var _this3 = this;
 
-                var position = arguments.length <= 1 || arguments[1] === undefined ? this.position : arguments[1];
+                var position = arguments.length <= 2 || arguments[2] === undefined ? this.position : arguments[2];
                 var data = {
-                    elements: [],
+                    collisions: [],
                     solids_collisions: false
                 };
 
@@ -317,23 +352,41 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                     return data;
                 }
 
-                var rectangle = this.getRectangle();
-                rectangle.position.copy(position);
-                data.elements = layer.elements.filter(function (element) {
+                var rectangle = mask.clone();
+                rectangle.position.add(position);
+                layer.elements.forEach(function (element) {
                     if (element === _this3) {
-                        return false;
+                        return;
                     }
 
-                    return rectangle.isCollidedWithRectangle(element.getRectangle());
+                    var collision = {
+                        element: null,
+                        masks: []
+                    };
+                    element.getCurrentMasks().forEach(function (otherMask) {
+                        var otherRectangle = otherMask.clone();
+                        otherRectangle.position.add(element.position);
+
+                        if (rectangle.isCollidedWithRectangle(otherRectangle)) {
+                            collision.element = element;
+                            collision.masks.push(otherRectangle);
+                        }
+                    });
+
+                    if (collision.element) {
+                        data.collisions.push(collision);
+                    }
                 });
-                data.solids_collisions = data.elements.some(function (element) {
-                    return element.is_solid;
+                data.solids_collisions = data.collisions.some(function (collision) {
+                    return collision.element.is_solid || collision.masks.some(function (mask) {
+                        return mask.is_solid;
+                    });
                 });
                 return data;
             }
         }, {
             key: "refinePosition",
-            value: function refinePosition(layer, checkCollisionsMethod) {
+            value: function refinePosition(layer, mask, checkCollisionsMethod) {
                 var delta_position = this.position.subtract(this.prev_position, true);
                 var limit_x = Math.abs(delta_position.x);
                 var limit_y = Math.abs(delta_position.y);
@@ -343,7 +396,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 for (var x = 0; x < limit_x; x++) {
                     new_position.x += delta_x;
-                    var collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+                    var collisions_data = checkCollisionsMethod.call(this, layer, mask, new_position);
 
                     if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                         new_position.x -= delta_x;
@@ -353,7 +406,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                 for (var y = 0; y < limit_y; y++) {
                     new_position.y += delta_y;
-                    var collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+                    var collisions_data = checkCollisionsMethod.call(this, layer, mask, new_position);
 
                     if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                         new_position.y -= delta_y;
@@ -394,10 +447,10 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
             key: "onCollision",
             value: function onCollision(targetClass, callback) {
                 this.on('collision', function (e) {
-                    var element = e.detail.element;
+                    var element = e.detail.collision.element;
 
                     if (element instanceof targetClass) {
-                        callback(element, e);
+                        callback(e.detail.collision, e);
                     }
                 });
                 return this;

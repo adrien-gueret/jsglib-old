@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/rpg/rpg_core", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inputs", "jsglib/traits/keys_mapping"], function (exports, _rpg_core, _element, _point, _inputs, _keys_mapping) {
+define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inputs", "jsglib/rpg/rpg_interactive", "jsglib/traits/keys_mapping"], function (exports, _element, _point, _inputs, _rpg_interactive, _keys_mapping) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -12,6 +12,8 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/core/element", "jsglib/core/po
     var _point2 = _interopRequireDefault(_point);
 
     var _inputs2 = _interopRequireDefault(_inputs);
+
+    var _rpg_interactive2 = _interopRequireDefault(_rpg_interactive);
 
     var _keys_mapping2 = _interopRequireDefault(_keys_mapping);
 
@@ -111,34 +113,47 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/core/element", "jsglib/core/po
                     _this.speed.y = 0;
                 }
             }).on('solids_collision', function (e) {
-                var elements = e.detail.elements.map(function (element) {
+                var elements = e.detail.elements_collisions.map(function (collision) {
                     return {
-                        position: element.position,
-                        element: element
+                        mask: collision.mask,
+                        solid: collision.solid_element,
+                        position: collision.solid_element.position
                     };
                 });
-                var solids = e.detail.tiles.concat(elements);
-
-                var this_size = _this.getSize();
-
+                var masks = e.detail.masks_collisions.map(function (collision) {
+                    return {
+                        mask: collision.mask,
+                        solid: collision.solid_mask,
+                        position: collision.solid_mask.position
+                    };
+                });
+                var tiles = e.detail.tiles_collisions.map(function (collision) {
+                    return {
+                        mask: collision.mask,
+                        solid: collision.solid_tile_data.tile,
+                        position: collision.solid_tile_data.position
+                    };
+                });
+                var solids = tiles.concat(elements).concat(masks);
                 solids.some(function (solid_data) {
-                    var solid = solid_data.tile || solid_data.element;
+                    var solid = solid_data.solid;
                     var solid_size = solid.getSize();
                     var solid_position = solid_data.position;
                     var event_data = {
                         solid: solid,
-                        solid_position: solid_position,
-                        is_tile: !!solid_data.tile
+                        solid_position: solid_position
                     };
+                    var this_size = solid_data.mask.getSize();
+                    var this_position = solid_data.mask.position.add(_this.position, true);
 
-                    if (solid_position.y + solid_size.height <= _this.position.y) {
-                        event_data.direction = _rpg_core.DIRECTIONS.UP;
-                    } else if (_this.position.y + this_size.height <= solid_position.y) {
-                        event_data.direction = _rpg_core.DIRECTIONS.DOWN;
-                    } else if (solid_position.x + solid_size.width <= _this.position.x) {
-                        event_data.direction = _rpg_core.DIRECTIONS.LEFT;
-                    } else if (_this.position.x + this_size.width <= solid_position.x) {
-                        event_data.direction = _rpg_core.DIRECTIONS.RIGHT;
+                    if (solid_position.y + solid_size.height <= this_position.y) {
+                        event_data.direction = RpgPlayer.DIRECTIONS.UP;
+                    } else if (this_position.y + this_size.height <= solid_position.y) {
+                        event_data.direction = RpgPlayer.DIRECTIONS.DOWN;
+                    } else if (solid_position.x + solid_size.width <= this_position.x) {
+                        event_data.direction = RpgPlayer.DIRECTIONS.LEFT;
+                    } else if (this_position.x + this_size.width <= solid_position.x) {
+                        event_data.direction = RpgPlayer.DIRECTIONS.RIGHT;
                     }
 
                     var custom_event = _this.trigger('rpg.solid_collision', event_data);
@@ -160,14 +175,19 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/core/element", "jsglib/core/po
         return RpgPlayer;
     })(_element2.default);
 
-    RpgPlayer.SPEED = 100;
+    RpgPlayer.SPEED = 96;
+    RpgPlayer.DIRECTIONS = {
+        LEFT: Symbol(),
+        RIGHT: Symbol(),
+        UP: Symbol(),
+        DOWN: Symbol()
+    };
     RpgPlayer.ACTIONS = {
         MOVE_LEFT: Symbol(),
         MOVE_RIGHT: Symbol(),
         MOVE_UP: Symbol(),
         MOVE_DOWN: Symbol(),
-        MOVE_ACTION_1: Symbol(),
-        MOVE_ACTION_2: Symbol()
+        INTERACT: Symbol()
     };
     (0, _keys_mapping2.default)(RpgPlayer);
     exports.default = RpgPlayer;

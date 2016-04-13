@@ -51,9 +51,24 @@ define(["exports", "jsglib/core/point"], function (exports, _point) {
         }
 
         _createClass(Rectangle, [{
+            key: "clone",
+            value: function clone() {
+                return new Rectangle(this.width, this.height, this.position);
+            }
+        }, {
             key: "getCenter",
             value: function getCenter() {
                 return new _point2.default(this.position.x + this.width / 2, this.position.y + this.height / 2);
+            }
+        }, {
+            key: "getSize",
+            value: function getSize() {
+                var width = this.width;
+                var height = this.height;
+                return {
+                    width: width,
+                    height: height
+                };
             }
         }, {
             key: "isCollidedWithRectangle",

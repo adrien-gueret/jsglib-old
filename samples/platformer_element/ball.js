@@ -17,7 +17,7 @@ export class Ball extends PlatformPlayer {
         // Indicate the sprite class to use
         this.setSpriteClass(BallSprite);
 
-        this.onCollision(Star, element => element.destroy());
+        this.onCollision(Star, collision => collision.element.destroy());
 
         // Add player to layer in order to display it
         Layer.MAIN_LAYER.addElement(this);

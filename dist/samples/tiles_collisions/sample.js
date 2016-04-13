@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/core/tile", "./link"], function (_game, _room, _sprite, _tile, _link) {
+define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/core/tile", "./link", "./man"], function (_game, _room, _sprite, _tile, _link, _man) {
     "use strict";
 
     var _game2 = _interopRequireDefault(_game);
@@ -75,8 +75,12 @@ define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/co
     })(_sprite2.default);
 
     var my_game = new _game2.default(document.getElementById('myGame'));
-    Promise.all([_link.LinkSprite.loadImage('./link.png'), HouseSpriteSheets.loadImage('./house_tiles.png')]).then(function () {
+    Promise.all([_link.LinkSprite.loadImage('./link.png'), _link.LinkSpriteMask.loadImage('./link_mask.png'), _man.ManSprite.loadImage('./man.png'), HouseSpriteSheets.loadImage('./house_tiles.png')]).then(function () {
+        _link.LinkSpriteMask.init();
+
         _link.LinkSprite.init(my_game.timer);
+
+        _man.ManSprite.init(my_game.timer);
 
         HouseSpriteSheets.makeTiles(32, 32, 1).defineTilesTypes(_defineProperty({}, _tile2.default.TYPES.SOLID, [2, 4, 5, 6, 8, 10, 12, 14, 14, 15, 17, 18, 19]));
         var level = new _room2.default();
@@ -89,7 +93,8 @@ define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/co
             }
         });
         level.on('start', function () {
-            new _link.Link(128, 160, my_game);
+            new _man.Man(96, 96);
+            new _link.Link(128, 160, my_game.inputs);
         });
         my_game.goToRoom(level).start();
     });

@@ -1,12 +1,12 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _rpg_core, _rpg_player, _inputs, _layer, _sprite) {
+define(["exports", "jsglib/rpg/rpg_player", "jsglib/core/inputs", "jsglib/core/layer", "jsglib/core/sprite", "jsglib/core/point", "jsglib/core/mask"], function (exports, _rpg_player, _inputs, _layer, _sprite, _point, _mask) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.Link = exports.LinkSprite = undefined;
+    exports.Link = exports.LinkSprite = exports.LinkSpriteMask = undefined;
 
     var _rpg_player2 = _interopRequireDefault(_rpg_player);
 
@@ -15,6 +15,10 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
     var _layer2 = _interopRequireDefault(_layer);
 
     var _sprite2 = _interopRequireDefault(_sprite);
+
+    var _point2 = _interopRequireDefault(_point);
+
+    var _mask2 = _interopRequireDefault(_mask);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -36,6 +40,31 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
 
         return obj;
     }
+
+    var _get = function get(object, property, receiver) {
+        if (object === null) object = Function.prototype;
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+
+        if (desc === undefined) {
+            var parent = Object.getPrototypeOf(object);
+
+            if (parent === null) {
+                return undefined;
+            } else {
+                return get(parent, property, receiver);
+            }
+        } else if ("value" in desc) {
+            return desc.value;
+        } else {
+            var getter = desc.get;
+
+            if (getter === undefined) {
+                return undefined;
+            }
+
+            return getter.call(receiver);
+        }
+    };
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -85,8 +114,27 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
         if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
     }
 
-    var LinkSprite = exports.LinkSprite = (function (_Sprite) {
-        _inherits(LinkSprite, _Sprite);
+    var LinkSpriteMask = exports.LinkSpriteMask = (function (_Sprite) {
+        _inherits(LinkSpriteMask, _Sprite);
+
+        function LinkSpriteMask() {
+            _classCallCheck(this, LinkSpriteMask);
+
+            return _possibleConstructorReturn(this, Object.getPrototypeOf(LinkSpriteMask).apply(this, arguments));
+        }
+
+        _createClass(LinkSpriteMask, null, [{
+            key: "init",
+            value: function init() {
+                this.makeTiles(32, 32, 2);
+            }
+        }]);
+
+        return LinkSpriteMask;
+    })(_sprite2.default);
+
+    var LinkSprite = exports.LinkSprite = (function (_LinkSpriteMask) {
+        _inherits(LinkSprite, _LinkSpriteMask);
 
         function LinkSprite() {
             _classCallCheck(this, LinkSprite);
@@ -97,7 +145,9 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
         _createClass(LinkSprite, null, [{
             key: "init",
             value: function init(timer) {
-                this.makeTiles(32, 32, 2).defineTilesAnimations([{
+                _get(Object.getPrototypeOf(LinkSprite), "init", this).call(this);
+
+                this.defineTilesAnimations([{
                     name: 'walk_down',
                     tiles: [1, 2],
                     time: 150
@@ -130,98 +180,103 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
                     tiles: [15, 16],
                     time: 150
                 }], timer);
+                this.tiles.forEach(function (row) {
+                    row.forEach(function (tile) {
+                        tile.masks.push(new _mask2.default(16, 24, new _point2.default(8, 8), false, true));
+                    });
+                });
             }
         }]);
 
         return LinkSprite;
-    })(_sprite2.default);
+    })(LinkSpriteMask);
 
     var Link = exports.Link = (function (_RpgPlayer) {
         _inherits(Link, _RpgPlayer);
 
-        function Link(x, y, game) {
-            var _this2$initKeysMap;
+        function Link(x, y, inputs) {
+            var _this3$initKeysMap;
 
             _classCallCheck(this, Link);
 
             // Tell which Sprite class to use for displaying
 
-            var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y, game.inputs));
+            var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, x, y, inputs));
             // We must call the parent's constructor
 
-            _this2.setSpriteClass(LinkSprite);
+            _this3.setSpriteClass(LinkSprite);
 
             // RpgPlayer uses Trait_KeysMapping: we can bind keys to some actions
             // Here, we allow moving with arrows or ZQSD
-            _this2.initKeysMap((_this2$initKeysMap = {}, _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_LEFT, [_inputs2.default.KEYS.ARROWS.LEFT, _inputs2.default.KEYS.Q]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_RIGHT, [_inputs2.default.KEYS.ARROWS.RIGHT, _inputs2.default.KEYS.D]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_UP, [_inputs2.default.KEYS.ARROWS.UP, _inputs2.default.KEYS.Z]), _defineProperty(_this2$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_DOWN, [_inputs2.default.KEYS.ARROWS.DOWN, _inputs2.default.KEYS.S]), _this2$initKeysMap));
+            _this3.initKeysMap((_this3$initKeysMap = {}, _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_LEFT, [_inputs2.default.KEYS.ARROWS.LEFT, _inputs2.default.KEYS.Q]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_RIGHT, [_inputs2.default.KEYS.ARROWS.RIGHT, _inputs2.default.KEYS.D]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_UP, [_inputs2.default.KEYS.ARROWS.UP, _inputs2.default.KEYS.Z]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_DOWN, [_inputs2.default.KEYS.ARROWS.DOWN, _inputs2.default.KEYS.S]), _this3$initKeysMap));
 
             // == Events definitions ==
-            _this2.on('rpg.solid_collision', function (e) {
+            _this3.on('rpg.solid_collision', function (e) {
                 // We want to handle collision only on first collided solid found
                 e.stopPropagation();
 
                 // Use a "push" animation on solid collision
                 switch (e.detail.direction) {
-                    case _rpg_core.DIRECTIONS.UP:
-                        _this2.useAnimation('push_up');
+                    case _rpg_player2.default.DIRECTIONS.UP:
+                        _this3.useAnimation('push_up');
                         break;
 
-                    case _rpg_core.DIRECTIONS.DOWN:
-                        _this2.useAnimation('push_down');
+                    case _rpg_player2.default.DIRECTIONS.DOWN:
+                        _this3.useAnimation('push_down');
                         break;
 
-                    case _rpg_core.DIRECTIONS.LEFT:
-                        _this2.useAnimation('push_left');
+                    case _rpg_player2.default.DIRECTIONS.LEFT:
+                        _this3.useAnimation('push_left');
                         break;
 
-                    case _rpg_core.DIRECTIONS.RIGHT:
-                        _this2.useAnimation('push_right');
+                    case _rpg_player2.default.DIRECTIONS.RIGHT:
+                        _this3.useAnimation('push_right');
                         break;
                 }
             }).on('no_solids_collision', function () {
                 // When Link has no collisions with solids, if it's pushing,
                 // change its "push" animation to the corresponding "walk" one
-                switch (_this2.getAnimationName()) {
+                switch (_this3.getAnimationName()) {
                     case 'push_left':
-                        _this2.useAnimation('walk_left');
+                        _this3.useAnimation('walk_left');
                         break;
                     case 'push_up':
-                        _this2.useAnimation('walk_up');
+                        _this3.useAnimation('walk_up');
                         break;
                     case 'push_right':
-                        _this2.useAnimation('walk_right');
+                        _this3.useAnimation('walk_right');
                         break;
                     case 'push_down':
-                        _this2.useAnimation('walk_down');
+                        _this3.useAnimation('walk_down');
                         break;
                 }
             }).on('rpg.moving_key_up', function (e) {
                 if (e.detail.pressed_moving_key) {
-                    _this2.switchAnimationByKey(e.detail.pressed_moving_key);
+                    _this3.switchAnimationByKey(e.detail.pressed_moving_key);
                     return;
                 }
 
                 // No moving keys are pressed: we stop the animation
-                _this2.switchAnimationByKey(e.detail.key);
-                _this2.setCurrentTileNumber(_this2.current_animation.tiles_numbers[0]);
-                _this2.current_animation.stop();
+                _this3.switchAnimationByKey(e.detail.key);
+                _this3.setCurrentTileNumber(_this3.current_animation.tiles_numbers[0]);
+                _this3.current_animation.stop();
             });
 
-            game.inputs.on('keydown', function (e) {
+            inputs.on('keydown', function (e) {
                 // Do nothing if released key is not a moving one
-                if (!_this2.isMovingKey(e.detail.key)) {
+                if (!_this3.isMovingKey(e.detail.key)) {
                     return;
                 }
 
                 // Update player animation if he's not pushing walls
-                if (_this2.getAnimationName().indexOf('push') === -1) {
-                    _this2.switchAnimationByKey(e.detail.key);
+                if (_this3.getAnimationName().indexOf('push') === -1) {
+                    _this3.switchAnimationByKey(e.detail.key);
                 }
             });
 
             // Add player to layer in order to display it
-            _layer2.default.MAIN_LAYER.addElement(_this2);
-            return _this2;
+            _layer2.default.MAIN_LAYER.addElement(_this3);
+            return _this3;
         }
 
         // Custom method for this class: it updates Link's animation according to pressed moving key
@@ -246,6 +301,6 @@ define(["exports", "jsglib/rpg/rpg_core", "jsglib/rpg/rpg_player", "jsglib/core/
         return Link;
     })(_rpg_player2.default);
 
-    Link.SPEED = 80;
+    Link.SPEED = 64;
 });
 //# sourceMappingURL=link.js.map

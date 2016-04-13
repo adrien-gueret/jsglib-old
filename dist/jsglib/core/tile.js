@@ -45,17 +45,18 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
             var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
             var tile_number = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
             var type = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
-            var slope_point = arguments.length <= 5 || arguments[5] === undefined ? null : arguments[5];
+            var masks = arguments.length <= 5 || arguments[5] === undefined ? [] : arguments[5];
 
             _classCallCheck(this, Tile);
 
             this.sprite_class = sprite_class;
             this.sheet_position = new _point2.default(x, y);
             this.tile_number = tile_number;
-            this.needs_redraw = true;
-            this.is_empty = false;
             this.type = type;
-            this.slope_point = slope_point;
+            this.masks = masks;
+            this.is_empty = false;
+            this.needs_redraw = true;
+            this.slope_point = null;
         }
 
         _createClass(Tile, [{
@@ -66,7 +67,10 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
         }, {
             key: "clone",
             value: function clone() {
-                return new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type, this.slope_point);
+                var clone_tile = new Tile(this.sprite_class, this.sheet_position.x, this.sheet_position.y, this.tile_number, this.type);
+                clone_tile.slope_point = this.slope_point ? this.slope_point.clone() : null;
+                clone_tile.masks = this.masks.slice(0);
+                return clone_tile;
             }
         }, {
             key: "setTileNumber",
@@ -76,7 +80,8 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
                 this.tile_number = tile_number;
                 this.sheet_position = tile.sheet_position;
                 this.type = tile.type;
-                this.slope_point = tile.slope_point;
+                this.slope_point = tile.slope_point ? tile.slope_point.clone() : null;
+                this.masks = tile.masks.slice(0);
                 this.needs_redraw = true;
                 return this;
             }
@@ -102,6 +107,11 @@ define(["exports", "jsglib/core/point", "jsglib/traits/events_handler"], functio
                 };
                 ctx.clearRect(x, y, tiles_size.width, tiles_size.height);
                 return this;
+            }
+        }, {
+            key: "hasMasks",
+            value: function hasMasks() {
+                return this.masks.length > 0;
             }
         }, {
             key: "isSolid",

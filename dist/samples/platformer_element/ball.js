@@ -75,8 +75,8 @@ define(["exports", "jsglib/platformer/platform_player", "jsglib/core/layer", "js
 
                         _this2.setSpriteClass(BallSprite);
 
-                        _this2.onCollision(_star.Star, function (element) {
-                                return element.destroy();
+                        _this2.onCollision(_star.Star, function (collision) {
+                                return collision.element.destroy();
                         });
 
                         // Add player to layer in order to display it
