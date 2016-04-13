@@ -4,14 +4,15 @@ import Point from "jsglib/core/point";
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 
 class Tile {
-    constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null, slope_point = null) {
+    constructor(sprite_class, x = 0, y = 0, tile_number = 0, type = null, masks = []) {
         this.sprite_class = sprite_class;
         this.sheet_position = new Point(x, y);
         this.tile_number = tile_number;
-        this.needs_redraw = true;
-        this.is_empty = false;
         this.type = type;
-        this.slope_point = slope_point;
+        this.masks = masks;
+        this.is_empty = false;
+        this.needs_redraw = true;
+        this.slope_point = null;
     }
 
     static getNewEmptyTile(sprite_class) {
@@ -25,14 +26,18 @@ class Tile {
     }
 
     clone() {
-        return new Tile(
+        let clone_tile = new Tile(
             this.sprite_class,
             this.sheet_position.x,
             this.sheet_position.y,
             this.tile_number,
-            this.type,
-            this.slope_point
+            this.type
         );
+
+        clone_tile.slope_point = this.slope_point ? this.slope_point.clone() : null;
+        clone_tile.masks = this.masks.slice(0);
+
+        return clone_tile;
     }
 
     setTileNumber(tile_number) {
@@ -41,7 +46,8 @@ class Tile {
         this.tile_number = tile_number;
         this.sheet_position = tile.sheet_position;
         this.type = tile.type;
-        this.slope_point = tile.slope_point;
+        this.slope_point = tile.slope_point ? tile.slope_point.clone() : null;
+        this.masks = tile.masks.slice(0);
         this.needs_redraw = true;
 
         return this;
@@ -78,6 +84,10 @@ class Tile {
 
         ctx.clearRect(x, y, tiles_size.width, tiles_size.height);
         return this;
+    }
+
+    hasMasks() {
+        return this.masks.length > 0;
     }
 
     isSolid() {

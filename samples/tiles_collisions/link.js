@@ -1,17 +1,24 @@
 "use strict";
 
-import {DIRECTIONS} from "jsglib/rpg/rpg_core";
 import RpgPlayer from "jsglib/rpg/rpg_player";
 import Inputs from "jsglib/core/inputs";
 import Layer from "jsglib/core/layer";
 import Sprite from "jsglib/core/sprite";
+import Point from "jsglib/core/point";
+import Mask from "jsglib/core/mask";
 
 // Sprite class defining tiles and animations for Link
-export class LinkSprite extends Sprite {
+export class LinkSpriteMask extends Sprite {
+    static init() {
+        this.makeTiles(32, 32, 2);
+    }
+}
+
+export class LinkSprite extends LinkSpriteMask {
     static init(timer) {
-        this
-            .makeTiles(32, 32, 2)
-            .defineTilesAnimations([
+        super.init();
+
+        this.defineTilesAnimations([
                 {
                     name: 'walk_down',
                     tiles: [1, 2],
@@ -53,13 +60,18 @@ export class LinkSprite extends Sprite {
                     time: 150
                 }
             ], timer);
+        this.tiles.forEach(row => {
+            row.forEach(tile => {
+                tile.masks.push(new Mask(16, 24, new Point(8, 8), false, true));
+            })
+        });
     }
 }
 
 export class Link extends RpgPlayer {
-    constructor(x, y, game) {
+    constructor(x, y, inputs) {
         // We must call the parent's constructor
-        super(x, y, game.inputs);
+        super(x, y, inputs);
 
         // Tell which Sprite class to use for displaying
         this.setSpriteClass(LinkSprite);
@@ -80,19 +92,19 @@ export class Link extends RpgPlayer {
 
                 // Use a "push" animation on solid collision
                 switch (e.detail.direction) {
-                    case DIRECTIONS.UP:
+                    case RpgPlayer.DIRECTIONS.UP:
                         this.useAnimation('push_up');
                         break;
 
-                    case DIRECTIONS.DOWN:
+                    case RpgPlayer.DIRECTIONS.DOWN:
                         this.useAnimation('push_down');
                         break;
 
-                    case DIRECTIONS.LEFT:
+                    case RpgPlayer.DIRECTIONS.LEFT:
                         this.useAnimation('push_left');
                         break;
 
-                    case DIRECTIONS.RIGHT:
+                    case RpgPlayer.DIRECTIONS.RIGHT:
                         this.useAnimation('push_right');
                         break;
                 }
@@ -127,7 +139,7 @@ export class Link extends RpgPlayer {
                 this.current_animation.stop();
             });
 
-        game.inputs.on('keydown', e => {
+        inputs.on('keydown', e => {
             // Do nothing if released key is not a moving one
             if (!this.isMovingKey(e.detail.key)) {
                 return;
@@ -159,4 +171,4 @@ export class Link extends RpgPlayer {
     }
 }
 
-Link.SPEED = 80;
+Link.SPEED = 64;

@@ -9,11 +9,20 @@ export default class Rectangle {
         this.position = position ? position.clone() : new Point();
     }
 
+    clone() {
+        return new Rectangle(this.width, this.height, this.position);
+    }
+
     getCenter() {
         return new Point(
             this.position.x + this.width / 2,
             this.position.y + this.height / 2
         );
+    }
+
+    getSize() {
+        let {width, height} = this;
+        return {width, height};
     }
 
     isCollidedWithRectangle(rectangle) {

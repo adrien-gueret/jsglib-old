@@ -3,6 +3,7 @@
 import Trait_EventsHandler from "jsglib/traits/events_handler";
 import Point from "jsglib/core/point";
 import Rectangle from "jsglib/core/rectangle";
+import Mask from "jsglib/core/mask";
 import {degreeToRadian, radianToDegree} from "jsglib/core/utils";
 
 class Element {
@@ -17,10 +18,10 @@ class Element {
         this.current_animation = null;
         this.speed = new Point();
         this.acceleration = new Point();
-        this.stop_on_solids = false;
         this.is_destroyed = false;
         this.is_inside_room = false;
         this.is_solid = false;
+        this.stop_on_solids = false;
     }
 
     destroy() {
@@ -130,68 +131,87 @@ class Element {
         return this;
     }
 
+    getCurrentMasks() {
+        return this.current_tile.hasMasks()
+            ? this.current_tile.masks
+            : [Mask.createFromRectangle(this.getRectangle(), this.is_solid, this.stop_on_solids)];
+    }
+
     checkCollisions(layers) {
         let has_solid_collision = false;
-        let solid_tiles = [];
-        let solid_elements = [];
+        let solid_tiles_collisions = [];
+        let solid_elements_collisions = [];
+        let solid_masks_collisions = [];
 
-        for (var layer_name in layers) {
-            let layer = layers[layer_name];
+        this.getCurrentMasks().forEach(mask => {
+            for (var layer_name in layers) {
+                let layer = layers[layer_name];
 
-            // First, check tiles collisions
-            let collisions_data = this.checkTilesCollisions(layer);
+                // First, check tiles collisions
+                let collisions_data = this.checkTilesCollisions(layer, mask);
 
-            // Check collisions with solid tiles
-            if (this.stop_on_solids && collisions_data.solids_collisions) {
-                has_solid_collision = true;
+                // Check collisions with solid tiles
+                if (mask.stop_on_solids && collisions_data.solids_collisions) {
+                    has_solid_collision = true;
 
-                let new_solid_tiles = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
-                solid_tiles = solid_tiles.concat(new_solid_tiles);
+                    let new_solid_tiles = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
+                    new_solid_tiles = new_solid_tiles.map(solid_tile_data => ({mask, solid_tile_data}));
+                    solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_tiles);
 
-                this.refinePosition(layer, this.checkTilesCollisions);
+                    this.refinePosition(layer, mask, this.checkTilesCollisions);
 
-                if (collisions_data.slopes_collisions) {
-                    this.refinePositionOnSlopes(new_solid_tiles.filter(tile_data => tile_data.tile.isSlope()));
+                    if (collisions_data.slopes_collisions) {
+                        this.refinePositionOnSlopes(new_solid_tiles.filter(tile_data => tile_data.tile.isSlope()));
+                    }
                 }
+
+                // Trigger collision events for each tile
+                collisions_data.tiles.some(tile_data => {
+                    let custom_event = this.trigger('tile_collision', {tile_data, mask});
+                    return custom_event.propagationStopped;
+                });
+
+                // Then check collisions with other elements
+                collisions_data = this.checkElementsCollisions(layer, mask);
+
+                // Check collisions with solid elements
+                if (mask.stop_on_solids && collisions_data.solids_collisions) {
+                    has_solid_collision = true;
+
+
+                    collisions_data.collisions.forEach(collision => {
+                        if (collision.element.is_solid) {
+                            solid_elements_collisions.push({mask, solid_element: collision.element});
+                        }
+
+                        let new_solid_masks = collision.masks.filter(mask => mask.is_solid);
+                        new_solid_masks = new_solid_masks.map(solid_mask => ({mask, solid_mask}));
+                        solid_masks_collisions = solid_masks_collisions.concat(new_solid_masks);
+                    });
+
+                    this.refinePosition(layer, mask, this.checkElementsCollisions);
+                }
+
+                // Trigger collision events for each element
+                collisions_data.collisions.some(collision => {
+                    let custom_event = this.trigger('collision', {collision});
+                    return custom_event.propagationStopped;
+                });
             }
-
-            // Trigger collision events for each tile
-            collisions_data.tiles.some(tile_data => {
-                let custom_event = this.trigger('tile_collision', {tile_data});
-                return custom_event.propagationStopped;
-            });
-
-            // Then check collisions with other elements
-            collisions_data = this.checkElementsCollisions(layer);
-
-            // Check collisions with solid elements
-            if (this.stop_on_solids && collisions_data.solids_collisions) {
-                has_solid_collision = true;
-
-                let new_solid_elements = collisions_data.elements.filter(element => element.is_solid);
-                solid_elements = solid_elements.concat(new_solid_elements);
-
-                this.refinePosition(layer, this.checkElementsCollisions);
-            }
-
-            // Trigger collision events for each element
-            collisions_data.elements.some(element => {
-                let custom_event = this.trigger('collision', {element});
-                return custom_event.propagationStopped;
-            });
-        }
+        });
 
         if (!has_solid_collision) {
             this.trigger('no_solids_collision');
         } else {
             this.trigger('solids_collision', {
-                tiles: solid_tiles,
-                elements: solid_elements
+                tiles_collisions: solid_tiles_collisions,
+                elements_collisions: solid_elements_collisions,
+                masks_collisions: solid_masks_collisions
             });
         }
     }
 
-    checkTilesCollisions(layer, position = this.position) {
+    checkTilesCollisions(layer, mask, position = this.position) {
         let data = {
             tiles: [],
             solids_collisions: false,
@@ -203,8 +223,8 @@ class Element {
             return data;
         }
 
-        let rectangle = this.getRectangle();
-        rectangle.position.copy(position);
+        let rectangle = mask.clone();
+        rectangle.position.add(position);
 
         data.tiles = layer.getTilesFromRectangle(rectangle);
 
@@ -238,9 +258,9 @@ class Element {
         return data;
     }
 
-    checkElementsCollisions(layer, position = this.position) {
+    checkElementsCollisions(layer, mask, position = this.position) {
         let data = {
-            elements: [],
+            collisions: [],
             solids_collisions: false
         };
 
@@ -248,23 +268,40 @@ class Element {
             return data;
         }
 
-        let rectangle = this.getRectangle();
-        rectangle.position.copy(position);
+        let rectangle = mask.clone();
+        rectangle.position.add(position);
 
-        data.elements = layer.elements.filter(element => {
+        layer.elements.forEach(element => {
             if (element === this) {
-                return false;
+                return;
             }
 
-            return rectangle.isCollidedWithRectangle(element.getRectangle());
+            let collision = {
+                element: null,
+                masks: []
+            };
+
+            element.getCurrentMasks().forEach(otherMask => {
+                let otherRectangle = otherMask.clone();
+                otherRectangle.position.add(element.position);
+
+                if (rectangle.isCollidedWithRectangle(otherRectangle)) {
+                    collision.element = element;
+                    collision.masks.push(otherRectangle);
+                }
+            });
+
+            if (collision.element) {
+                data.collisions.push(collision);
+            }
         });
 
-        data.solids_collisions = data.elements.some(element => element.is_solid);
+        data.solids_collisions = data.collisions.some(collision => collision.element.is_solid || collision.masks.some(mask => mask.is_solid));
 
         return data;
     }
 
-    refinePosition(layer, checkCollisionsMethod) {
+    refinePosition(layer, mask, checkCollisionsMethod) {
         let delta_position = this.position.subtract(this.prev_position, true);
         let limit_x = Math.abs(delta_position.x);
         let limit_y = Math.abs(delta_position.y);
@@ -276,7 +313,7 @@ class Element {
         for (let x = 0; x < limit_x; x++) {
             new_position.x += delta_x;
 
-            let collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+            let collisions_data = checkCollisionsMethod.call(this, layer, mask, new_position);
             if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                 new_position.x -= delta_x;
                 break;
@@ -287,7 +324,7 @@ class Element {
         for (let y = 0; y < limit_y; y++) {
             new_position.y += delta_y;
 
-            let collisions_data = checkCollisionsMethod.call(this, layer, new_position);
+            let collisions_data = checkCollisionsMethod.call(this, layer, mask, new_position);
             if (collisions_data.solids_collisions && !collisions_data.only_slopes_collisions) {
                 new_position.y -= delta_y;
                 break;
@@ -325,10 +362,10 @@ class Element {
 
     onCollision(targetClass, callback) {
         this.on('collision', e => {
-            let element = e.detail.element;
+            let element = e.detail.collision.element;
 
             if (element instanceof targetClass) {
-                callback(element, e);
+                callback(e.detail.collision, e);
             }
         });
 
