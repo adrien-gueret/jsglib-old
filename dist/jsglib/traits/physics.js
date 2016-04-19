@@ -1,4 +1,4 @@
-define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/point"], function (exports, _trait, _element, _point) {
+define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/point", "jsglib/core/tile"], function (exports, _trait, _element, _point, _tile) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -10,6 +10,8 @@ define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/poin
     var _element2 = _interopRequireDefault(_element);
 
     var _point2 = _interopRequireDefault(_point);
+
+    var _tile2 = _interopRequireDefault(_tile);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -42,33 +44,40 @@ define(["exports", "jsglib/core/trait", "jsglib/core/element", "jsglib/core/poin
                 var center_x = _this.getRectangle().getCenter().x;
 
                 var impulse = new _point2.default();
-                _this.on_ground = e.detail.tiles.some(function (tile_data) {
-                    var tile_position = tile_data.position;
-                    var contact_y = tile_data.tile.getContactY(center_x, tile_position);
+                _this.on_ground = e.detail.all_solids_collisions.some(function (solid_data) {
+                    var solid = solid_data.solid;
+                    var solid_position = solid_data.position;
 
-                    if (isNaN(contact_y)) {
-                        return false;
+                    if (solid instanceof _tile2.default) {
+                        var contact_y = solid.getContactY(center_x, solid_position);
+
+                        if (isNaN(contact_y)) {
+                            return false;
+                        }
+
+                        return _this.position.y + this_size.height <= contact_y;
                     }
 
-                    return _this.position.y + this_size.height <= contact_y;
+                    return _this.position.y + this_size.height <= solid_position.y;
                 });
-                e.detail.tiles.some(function (tile_data) {
-                    var tile_position = tile_data.position;
-                    var tile_size = tile_data.tile.getSize();
+                e.detail.all_solids_collisions.some(function (solid_data) {
+                    var solid = solid_data.solid;
+                    var solid_size = solid.getSize();
+                    var solid_position = solid_data.position;
 
-                    if (tile_position.y + tile_size.height <= _this.position.y) {
+                    if (solid_position.y + solid_size.height <= _this.position.y) {
                         impulse.y = _this.speed.y * _this.bounce_factor.y;
                         _this.speed.y = _this.gravity.y;
                         return true;
-                    } else if (_this.position.y + this_size.height <= tile_position.y) {
+                    } else if (_this.position.y + this_size.height <= solid_position.y) {
                         impulse.y = _this.speed.y * _this.bounce_factor.y;
                         _this.speed.y = _this.gravity.y;
                         return true;
-                    } else if (tile_position.x + tile_size.width <= _this.position.x) {
+                    } else if (solid_position.x + solid_size.width <= _this.position.x) {
                         impulse.x = _this.speed.x * _this.bounce_factor.x;
                         _this.speed.x = 0;
                         return true;
-                    } else if (_this.position.x + this_size.width <= tile_position.x) {
+                    } else if (_this.position.x + this_size.width <= solid_position.x) {
                         impulse.x = _this.speed.x * _this.bounce_factor.x;
                         _this.speed.x = 0;
                         return true;

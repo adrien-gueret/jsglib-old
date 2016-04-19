@@ -210,22 +210,22 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
 
                         if (mask.stop_on_solids && collisions_data.solids_collisions) {
                             has_solid_collision = true;
-                            var new_solid_tiles = collisions_data.tiles.filter(function (tile_data) {
+                            var new_solid_collisions = collisions_data.tiles.filter(function (tile_data) {
                                 return tile_data.tile.isSolid();
                             });
-                            new_solid_tiles = new_solid_tiles.map(function (solid_tile_data) {
+                            new_solid_collisions = new_solid_collisions.map(function (solid_tile_data) {
                                 return {
                                     mask: mask,
                                     solid_tile_data: solid_tile_data
                                 };
                             });
-                            solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_tiles);
+                            solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_collisions);
 
                             _this2.refinePosition(layer, mask, _this2.checkTilesCollisions);
 
                             if (collisions_data.slopes_collisions) {
-                                _this2.refinePositionOnSlopes(new_solid_tiles.filter(function (tile_data) {
-                                    return tile_data.tile.isSlope();
+                                _this2.refinePositionOnSlopes(new_solid_collisions.filter(function (collision_data) {
+                                    return collision_data.solid_tile_data.tile.isSlope();
                                 }));
                             }
                         }
@@ -278,10 +278,33 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 if (!has_solid_collision) {
                     this.trigger('no_solids_collision');
                 } else {
+                    var elements_collisions = solid_elements_collisions.map(function (collision) {
+                        return {
+                            mask: collision.mask,
+                            solid: collision.solid_element,
+                            position: collision.solid_element.position
+                        };
+                    });
+                    var masks_collisions = solid_masks_collisions.map(function (collision) {
+                        return {
+                            mask: collision.mask,
+                            solid: collision.solid_mask,
+                            position: collision.solid_mask.position
+                        };
+                    });
+                    var tiles_collisions = solid_tiles_collisions.map(function (collision) {
+                        return {
+                            mask: collision.mask,
+                            solid: collision.solid_tile_data.tile,
+                            position: collision.solid_tile_data.position
+                        };
+                    });
+                    var all_solids_collisions = tiles_collisions.concat(elements_collisions).concat(masks_collisions);
                     this.trigger('solids_collision', {
-                        tiles_collisions: solid_tiles_collisions,
-                        elements_collisions: solid_elements_collisions,
-                        masks_collisions: solid_masks_collisions
+                        elements_collisions: elements_collisions,
+                        masks_collisions: masks_collisions,
+                        tiles_collisions: tiles_collisions,
+                        all_solids_collisions: all_solids_collisions
                     });
                 }
             }
@@ -426,7 +449,7 @@ define(["exports", "jsglib/traits/events_handler", "jsglib/core/point", "jsglib/
                 var height = this.getSize().height;
                 var center_x = this.getRectangle().getCenter().x;
                 return slopes_tiles_data.some(function (slope_data) {
-                    var y_contact = slope_data.tile.getContactY(center_x, slope_data.position);
+                    var y_contact = slope_data.solid_tile_data.tile.getContactY(center_x, slope_data.solid_tile_data.position);
 
                     if (isNaN(y_contact)) {
                         return false;
