@@ -1,12 +1,14 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/rpg/rpg_interactive", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _rpg_interactive, _layer, _sprite) {
+define(["exports", "jsglib/rpg/rpg_player", "jsglib/rpg/rpg_interactive", "jsglib/core/layer", "jsglib/core/sprite"], function (exports, _rpg_player, _rpg_interactive, _layer, _sprite) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
     exports.Man = exports.ManSprite = undefined;
+
+    var _rpg_player2 = _interopRequireDefault(_rpg_player);
 
     var _rpg_interactive2 = _interopRequireDefault(_rpg_interactive);
 
@@ -80,7 +82,7 @@ define(["exports", "jsglib/rpg/rpg_interactive", "jsglib/core/layer", "jsglib/co
         _createClass(ManSprite, null, [{
             key: "init",
             value: function init(timer) {
-                this.makeTiles(26, 32, 2).defineTilesAnimations([{
+                this.makeTiles(26, 32, 1).defineTilesAnimations([{
                     name: 'walk_down',
                     tiles: [1, 2],
                     time: 250
@@ -119,6 +121,26 @@ define(["exports", "jsglib/rpg/rpg_interactive", "jsglib/core/layer", "jsglib/co
             _this2.setSpriteClass(ManSprite);
 
             _this2.useAnimation('walk_down');
+
+            _this2.on('rpg.interact', function (e) {
+                switch (e.detail.direction) {
+                    case _rpg_player2.default.DIRECTIONS.LEFT:
+                        _this2.useAnimation('walk_left');
+                        break;
+
+                    case _rpg_player2.default.DIRECTIONS.RIGHT:
+                        _this2.useAnimation('walk_right');
+                        break;
+
+                    case _rpg_player2.default.DIRECTIONS.UP:
+                        _this2.useAnimation('walk_up');
+                        break;
+
+                    case _rpg_player2.default.DIRECTIONS.DOWN:
+                        _this2.useAnimation('walk_down');
+                        break;
+                }
+            });
             return _this2;
         }
 

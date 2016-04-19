@@ -208,7 +208,7 @@ define(["exports", "jsglib/rpg/rpg_player", "jsglib/core/inputs", "jsglib/core/l
 
             // RpgPlayer uses Trait_KeysMapping: we can bind keys to some actions
             // Here, we allow moving with arrows or ZQSD
-            _this3.initKeysMap((_this3$initKeysMap = {}, _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_LEFT, [_inputs2.default.KEYS.ARROWS.LEFT, _inputs2.default.KEYS.Q]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_RIGHT, [_inputs2.default.KEYS.ARROWS.RIGHT, _inputs2.default.KEYS.D]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_UP, [_inputs2.default.KEYS.ARROWS.UP, _inputs2.default.KEYS.Z]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_DOWN, [_inputs2.default.KEYS.ARROWS.DOWN, _inputs2.default.KEYS.S]), _this3$initKeysMap));
+            _this3.initKeysMap((_this3$initKeysMap = {}, _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_LEFT, [_inputs2.default.KEYS.ARROWS.LEFT, _inputs2.default.KEYS.Q]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_RIGHT, [_inputs2.default.KEYS.ARROWS.RIGHT, _inputs2.default.KEYS.D]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_UP, [_inputs2.default.KEYS.ARROWS.UP, _inputs2.default.KEYS.Z]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.MOVE_DOWN, [_inputs2.default.KEYS.ARROWS.DOWN, _inputs2.default.KEYS.S]), _defineProperty(_this3$initKeysMap, _rpg_player2.default.ACTIONS.INTERACT, [_inputs2.default.KEYS.SPACE, _inputs2.default.KEYS.W]), _this3$initKeysMap));
 
             // == Events definitions ==
             _this3.on('rpg.solid_collision', function (e) {

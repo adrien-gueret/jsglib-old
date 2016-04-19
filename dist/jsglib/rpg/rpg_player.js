@@ -1,6 +1,6 @@
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inputs", "jsglib/rpg/rpg_interactive", "jsglib/traits/keys_mapping"], function (exports, _element, _point, _inputs, _rpg_interactive, _keys_mapping) {
+define(["exports", "jsglib/core/element", "jsglib/rpg/rpg_interactive", "jsglib/traits/keys_mapping"], function (exports, _element, _rpg_interactive, _keys_mapping) {
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -8,10 +8,6 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
     });
 
     var _element2 = _interopRequireDefault(_element);
-
-    var _point2 = _interopRequireDefault(_point);
-
-    var _inputs2 = _interopRequireDefault(_inputs);
 
     var _rpg_interactive2 = _interopRequireDefault(_rpg_interactive);
 
@@ -81,6 +77,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
 
             var SPEED = _this.constructor.SPEED || RpgPlayer.SPEED;
             _this.stop_on_solids = true;
+            _this.interaction_data = null;
             inputs.on('keyup', function (e) {
                 if (!_this.isMovingKey(e.detail.key)) {
                     return;
@@ -94,6 +91,13 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
                     key: e.detail.key,
                     pressed_moving_key: pressed_moving_keys[0] || null
                 });
+            }).on('keydown', function (e) {
+                if (_this.interaction_data && _this.isKeyBindedToAction(e.detail.key, RpgPlayer.ACTIONS.INTERACT)) {
+                    _this.interaction_data.interactive_element.trigger('rpg.interact', {
+                        element: _this,
+                        direction: _this.interaction_data.direction
+                    });
+                }
             });
 
             _this.on('frame', function () {
@@ -113,29 +117,7 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
                     _this.speed.y = 0;
                 }
             }).on('solids_collision', function (e) {
-                var elements = e.detail.elements_collisions.map(function (collision) {
-                    return {
-                        mask: collision.mask,
-                        solid: collision.solid_element,
-                        position: collision.solid_element.position
-                    };
-                });
-                var masks = e.detail.masks_collisions.map(function (collision) {
-                    return {
-                        mask: collision.mask,
-                        solid: collision.solid_mask,
-                        position: collision.solid_mask.position
-                    };
-                });
-                var tiles = e.detail.tiles_collisions.map(function (collision) {
-                    return {
-                        mask: collision.mask,
-                        solid: collision.solid_tile_data.tile,
-                        position: collision.solid_tile_data.position
-                    };
-                });
-                var solids = tiles.concat(elements).concat(masks);
-                solids.some(function (solid_data) {
+                e.detail.all_solids_collisions.some(function (solid_data) {
                     var solid = solid_data.solid;
                     var solid_size = solid.getSize();
                     var solid_position = solid_data.position;
@@ -158,8 +140,17 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
 
                     var custom_event = _this.trigger('rpg.solid_collision', event_data);
 
+                    if (solid instanceof _rpg_interactive2.default) {
+                        _this.interaction_data = {
+                            interactive_element: solid,
+                            direction: getReversedDirection(event_data.direction)
+                        };
+                    }
+
                     return custom_event.propagationStopped;
                 });
+            }).on('no_solids_collision', function () {
+                return _this.interaction_data = null;
             });
 
             return _this;
@@ -177,18 +168,35 @@ define(["exports", "jsglib/core/element", "jsglib/core/point", "jsglib/core/inpu
 
     RpgPlayer.SPEED = 96;
     RpgPlayer.DIRECTIONS = {
-        LEFT: Symbol(),
-        RIGHT: Symbol(),
-        UP: Symbol(),
-        DOWN: Symbol()
+        LEFT: Symbol('left'),
+        RIGHT: Symbol('right'),
+        UP: Symbol('up'),
+        DOWN: Symbol('down')
     };
     RpgPlayer.ACTIONS = {
-        MOVE_LEFT: Symbol(),
-        MOVE_RIGHT: Symbol(),
-        MOVE_UP: Symbol(),
-        MOVE_DOWN: Symbol(),
-        INTERACT: Symbol()
+        MOVE_LEFT: Symbol('move_left'),
+        MOVE_RIGHT: Symbol('move_right'),
+        MOVE_UP: Symbol('move_up'),
+        MOVE_DOWN: Symbol('move_down'),
+        INTERACT: Symbol('interact')
     };
+
+    function getReversedDirection(direction) {
+        switch (direction) {
+            case RpgPlayer.DIRECTIONS.LEFT:
+                return RpgPlayer.DIRECTIONS.RIGHT;
+
+            case RpgPlayer.DIRECTIONS.RIGHT:
+                return RpgPlayer.DIRECTIONS.LEFT;
+
+            case RpgPlayer.DIRECTIONS.UP:
+                return RpgPlayer.DIRECTIONS.DOWN;
+
+            case RpgPlayer.DIRECTIONS.DOWN:
+                return RpgPlayer.DIRECTIONS.UP;
+        }
+    }
+
     (0, _keys_mapping2.default)(RpgPlayer);
     exports.default = RpgPlayer;
 });

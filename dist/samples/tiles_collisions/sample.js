@@ -93,7 +93,7 @@ define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/sprite", "jsglib/co
             }
         });
         level.on('start', function () {
-            new _man.Man(96, 96);
+            new _man.Man(96, 128);
             new _link.Link(128, 160, my_game.inputs);
         });
         my_game.goToRoom(level).start();
