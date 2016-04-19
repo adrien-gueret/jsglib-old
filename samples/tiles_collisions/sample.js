@@ -54,7 +54,7 @@ Promise
 
         // When level starts, create an instance of Link
         level.on('start', () => {
-            new Man(96, 96);
+            new Man(96, 128);
             new Link(128, 160, my_game.inputs);
         });
 

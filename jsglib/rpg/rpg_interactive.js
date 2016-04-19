@@ -9,10 +9,6 @@ class RpgInteractive extends Element {
         this.is_solid = true;
         this.stop_on_solids = true;
     }
-
-    performInteraction() {
-
-    }
 }
 
 export default RpgInteractive;

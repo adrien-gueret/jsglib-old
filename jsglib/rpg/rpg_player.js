@@ -1,8 +1,6 @@
 "use strict";
 
 import Element from "jsglib/core/element";
-import Point from "jsglib/core/point";
-import Inputs from "jsglib/core/inputs";
 import RpgInteractive from "jsglib/rpg/rpg_interactive";
 import Trait_KeysMapping from "jsglib/traits/keys_mapping";
 
@@ -13,6 +11,7 @@ class RpgPlayer extends Element {
         const SPEED = this.constructor.SPEED || RpgPlayer.SPEED;
 
         this.stop_on_solids = true;
+        this.interaction_data = null;
 
         // Attach keyboards events
         inputs
@@ -29,6 +28,14 @@ class RpgPlayer extends Element {
                     key: e.detail.key,
                     pressed_moving_key: pressed_moving_keys[0] || null
                 });
+            })
+            .on('keydown', e => {
+                if (this.interaction_data && this.isKeyBindedToAction(e.detail.key, RpgPlayer.ACTIONS.INTERACT)) {
+                    this.interaction_data.interactive_element.trigger('rpg.interact', {
+                        element: this,
+                        direction: this.interaction_data.direction
+                    });
+                }
             });
 
         // Other specific events related to this current instance
@@ -52,27 +59,7 @@ class RpgPlayer extends Element {
                 }
             })
             .on('solids_collision', e => {
-                let elements = e.detail.elements_collisions.map(collision => ({
-                    mask: collision.mask,
-                    solid: collision.solid_element,
-                    position: collision.solid_element.position
-                }));
-
-                let masks = e.detail.masks_collisions.map(collision => ({
-                    mask: collision.mask,
-                    solid: collision.solid_mask,
-                    position: collision.solid_mask.position
-                }));
-
-                let tiles = e.detail.tiles_collisions.map(collision => ({
-                    mask: collision.mask,
-                    solid: collision.solid_tile_data.tile,
-                    position: collision.solid_tile_data.position
-                }));
-
-                let solids = tiles.concat(elements).concat(masks);
-
-                solids.some(solid_data => {
+                e.detail.all_solids_collisions.some(solid_data => {
                     let solid = solid_data.solid;
                     let solid_size = solid.getSize();
                     let solid_position = solid_data.position;
@@ -94,9 +81,18 @@ class RpgPlayer extends Element {
                     }
 
                     let custom_event = this.trigger('rpg.solid_collision', event_data);
+
+                    if (solid instanceof RpgInteractive) {
+                        this.interaction_data = {
+                            interactive_element: solid,
+                            direction: getReversedDirection(event_data.direction)
+                        };
+                    }
+
                     return custom_event.propagationStopped;
                 });
-            });
+            })
+            .on('no_solids_collision', () => this.interaction_data = null);
     }
 
     isMovingKey(key) {
@@ -109,18 +105,34 @@ class RpgPlayer extends Element {
 
 RpgPlayer.SPEED = 96;
 RpgPlayer.DIRECTIONS = {
-    LEFT: Symbol(),
-    RIGHT: Symbol(),
-    UP: Symbol(),
-    DOWN: Symbol()
+    LEFT: Symbol('left'),
+    RIGHT: Symbol('right'),
+    UP: Symbol('up'),
+    DOWN: Symbol('down')
 };
 RpgPlayer.ACTIONS = {
-    MOVE_LEFT: Symbol(),
-    MOVE_RIGHT: Symbol(),
-    MOVE_UP: Symbol(),
-    MOVE_DOWN: Symbol(),
-    INTERACT: Symbol()
+    MOVE_LEFT: Symbol('move_left'),
+    MOVE_RIGHT: Symbol('move_right'),
+    MOVE_UP: Symbol('move_up'),
+    MOVE_DOWN: Symbol('move_down'),
+    INTERACT: Symbol('interact')
 };
+
+function getReversedDirection(direction) {
+    switch (direction) {
+        case RpgPlayer.DIRECTIONS.LEFT:
+            return RpgPlayer.DIRECTIONS.RIGHT;
+
+        case RpgPlayer.DIRECTIONS.RIGHT:
+            return RpgPlayer.DIRECTIONS.LEFT;
+
+        case RpgPlayer.DIRECTIONS.UP:
+            return RpgPlayer.DIRECTIONS.DOWN;
+
+        case RpgPlayer.DIRECTIONS.DOWN:
+            return RpgPlayer.DIRECTIONS.UP;
+    }
+}
 
 Trait_KeysMapping(RpgPlayer);
 

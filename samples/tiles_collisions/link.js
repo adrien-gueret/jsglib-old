@@ -82,7 +82,8 @@ export class Link extends RpgPlayer {
             [RpgPlayer.ACTIONS.MOVE_LEFT]: [Inputs.KEYS.ARROWS.LEFT, Inputs.KEYS.Q],
             [RpgPlayer.ACTIONS.MOVE_RIGHT]: [Inputs.KEYS.ARROWS.RIGHT, Inputs.KEYS.D],
             [RpgPlayer.ACTIONS.MOVE_UP]: [Inputs.KEYS.ARROWS.UP, Inputs.KEYS.Z],
-            [RpgPlayer.ACTIONS.MOVE_DOWN]: [Inputs.KEYS.ARROWS.DOWN, Inputs.KEYS.S]
+            [RpgPlayer.ACTIONS.MOVE_DOWN]: [Inputs.KEYS.ARROWS.DOWN, Inputs.KEYS.S],
+            [RpgPlayer.ACTIONS.INTERACT]: [Inputs.KEYS.SPACE, Inputs.KEYS.W]
         });
 
         // == Events definitions ==
