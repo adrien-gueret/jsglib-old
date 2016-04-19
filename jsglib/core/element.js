@@ -154,14 +154,14 @@ class Element {
                 if (mask.stop_on_solids && collisions_data.solids_collisions) {
                     has_solid_collision = true;
 
-                    let new_solid_tiles = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
-                    new_solid_tiles = new_solid_tiles.map(solid_tile_data => ({mask, solid_tile_data}));
-                    solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_tiles);
+                    let new_solid_collisions = collisions_data.tiles.filter(tile_data => tile_data.tile.isSolid());
+                    new_solid_collisions = new_solid_collisions.map(solid_tile_data => ({mask, solid_tile_data}));
+                    solid_tiles_collisions = solid_tiles_collisions.concat(new_solid_collisions);
 
                     this.refinePosition(layer, mask, this.checkTilesCollisions);
 
                     if (collisions_data.slopes_collisions) {
-                        this.refinePositionOnSlopes(new_solid_tiles.filter(tile_data => tile_data.tile.isSlope()));
+                        this.refinePositionOnSlopes(new_solid_collisions.filter(collision_data => collision_data.solid_tile_data.tile.isSlope()));
                     }
                 }
 
@@ -203,10 +203,33 @@ class Element {
         if (!has_solid_collision) {
             this.trigger('no_solids_collision');
         } else {
+            let elements_collisions = solid_elements_collisions.map(collision => ({
+                mask: collision.mask,
+                solid: collision.solid_element,
+                position: collision.solid_element.position
+            }));
+
+            let masks_collisions = solid_masks_collisions.map(collision => ({
+                mask: collision.mask,
+                solid: collision.solid_mask,
+                position: collision.solid_mask.position
+            }));
+
+            let tiles_collisions = solid_tiles_collisions.map(collision => ({
+                mask: collision.mask,
+                solid: collision.solid_tile_data.tile,
+                position: collision.solid_tile_data.position
+            }));
+
+            let all_solids_collisions = tiles_collisions
+                .concat(elements_collisions)
+                .concat(masks_collisions);
+
             this.trigger('solids_collision', {
-                tiles_collisions: solid_tiles_collisions,
-                elements_collisions: solid_elements_collisions,
-                masks_collisions: solid_masks_collisions
+                elements_collisions,
+                masks_collisions,
+                tiles_collisions,
+                all_solids_collisions
             });
         }
     }
@@ -342,7 +365,7 @@ class Element {
         let center_x = this.getRectangle().getCenter().x;
 
         return slopes_tiles_data.some(slope_data => {
-            let y_contact = slope_data.tile.getContactY(center_x, slope_data.position);
+            let y_contact = slope_data.solid_tile_data.tile.getContactY(center_x, slope_data.solid_tile_data.position);
 
             if (isNaN(y_contact)) {
                 return false;

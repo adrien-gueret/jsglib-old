@@ -3,6 +3,7 @@
 import Trait from "jsglib/core/trait";
 import Element from "jsglib/core/element";
 import Point from "jsglib/core/point";
+import Tile from "jsglib/core/tile";
 
 let Trait_Physics = Trait({
     initPhysics(gravity = new Point(0, 10)) {
@@ -27,34 +28,41 @@ let Trait_Physics = Trait({
             let impulse = new Point();
 
             // Check if element is on ground
-            this.on_ground = e.detail.tiles.some(tile_data => {
-                let tile_position = tile_data.position;
-                let contact_y = tile_data.tile.getContactY(center_x, tile_position);
+            this.on_ground = e.detail.all_solids_collisions.some(solid_data => {
+                let solid = solid_data.solid;
+                let solid_position = solid_data.position;
 
-                if (isNaN(contact_y)) {
-                    return false;
+                if (solid instanceof Tile) {
+                    let contact_y = solid.getContactY(center_x, solid_position);
+
+                    if (isNaN(contact_y)) {
+                        return false;
+                    }
+
+                    return this.position.y + this_size.height <= contact_y;
                 }
 
-                return this.position.y + this_size.height <= contact_y;
+                return this.position.y + this_size.height <= solid_position.y;
             });
 
-            e.detail.tiles.some(tile_data => {
-                let tile_position = tile_data.position;
-                let tile_size = tile_data.tile.getSize();
+            e.detail.all_solids_collisions.some(solid_data => {
+                let solid = solid_data.solid;
+                let solid_size = solid.getSize();
+                let solid_position = solid_data.position;
 
-                if (tile_position.y + tile_size.height <= this.position.y) {
+                if (solid_position.y + solid_size.height <= this.position.y) {
                     impulse.y = this.speed.y * this.bounce_factor.y;
                     this.speed.y = this.gravity.y;
                     return true;
-                } else if (this.position.y + this_size.height <= tile_position.y) {
+                } else if (this.position.y + this_size.height <= solid_position.y) {
                     impulse.y = this.speed.y * this.bounce_factor.y;
                     this.speed.y = this.gravity.y;
                     return true;
-                } else if (tile_position.x + tile_size.width <= this.position.x) {
+                } else if (solid_position.x + solid_size.width <= this.position.x) {
                     impulse.x = this.speed.x * this.bounce_factor.x;
                     this.speed.x = 0;
                     return true;
-                } else if (this.position.x + this_size.width <= tile_position.x) {
+                } else if (this.position.x + this_size.width <= solid_position.x) {
                     impulse.x = this.speed.x * this.bounce_factor.x;
                     this.speed.x = 0;
                     return true;
