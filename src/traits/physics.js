@@ -1,11 +1,9 @@
-"use strict";
-
 import Trait from "../core/trait";
 import Element from "../core/element";
 import Point from "../core/point";
 import Tile from "../core/tile";
 
-let Trait_Physics = Trait({
+const Trait_Physics = Trait({
     initPhysics(gravity = new Point(0, 10)) {
         if (!this instanceof Element) {
             throw new TypeError('Trait_Physics: trying to init gravity feature on non-Element instance');

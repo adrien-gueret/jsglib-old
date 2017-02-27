@@ -1,0 +1,193 @@
+<?
+    getClassHeader = function(classDefinition, fileDepth) {
+        let type = 'class';
+
+        const specificTypes = {
+            isTypeDef: 'type',
+            isEnum: 'enum',
+            isNamespace: 'namespace',
+            isTrait: 'trait',
+        };
+
+        Object.keys(specificTypes).some((checkMethod) => {
+            if (classDefinition[checkMethod]) {
+                type = specificTypes[checkMethod];
+                return true;
+            }
+        });
+
+        let str = `# *${type}* ${classDefinition.name}`;
+
+        if (classDefinition.extends) {
+            str += ` <sub><sup>extends ${getLinkedTypes(classDefinition.extends, fileDepth)}</sup></sub>`;
+        }
+
+         if (classDefinition.usedTraits.length) {
+            str += `\n**use** ${getLinkedTypes(classDefinition.usedTraits, fileDepth)}`;
+        }
+
+        return str;
+    }
+
+    getMethodsTocLinks = function(doc) {
+        return doc.publicMethods.concat(doc.privateMethods).reduce((str, method) => {
+            return `${str}<a name="toc_${method.name}"></a>`;
+        }, '');
+    }
+
+    showMethodsToC = function(toc, methodDefinition) {
+        return toc + getMethodSignature(methodDefinition);
+    }
+
+    getMethodSignature = function(methodDefinition) {
+        if (methodDefinition.ignore || ! methodDefinition.name) {
+            return '';
+        }
+
+        let str = '* ';
+
+        if (methodDefinition.isStatic) {
+            str += '*static* ';
+        }
+
+        return `${str}[${methodDefinition.name }](#${methodDefinition.name })(${methodDefinition.paramStr})\n`;
+    }
+
+    getGlobalInformations = function(definition) {
+        let str = '';
+
+        if (definition.deprecated) {
+            str += `**Deprecated**\n`;
+        }
+
+        if (definition.version) {
+            str += `Version: ${definition.version}\n`;
+        }
+
+        return str + definition.description;
+    }
+
+    getLinkedTypes = function(types, fileDepth) {
+        const primitiveTypes = [
+            'string',
+            'object',
+            'number',
+            'promise',
+            'function',
+            'array',
+            'boolean',
+            'class',
+            'symbol',
+            'event',
+        ];
+
+        if (!(types instanceof Array)) {
+            types = [types];
+        }
+
+        return types.map((type) => {
+            if (primitiveTypes.indexOf(type.toLowerCase()) >= 0) {
+                return type;
+            }
+
+            const prefix = '../'.repeat(fileDepth);
+            const label = type.substr(type.lastIndexOf('.') + 1);
+            const link = type.replace(/\./, '/').toLowerCase();
+            const totalSegments = link.split('/').length;
+            const extension = totalSegments > 1 ? '.md' : '';
+
+            return `[${label}](./${prefix}${link}${extension})`;
+        }).join('|');
+    }
+
+    pluralize = function(total) {
+        if (total > 1) {
+            return 's';
+        }
+
+        return '';
+    }
+
+    showExamples = function(examples) {
+        const totalExamples = examples.length;
+
+        if (totalExamples === 0) {
+            return '';
+        }
+
+        let str = `### Example${pluralize(totalExamples)}:\n`;
+
+        examples.forEach((example, index) => {
+            if (totalExamples > 1) {
+                str += `* Example ${index + 1}\n`;
+            }
+
+            str += '```js\n';
+            str += `${example}\n`;
+            str += '```\n';
+        });
+
+        return str;
+    }
+
+    showBackLink = function(doc) {
+        if (doc.isIndex) {
+            return doc.fileDepth ? '[&lt; Back](../README.md)' : '';
+        }
+
+        return '[&lt; Back](./README.md)';
+    }
+?>
+<? docfiles.forEach(function(doc) { ?>
+        <?= showBackLink(doc) ?>
+        <? doc.classes.forEach(function(classDefinition) { ?>
+                <? if (!classDefinition.ignore && classDefinition.name) { ?>
+                <?= getClassHeader(classDefinition, doc.fileDepth) ?>
+
+                <?= getGlobalInformations(classDefinition) ?>
+
+                <? if (classDefinition.propertyTags.length > 0) { ?>
+                    ## Properties:
+                            <? classDefinition.propertyTags.forEach(function(propertyTag) { ?>
+                                * <? if (!classDefinition.isEnum) { ?>**<?= getLinkedTypes(propertyTag.types, doc.fileDepth) ?>**<? } ?> *<?= propertyTag.name ?>* <?= propertyTag.description ?><? }) ?>
+                    <? } ?>
+
+                <?= showExamples(classDefinition.examplesTags) ?>
+                <? } ?>
+                <? }) ?>
+        <?= getMethodsTocLinks(doc) ?>
+        <? if (doc.publicMethods.length > 0) { ?>
+        ## Public method<?= pluralize(doc.publicMethods.length) ?>:
+        <?= doc.publicMethods.reduce(showMethodsToC, '')?>
+        <? } ?>
+
+        <? if (doc.privateMethods.length > 0) { ?>
+        ## Private method<?= pluralize(doc.privateMethods.length) ?>:
+        <?= doc.privateMethods.reduce(showMethodsToC, '')?>
+        <? } ?>
+
+        ___
+
+        <? doc.javadoc.forEach(function(comment) { ?>
+                <? if (!comment.ignore && !comment.isClass && comment.name) { ?>
+                ## <a name="<?= comment.name ?>"></a>*<?= comment.access ?>* <? if (comment.isStatic) { ?>*static* <? } ?> <?= comment.name ?><? if (comment.isMethod || comment.isFunction) { ?>(<?= comment.paramStr ?>)<? } ?> [:arrow_heading_up:](#toc_<?= comment.name ?>)
+
+                <?= getGlobalInformations(comment) ?>
+
+                <? if (comment.paramTags.length > 0) { ?>
+                    ### Params:
+                            <? comment.paramTags.forEach(function(paramTag) { ?>
+                                *<? if (paramTag.types.length > 0) { ?> **<?= getLinkedTypes(paramTag.types, doc.fileDepth) ?>**<? } ?> *<?= paramTag.name ?>* <?= paramTag.description ?><? }) ?>
+                    <? } ?>
+
+                <? if (comment.returnTags.length > 0) { ?>
+                    ### Return:
+                            <? comment.returnTags.forEach(function(returnTag) { ?>
+                                **<?= getLinkedTypes(returnTag.types, doc.fileDepth) ?>** <?= returnTag.description ?><? }) ?>
+                    <? } ?>
+
+                <?= showExamples(comment.examplesTags) ?>
+                <? } ?>
+                <? }) ?>
+        <?= showBackLink(doc) ?>
+        <? }) ?>

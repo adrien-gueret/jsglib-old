@@ -77,15 +77,102 @@ function getExposedMethod(request_method) {
     };
 }
 
-let $http = {
+/**
+ * @namespace $http
+ * @description Utils handling Ajax requests.
+ * @property {Object} DATA_TYPES A collection of data types constants.
+ * It has the properties `TEXT`, `XML` and `JSON`.
+ * @example const { $http } = JSGLib.Core;
+ */
+const $http = {
     DATA_TYPES: {
         TEXT: DATA_TYPE_TEXT,
         XML: DATA_TYPE_XML,
         JSON: DATA_TYPE_JSON
     },
+    /**
+     * @method get
+     * @public
+     * @description Perform a GET request.
+     * @param {String} url Url to request.
+     * @param {Object} [options={ data, async = true, data_type = $http.DATA_TYPES.TEXT}]
+     * The options to send to the request. Properties are:
+     *  _Object_ data Data to send with the request, in the format { paramName: paramValue }
+     *  _Boolean_ async Tells if the Ajax request should be performed asynchronously or not.
+     *  _String_ data_type Type of data the request is expected to answer with.
+     * @return {Promise} The promise handling the request.
+     * @example
+     * $http.get('http://my.url.com/').then((response) => {
+     *  //  ...
+     * });
+     * @example
+     * $http.get('http://my.url.com/', { data_type: $http.DATA_TYPES.JSON }).then((response) => {
+     *  //  ...
+     * });
+     */
     get: getExposedMethod(METHOD_GET),
+    /**
+     * @method post
+     * @public
+     * @description Perform a POST request.
+     * @param {String} url Url to request.
+     * @param {Object} [options={ data, async = true, data_type = $http.DATA_TYPES.TEXT}]
+     * The options to send to the request. Properties are:
+     *  _Object_ data Data to send with the request, in the format { paramName: paramValue }
+     *  _Boolean_ async Tells if the Ajax request should be performed asynchronously or not.
+     *  _String_ data_type Type of data the request is expected to answer with.
+     * @return {Promise} The promise handling the request.
+     * @example
+     * $http.post('http://my.url.com/').then((response) => {
+     *  //  ...
+     * });
+     * @example
+     * $http.post('http://my.url.com/', { data: { foo: 'bar' } }).then((response) => {
+     *  //  ...
+     * });
+     */
     post: getExposedMethod(METHOD_POST),
+    /**
+     * @method delete
+     * @public
+     * @description Perform a DELETE request.
+     * @param {String} url Url to request.
+     * @param {Object} [options={ data, async = true, data_type = $http.DATA_TYPES.TEXT}]
+     * The options to send to the request. Properties are:
+     *  _Object_ data Data to send with the request, in the format { paramName: paramValue }
+     *  _Boolean_ async Tells if the Ajax request should be performed asynchronously or not.
+     *  _String_ data_type Type of data the request is expected to answer with.
+     * @return {Promise} The promise handling the request.
+     * @example
+     * $http.delete('http://my.url.com/').then((response) => {
+     *  //  ...
+     * });
+     * @example
+     * $http.delete('http://my.url.com/', { data: { foo: 'bar' } }).then((response) => {
+     *  //  ...
+     * });
+     */
     delete: getExposedMethod(METHOD_DELETE),
+    /**
+     * @method put
+     * @public
+     * @description Perform a PUT request.
+     * @param {String} url Url to request.
+     * @param {Object} [options={ data, async = true, data_type = $http.DATA_TYPES.TEXT}]
+     * The options to send to the request. Properties are:
+     *  _Object_ data Data to send with the request, in the format { paramName: paramValue }
+     *  _Boolean_ async Tells if the Ajax request should be performed asynchronously or not.
+     *  _String_ data_type Type of data the request is expected to answer with.
+     * @return {Promise} The promise handling the request.
+     * @example
+     * $http.put('http://my.url.com/').then((response) => {
+     *  //  ...
+     * });
+     * @example
+     * $http.put('http://my.url.com/', { data: { foo: 'bar' } }).then((response) => {
+     *  //  ...
+     * });
+     */
     put: getExposedMethod(METHOD_PUT)
 };
 

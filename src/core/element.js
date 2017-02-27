@@ -1,12 +1,38 @@
 "use strict";
 
-import Trait_EventsHandler from "../traits/events_handler";
+import { Events_Handler } from "../traits";
 import Point from "./point";
 import Rectangle from "./rectangle";
 import Mask from "./mask";
 import {degreeToRadian, radianToDegree} from "./utils";
 
+/**
+ * @class Element
+ * @use Traits.Events_Handler
+ * @description Main class handling the interactive game elements.
+ * @property {Core.Point} prev_position Element position on previous frame.
+ * @property {Core.Point} position Element current position.
+ * @property {Core.Point} transform_origin Point used as origin for transformations, relative to element's position.
+ * @property {Number} rotation Rotation of the element, between 0 and 360 degrees.
+ * @property {Core.Layer} layer Layer where this element is displayed.
+ * @property {Class} sprite_class A class inherited from [Sprite](./sprite.md). This is the class used to display the element.
+ * @property {Core.Tile} current_tile The tile currently displayed.
+ * @property {Core.Animation} current_animation The currently used animation.
+ * @property {Core.Point} speed The point representing this element speed.
+ * @property {Core.Point} acceleration The point representing this element acceleration.
+ * @property {Boolean} is_destroyed Is this element destroyed or not?
+ * @property {Boolean} is_inside_room Is this element inside current room or not?
+ * @property {Boolean} is_solid Is this element solid or not?
+ * @property {Boolean} stop_on_solids Must this element stop on solids or not?
+ */
 class Element {
+    /**
+     * @method constructor
+     * @public
+     * @param {Number} x Start abscissa of the new element.
+     * @param {Number} y Start ordinate of the new element.
+     * @example const myElement = new Element(10, 20);
+     */
     constructor(x, y) {
         this.prev_position = new Point(NaN, NaN);
         this.position = new Point(x, y);
@@ -24,6 +50,13 @@ class Element {
         this.stop_on_solids = false;
     }
 
+    /**
+     * @method destroy
+     * @public
+     * @description Destroy the element.
+     * @return {Core.Element} This element.
+     * @example myElement.destroy();
+     */
     destroy() {
         let custom_event = this.trigger('destroy');
 
@@ -40,12 +73,30 @@ class Element {
         return this;
     }
 
+    /**
+     * @method setSpriteClass
+     * @public
+     * @description Define the Sprite class to use to display this element.
+     * @param {Class} sprite_class A class inherited from [Sprite](./sprite.md).
+     * @param {Number} [current_tile_number=1] A class inherited from [Sprite](./sprite.md).
+     * @return {Core.Element} This element.
+     * @example myElement.setSpriteClass(MyCustomSpriteClass);
+     * @example myElement.setSpriteClass(MyCustomSpriteClass, 3);
+     */
     setSpriteClass(sprite_class, current_tile_number = 1) {
         this.sprite_class = sprite_class;
         this.current_tile = sprite_class.getTile(current_tile_number);
         return this;
     }
 
+    /**
+     * @method setCurrentTileNumber
+     * @public
+     * @description Define the current tile number of the Sprite animation.
+     * @param {Number} tile_number The new tile number.
+     * @return {Core.Element} This element.
+     * @example myElement.setCurrentTileNumber(3);
+     */
     setCurrentTileNumber(tile_number) {
         this.current_tile = this.sprite_class.getTile(tile_number);
 
@@ -56,6 +107,20 @@ class Element {
         return this;
     }
 
+
+    /**
+     * @method useAnimation
+     * @public
+     * @description Define the new animation to use. Animations are defined
+     * via [Animation.defineTilesAnimations](./animation.md#toc_defineTilesAnimations).
+     * @param {String} animation_name The name of the animation to use.
+     * @param {Number} [time=undefined] Time in ms between each tiles.
+     * Default set to the default time defined in this element Sprite class.
+     * @param {Boolean} [loop=true] If `true`, animation will be run again at end.
+     * @param {Core.Timer} [timer=null] Timer used for the animation.
+     * @return {Core.Element} This element.
+     * @example myElement.useAnimation('my_animation');
+     */
     useAnimation(animation_name, time, loop = true, timer = null) {
         if (this.current_animation && this.current_animation.is_running) {
             if (this.getAnimationName() === animation_name) {
@@ -84,20 +149,50 @@ class Element {
         return this;
     }
 
+    /**
+     * @method getAnimationName
+     * @public
+     * @description Get the name of the current played animation.
+     * @return {String} The current animation name.
+     * @example const animationName = myElement.getAnimationName();
+     */
     getAnimationName() {
         return this.current_animation ? this.current_animation.name : '';
     }
 
+    /**
+     * @method getSize
+     * @public
+     * @description Get the width and height of the element.
+     * @return {Object} An object with `height` and `width` properties.
+     * @example const size = myElement.getSize();
+     */
     getSize() {
         let {width, height} = this.getRectangle();
         return {width, height};
     }
 
+    /**
+     * @method getDirection
+     * @public
+     * @description Get the following direction of the element.
+     * @param {Boolean} [to_degree=true] Indicates if we want a value in radians or in degrees.
+     * @return {Number} The direction in degrees if `to_degree` is `true`. In radians otherwise.
+     * @example const directionInDegrees = myElement.getDirection();
+     * @example const directionInRadians = myElement.getDirection(false);
+     */
     getDirection(to_degree = true) {
         let direction = Math.atan2(-this.speed.y, this.speed.x);
         return to_degree ? radianToDegree(direction) : direction;
     }
 
+    /**
+     * @method draw
+     * @private
+     * @description Draw the element on given canvas context.
+     * @param {Object} ctx The canvas context where the element has to be drawn.
+     * @return {Core.Element} This element.
+     */
     draw(ctx) {
         let transform_origin = this.position.add(this.transform_origin, true);
         let draw_position = this.position.subtract(transform_origin, true);
@@ -113,17 +208,38 @@ class Element {
         return this;
     }
 
+    /**
+     * @method getRectangle
+     * @public
+     * @description Get a rectangle representation of the element.
+     * @return {Core.Rectangle} The rectangle object representing the element.
+     * @example const rectangle = myElement.getRectangle();
+     */
     getRectangle() {
         let size = this.sprite_class ? this.sprite_class.getTilesSize() : {};
         return new Rectangle(size.width, size.height, this.position);
     }
 
+    /**
+     * @method setTransformOriginToCenter
+     * @public
+     * @description Move the transform origin point to the center of the element.
+     * @return {Core.Element} This element.
+     * @example myElement.setTransformOriginToCenter();
+     */
     setTransformOriginToCenter() {
         let {width, height} = this.getSize();
         this.transform_origin.set(width / 2, height / 2);
         return this;
     }
 
+    /**
+     * @method move
+     * @private
+     * @description Move the element according to its speed and acceleration.
+     * @param {Number} delta_time Time in ms between current frame and last one.
+     * @return {Core.Element} This element.
+     */
     move(delta_time) {
         let delta_position = new Point(delta_time, delta_time);
         this.speed.add(this.acceleration);
@@ -131,12 +247,26 @@ class Element {
         return this;
     }
 
+    /**
+     * @method getCurrentMasks
+     * @public
+     * @description Get all the collisions masks of the element.
+     * @return {Array} An array of [Mask](./Mask.md) objects.
+     * @example const masks = myElement.getCurrentMasks();
+     */
     getCurrentMasks() {
         return this.current_tile.hasMasks()
             ? this.current_tile.masks
             : [Mask.createFromRectangle(this.getRectangle(), this.is_solid, this.stop_on_solids)];
     }
 
+    /**
+     * @method checkCollisions
+     * @private
+     * @description Check this element collisions with elements and tiles from provided
+     * layers and trigger corresponding events.
+     * @param {Object} layers A JS object containing the layers to check. Format is `{ layerName: layerObject }`
+     */
     checkCollisions(layers) {
         let has_solid_collision = false;
         let solid_tiles_collisions = [];
@@ -144,7 +274,7 @@ class Element {
         let solid_masks_collisions = [];
 
         this.getCurrentMasks().forEach(mask => {
-            for (var layer_name in layers) {
+            for (let layer_name in layers) {
                 let layer = layers[layer_name];
 
                 // First, check tiles collisions
@@ -234,6 +364,24 @@ class Element {
         }
     }
 
+    /**
+     * @method checkTilesCollisions
+     * @private
+     * @description Check this element collisions with tiles from given layer.
+     * @param {Core.Layer} layer The layer containing the tiles to check collisions with.
+     * @param {Core.Mask} mask Collisions mask to use to check collisions.
+     * @param {Core.Point} [position=this.position] The position to move before checking collision.
+     * @return {Object}
+     * A JS object containing collisions data. Format is this one:
+     * ```js
+     * {
+     *   tiles: [], // Array of collided tiles
+     *   solids_collisions: false, // true if there are at least one collision with solid tile
+     *   slopes_collisions: false, // true if there are at least one collision with slope tile
+     *   only_slopes_collisions: false, // true if there are collisions only with slopes tiles
+     * }
+     * ```
+     */
     checkTilesCollisions(layer, mask, position = this.position) {
         let data = {
             tiles: [],
@@ -281,6 +429,22 @@ class Element {
         return data;
     }
 
+    /**
+     * @method checkElementsCollisions
+     * @private
+     * @description Check this element collisions with elements from given layer.
+     * @param {Core.Layer} layer The layer containing the elements to check collisions with.
+     * @param {Core.Mask} mask Collisions mask to use to check collisions.
+     * @param {Core.Point} [position=this.position] The position to move before checking collision.
+     * @return {Object}
+     * A JS object containing collisions data. Format is this one:
+     * ```js
+     * {
+     *   collisions: [], // Array of collided elements
+     *   solids_collisions: false, // true if there are at least one collision with solid element
+     * }
+     * ```
+     */
     checkElementsCollisions(layer, mask, position = this.position) {
         let data = {
             collisions: [],
@@ -324,6 +488,16 @@ class Element {
         return data;
     }
 
+    /**
+     * @method refinePosition
+     * @private
+     * @description Move element in order to avoid collisions with solid elements and tiles.
+     * @param {Core.Layer} layer The layer containing the elements and tiles to check collisions with.
+     * @param {Core.Mask} mask Collisions mask to use to check collisions.
+     * @param {Function} checkCollisionsMethod The function used to check collisions. Should be one
+     * of `this.checkElementsCollisions` or `this.checkTilesCollisions`.
+     * @return {Core.Element} This element.
+     */
     refinePosition(layer, mask, checkCollisionsMethod) {
         let delta_position = this.position.subtract(this.prev_position, true);
         let limit_x = Math.abs(delta_position.x);
@@ -359,6 +533,13 @@ class Element {
         return this;
     }
 
+    /**
+     * @method refinePositionOnSlopes
+     * @private
+     * @description Correctly move element on slopes if needed.
+     * @param {Object} slopes_tiles_data Object containing slopes data.
+     * @return {Boolean} `true` if a movement has been performed. `false` otherwise.
+     */
     refinePositionOnSlopes(slopes_tiles_data) {
         let new_position = this.position.clone();
         let height = this.getSize().height;
@@ -383,6 +564,19 @@ class Element {
         });
     }
 
+    /**
+     * @method onCollision
+     * @public
+     * @description Add an event listener to collision event with given class. If this element has collisions with
+     * an instance of given class, the given callback will be executed.
+     * @param {Class} targetClass The class to check collisions with.
+     * @param {Function} callback The function to run when collision occurs.
+     * @return {Core.Element} This element.
+     * @example
+     * myElement.onCollision(MyTargetClass, (detailCollision, event) => {
+     *      console.log(detailCollision, event);
+     * });
+     */
     onCollision(targetClass, callback) {
         this.on('collision', e => {
             let element = e.detail.collision.element;
@@ -396,6 +590,6 @@ class Element {
     }
 }
 
-Trait_EventsHandler(Element);
+Events_Handler(Element);
 
 export default Element;

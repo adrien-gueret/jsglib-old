@@ -2,7 +2,7 @@
 
 import Element from "jsglib/core/element";
 import RpgInteractive from "jsglib/rpg/rpg_interactive";
-import Trait_KeysMapping from "jsglib/traits/keys_mapping";
+import { Keys_Mapping } from "jsglib/traits";
 
 class RpgPlayer extends Element {
     constructor(x, y, inputs) {
@@ -134,6 +134,6 @@ function getReversedDirection(direction) {
     }
 }
 
-Trait_KeysMapping(RpgPlayer);
+Keys_Mapping(RpgPlayer);
 
 export default RpgPlayer;

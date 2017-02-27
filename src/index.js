@@ -2,22 +2,19 @@ import Core from './core';
 import Traits from './traits';
 
 /**
- * @class JSGlib
- * @description JSGLib library.
- * @property {ClientApi} ClientApi Client used to request OpenClassrooms API.
- * @property {Scopes} Scopes Enumeration containing scopes to request while asking
- * for authorization.
- * @property {LoginStatus} LoginStatus Enumeration representing login status.
+ * @namespace JSGLib
+ * @description JavaScript Gaming Library
+ * @property {Core} Core Namespace containing all core classes of JSGLib.
  * @example
- * import * as OC_SDK from 'oc-sdk-js';
- * console.log(OC_SDK, OC_SDK.ClientApi);
+ * import * as JSGLib from 'jsglib';
+ * console.log(JSGLib, JSGLib.Core);
  * @example
- * import { ClientApi } from 'oc-sdk-js';
- * console.log(ClientApi);
+ * import { Core } from 'jsglib';
+ * console.log(Core);
  * @example
- * <script src="./dist/oc-sdk.min.js"></script>
+ * <script src="./dist/jsglib.min.js"></script>
  * <script>
- *  console.log(OC_SDK, OC_SDK.ClientApi);
+ *  console.log(JSGLib, JSGLib.Core);
  * </script>
  */
 export {
