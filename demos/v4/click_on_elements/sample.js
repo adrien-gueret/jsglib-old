@@ -1,52 +1,58 @@
-define(["jsglib/core/game", "jsglib/core/room", "jsglib/core/layer", "./wanted_game", "./sprites"], function (_game, _room, _layer, _wanted_game, _sprites) {
-    "use strict";
+(window => {
+    const { Room, Layer } = window.JSGLib.Core;
+    const { BigHeadsSprite, SmallHeadsSprite } = window.WantedGameSprites;
+    const WantedGame = window.WantedGame;
 
-    var _game2 = _interopRequireDefault(_game);
+    // Store some DOM elements
+    const game_container = document.getElementById('myGame');
+    const big_head_container = document.getElementById('big_head');
+    const timer_container = document.getElementById('timer');
+    const points_container = document.getElementById('points');
 
-    var _room2 = _interopRequireDefault(_room);
+    // Create a new game from an inherited class
+    const my_game = new WantedGame(game_container);
 
-    var _layer2 = _interopRequireDefault(_layer);
+    // Our game will have only one room. We won't use any definitions, we simply provide the size
+    const level = new Room(256, 192);
 
-    var _wanted_game2 = _interopRequireDefault(_wanted_game);
+    // Load images
+    Promise.all([
+        SmallHeadsSprite.loadImage('./small_heads.png'),
+        BigHeadsSprite.loadImage('./big_heads.png')
+    ])
+        .then(() => {
+            // Init sprites to make tiles
+            SmallHeadsSprite.init();
+            BigHeadsSprite.init();
 
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
+            // Listen custom events
+            my_game
+            // When player wins a round, update displayed points and destroy all elements
+                .on('win_round', (e) => {
+                    points_container.innerHTML = e.detail.points;
+                    Layer.MAIN_LAYER.elements.forEach(element => element.destroy());
+                })
+                // When character to find needs to change, update background position of top image
+                .on('change_character', (e) => {
+                    big_head_container.style.backgroundPosition = e.detail.backgroundPosition;
+                })
+                // Update displayed timer
+                .on('update_timer', (e) => {
+                    timer_container.innerHTML = e.detail.timer;
+                })
+                // When timer reaches 0, destroy all elements but the last one to find and stop the game
+                .on('stop_timer', () => {
+                    Layer.MAIN_LAYER.elements
+                        .filter(element => !my_game.checkIsWanted(element))
+                        .forEach(element => element.destroy());
 
-    var game_container = document.getElementById('myGame');
-    var big_head_container = document.getElementById('big_head');
-    var timer_container = document.getElementById('timer');
-    var points_container = document.getElementById('points');
-    var my_game = new _wanted_game2.default(game_container);
-    var level = new _room2.default(256, 192);
-    Promise.all([_sprites.SmallHeadsSprite.loadImage('./small_heads.png'), _sprites.BigHeadsSprite.loadImage('./big_heads.png')]).then(function () {
-        _sprites.SmallHeadsSprite.init();
+                    my_game.stop();
+                });
 
-        _sprites.BigHeadsSprite.init();
+            // All event are set, we can start the game!
+            my_game.goToRoom(level).start();
 
-        my_game.on('win_round', function (e) {
-            points_container.innerHTML = e.detail.points;
-
-            _layer2.default.MAIN_LAYER.elements.forEach(function (element) {
-                return element.destroy();
-            });
-        }).on('change_character', function (e) {
-            big_head_container.style.backgroundPosition = e.detail.backgroundPosition;
-        }).on('update_timer', function (e) {
-            timer_container.innerHTML = e.detail.timer;
-        }).on('stop_timer', function () {
-            _layer2.default.MAIN_LAYER.elements.filter(function (element) {
-                return !my_game.checkIsWanted(element);
-            }).forEach(function (element) {
-                return element.destroy();
-            });
-
-            my_game.stop();
+            // Game is ready, we can show its DOM element
+            game_container.style.display = 'block';
         });
-        my_game.goToRoom(level).start();
-        game_container.style.display = 'block';
-    });
-});
-//# sourceMappingURL=sample.js.map
+})(window);

@@ -91,7 +91,7 @@
     <h1 class="project-name">JSGlib v4</h1>
     <h2 class="project-tagline">Click on elements : <em>Wanted!</em> minigame</h2>
     <a href="../../../" class="btn">Home</a>
-    <a href="https://github.com/adrien-gueret/jsglib/tree/v4/samples/click_on_elements" class="btn">View this demo on
+    <a href="https://github.com/adrien-gueret/jsglib/tree/gh-pages/demos/v4/click_on_elements" class="btn">View this demo on
         GitHub</a>
 </section>
 
@@ -118,15 +118,10 @@
     </p>
 </section>
 
-<script data-main="./sample.js"
-        src="//requirejs.org/docs/release/2.1.22/minified/require.js"></script>
-<script>
-    require.config({
-        urlArgs: 'bust=' + (new Date()).getTime(),
-        paths: {
-            jsglib: '../jsglib'
-        }
-    });
-</script>
+<script src="../jsglib/jsglib.min.js"></script>
+<script src="./sprites.js"></script>
+<script src="./head.js"></script>
+<script src="./wanted_game.js"></script>
+<script src="./sample.js"></script>
 </body>
 </html>

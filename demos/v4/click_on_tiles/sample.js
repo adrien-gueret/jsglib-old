@@ -1,108 +1,72 @@
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+(JSGLib => {
+    const { Game, Sprite, Room, Layer } = JSGLib.Core;
 
-define(["jsglib/core/game", "jsglib/core/sprite", "jsglib/core/room", "jsglib/core/layer"], function (_game, _sprite, _room, _layer) {
-    "use strict";
+// Create a new game from a dom element
+    const my_game = new Game(document.getElementById('myGame'));
 
-    var _game2 = _interopRequireDefault(_game);
+// Our game will have only one room
+    const level = new Room();
 
-    var _sprite2 = _interopRequireDefault(_sprite);
-
-    var _room2 = _interopRequireDefault(_room);
-
-    var _layer2 = _interopRequireDefault(_layer);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
+// Define a class inherited from JSGlib Sprite class
+    class TilesSprite extends Sprite {
     }
 
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
+// Load the only image of the game
+    TilesSprite.loadImage('./tiles.png')
+        .then(() => {
+            // Image is loaded, we can create tiles from it
+            TilesSprite.makeTiles(32, 32, 0);
 
-    function _possibleConstructorReturn(self, call) {
-        if (!self) {
-            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-        }
+            // Randomly generate tiles for room definition
+            const TOTAL_COLUMNS = 15;
+            const TOTAL_ROWS = 10;
+            const tiles = [];
 
-        return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
-    }
+            for (let row_index = 0; row_index < TOTAL_ROWS; row_index++) {
+                const row = [];
 
-    function _inherits(subClass, superClass) {
-        if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-        }
+                for (let column_index = 0; column_index < TOTAL_COLUMNS; column_index++) {
+                    const min_tile_number = 2;
+                    const max_tile_number = 7;
 
-        subClass.prototype = Object.create(superClass && superClass.prototype, {
-            constructor: {
-                value: subClass,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-        if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-    }
+                    const delta = 1 + max_tile_number - min_tile_number;
+                    const random = Math.floor(delta * Math.random()) + min_tile_number;
 
-    var my_game = new _game2.default(document.getElementById('myGame'));
-    var level = new _room2.default();
-
-    var TilesSprite = (function (_Sprite) {
-        _inherits(TilesSprite, _Sprite);
-
-        function TilesSprite() {
-            _classCallCheck(this, TilesSprite);
-
-            return _possibleConstructorReturn(this, Object.getPrototypeOf(TilesSprite).apply(this, arguments));
-        }
-
-        return TilesSprite;
-    })(_sprite2.default);
-
-    TilesSprite.loadImage('./tiles.png').then(function () {
-        TilesSprite.makeTiles(32, 32, 0);
-        var TOTAL_COLUMNS = 15;
-        var TOTAL_ROWS = 10;
-        var tiles = [];
-
-        for (var row_index = 0; row_index < TOTAL_ROWS; row_index++) {
-            var row = [];
-
-            for (var column_index = 0; column_index < TOTAL_COLUMNS; column_index++) {
-                var min_tile_number = 2;
-                var max_tile_number = 7;
-                var delta = 1 + max_tile_number - min_tile_number;
-                var random = Math.floor(delta * Math.random()) + min_tile_number;
-                row.push(random);
-            }
-
-            tiles[row_index] = row;
-        }
-
-        return level.useDefinition({
-            "layers": {
-                "TILES_LAYER": {
-                    "sprite_class": TilesSprite,
-                    "tiles": tiles
+                    row.push(random);
                 }
-            }
-        });
-    }).then(function () {
-        my_game.goToRoom(level).start();
-        my_game.inputs.on('click', function (e) {
-            var tile = _layer2.default.TILES_LAYER.getTileFromPoint(e.detail.mouse);
 
-            if (!tile) {
-                return;
+                tiles[row_index] = row;
             }
 
-            if (tile.tile_number > 1) {
-                tile.setTileNumber(tile.tile_number - 1);
-            }
+            // Instead of using an external file, we provide a plain object for our level definition
+            return level.useDefinition({
+                "layers": {
+                    "TILES_LAYER": {
+                        "sprite_class": TilesSprite,
+                        "tiles": tiles
+                    }
+                }
+            });
+        })
+        .then(() => {
+            // Level definition is fully loaded, we can go to our room and start the game!
+            my_game
+                .goToRoom(level)
+                .start();
+
+            // When we click on the game...
+            my_game.inputs.on('click', (e) => {
+                // Get the clicked tile
+                const tile = Layer.TILES_LAYER.getTileFromPoint(e.detail.mouse);
+
+                if (!tile) {
+                    return;
+                }
+
+                // And update its tile number
+                if (tile.tile_number > 1) {
+                    tile.setTileNumber(tile.tile_number - 1);
+                }
+            });
         });
-    });
-});
-//# sourceMappingURL=sample.js.map
+})(window.JSGLib);

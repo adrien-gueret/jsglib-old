@@ -1,26 +1,24 @@
-define(["jsglib/core/game", "jsglib/core/room", "./link"], function (_game, _room, _link) {
-    "use strict";
+((JSGLib, Link, LinkSprite) => {
+    const { Game, Room} = JSGLib.Core;
 
-    var _game2 = _interopRequireDefault(_game);
+    // Create a new game from a dom element
+    const my_game = new Game(document.getElementById('myGame'));
 
-    var _room2 = _interopRequireDefault(_room);
+    // Our game will have only one room. We won't use any definitions, we simply provide its size
+    const level = new Room(512, 320);
 
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    var my_game = new _game2.default(document.getElementById('myGame'));
-    var level = new _room2.default(512, 320);
-    level.on('start', function () {
-        new _link.Link(64, 64, my_game);
+    // When level will start, create a new instance of our element
+    level.on('start', () => {
+        new Link(64, 64, my_game);
     });
 
-    _link.LinkSprite.loadImage('./link.png').then(function () {
-        _link.LinkSprite.init(my_game.timer);
+    // Load Link's image
+    LinkSprite.loadImage('./link.png')
+        .then(() => {
+            LinkSprite.init(my_game.timer);
 
-        my_game.goToRoom(level).start();
-    });
-});
-//# sourceMappingURL=sample.js.map
+            my_game
+                .goToRoom(level)
+                .start();
+        });
+})(window.JSGLib, window.Link, window.LinkSprite);
