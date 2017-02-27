@@ -1,0 +1,20 @@
+{
+  "version": "4.1.0",
+  "name": "JSGlib",
+  "license": "MIT",
+  "main": "./dist/jsglib.min.js",
+  "scripts": {
+    "build": "node ./tasks/build && node ./tasks/minify",
+    "watch": "node ./tasks/build watch"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-3": "^6.22.0",
+    "uglify-js": "^2.7.5",
+    "webpack": "^2.2.1"
+  }
+}
